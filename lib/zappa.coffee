@@ -79,22 +79,20 @@ class App
     @defs = {}
     @helpers = {}
     @postrenders = {}
-    @wss = {}
-    @msgs = {}
+    @socket_handlers = {}
+    @msg_handlers = {}
 
     @views = {}
     @layouts = {}
     
   start: ->
     if io?
-      @ws_server = io.listen(@http_server, {log: ->}) unless @ws_server?
-      @ws_server.on 'connection', (client) =>
-        @wss.connection({}, {app: @vars, client: client, id: client.sessionId}) if @wss.connection?
-      @ws_server.on 'clientDisconnect', (client) =>
-        @wss.disconnection({}, {app: @vars, client: client, id: client.sessionId}) if @wss.disconnection?
+      @ws_server = io.listen @http_server, {log: ->}
+      @ws_server.on 'connection', (client) => @socket_handlers.connection?.execute client
+      @ws_server.on 'clientDisconnect', (client) => @socket_handlers.disconnection?.execute client
       @ws_server.on 'clientMessage', (raw_msg, client) =>
         msg = parse_msg raw_msg
-        @msgs[msg.title].execute(client, msg.params)
+        @msg_handlers[msg.title]?.execute client, msg.params
 
     @http_server.listen @port
     puts "App \"#{@name}\" listening on port #{@port}..."
@@ -140,12 +138,12 @@ class App
   at: (pairs) ->
     io = require 'socket.io'
     for k, v of pairs
-      @wss[k] = scoped(v)
+      @socket_handlers[k] = new MessageHandler(v, @defs, @helpers, @postrenders, @views, @layouts, @vars)
 
   msg: (pairs) ->
     io = require 'socket.io'
     for k, v of pairs
-      @msgs[k] = new MessageHandler(v, @defs, @helpers, @postrenders, @views, @layouts, @vars)
+      @msg_handlers[k] = new MessageHandler(v, @defs, @helpers, @postrenders, @views, @layouts, @vars)
 
   layout: (param) ->
     coffeekup = require 'coffeekup'
@@ -172,7 +170,7 @@ class RequestHandler
     @handler = scoped(handler)
     @locals = null
 
-  build_locals: ->
+  init_locals: ->
     @locals = {}
     @locals.app = @vars
     @locals.render = @render
@@ -190,7 +188,7 @@ class RequestHandler
     @locals.layouts = @layouts
 
   execute: (request, response, next) ->
-    @build_locals() unless @locals?
+    @init_locals() unless @locals?
 
     @locals.context = {}
     @locals.params = @locals.context
@@ -247,7 +245,7 @@ class MessageHandler
     @handler = scoped(handler)
     @locals = null
 
-  build_locals: ->
+  init_locals: ->
     @locals = {}
     @locals.app = @vars
     @locals.render = @render
@@ -264,7 +262,7 @@ class MessageHandler
     @locals.layouts = @layouts
 
   execute: (client, params) ->
-    @build_locals() unless @locals?
+    @init_locals() unless @locals?
 
     @locals.context = {}
     @locals.params = @locals.context
