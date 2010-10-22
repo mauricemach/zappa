@@ -43,29 +43,34 @@ class Zappa
       for k, v of @apps
         return k if v is @current_app
       null
-
-  port: (num) ->
-    @ensure_app 'default' unless @current_app?
-    @current_app.port = num
     
   include: (file) ->
     @execute js_from_file(file)
 
-  run: (path) ->
-    if path.indexOf('.coffee') > -1
-      js = js_from_file(path)
-    else
-      js = fs.readFileSync path, 'utf8'
+  run: (path, options) ->
+    options ?= {}
+    if options.port
+      options.port = if contains options.port, ',' then options.port.split ',' else [parseInt options.port]
+
+    js = if contains path, '.coffee' then js_from_file path else read_file path
 
     @locals.execute js
     
+    i = 0
     for k, v of @locals.apps
-      v.start()
+      opts = {}
+      if options.port
+        opts.port = if options.port[i]? then options.port[i] else v.port + i
+      else if i isnt 0
+        opts.port = v.port + i
+
+      v.start opts
+      i++
 
 class App
   constructor: ->
     @name = 'default'
-    @port = 8000
+    @port = 5678
     
     @http_server = express.createServer()
     if coffeekup?
@@ -85,7 +90,10 @@ class App
     @views = {}
     @layouts = {}
     
-  start: ->
+  start: (options) ->
+    options ?= {}
+    @port = options.port if options.port
+
     if io?
       @ws_server = io.listen @http_server, {log: ->}
       @ws_server.on 'connection', (client) => @socket_handlers.connection?.execute client
@@ -292,6 +300,8 @@ class MessageHandler
       @context.content = inner
       @send 'render', value: (coffeekup.render layout, context: @context)
 
+contains = (haystack, needle) -> haystack.indexOf(needle) > -1
+
 build_msg = (title, data) ->
   obj = {}
   obj[title] = data
@@ -302,9 +312,11 @@ parse_msg = (raw_msg) ->
   for k, v of obj
     return {title: k, params: v}
 
+read_file = (path) -> fs.readFileSync path, 'utf8'
+
 js_from_file = (file) ->
   coffee = require 'coffee-script'
-  code = fs.readFileSync file, 'utf8'
+  code = read_file file
   coffee.compile code
 
 new_doc = (cb) ->

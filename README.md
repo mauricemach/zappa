@@ -30,7 +30,7 @@ And drink it!
 
     $ npm install zappa
     $ zappa cuppa.coffee
-    => App "default" listening on port 8000...
+    => App "default" listening on port 5678...
 
 If you ever need to prepare your app to be run on vanilla node with no CoffeeScript, that's two commands away:
 
@@ -249,22 +249,24 @@ It currently works with your inner templates only though, not layouts.
 
 ### App combo
 
-There are no "run" blocking calls in node, so you can have multiple servers listening to different ports on the same process. To do that with zappa you just need to specify different names and ports:
+There are no "run" blocking calls in node, so you can have multiple apps listening to different ports on the same process. To do that with zappa, just name your apps:
 
     get '/': 'blog'
 
     app 'chat'
-    port 8001
     get '/': 'chat'
 
     app 'wiki'
-    port 8002
     get '/': 'wiki'
 
     $ zappa apps.coffee
-    => App "default" started on port 8000
-    => App "chat" started on port 8001
-    => App "wiki" started on port 8002
+    => App "default" started on port 5678
+    => App "chat" started on port 5679
+    => App "wiki" started on port 5680
+
+To specify the ports:
+
+    $ zappa -p 3000,4567,8080 apps.coffee
 
 ### Splitting up
 
