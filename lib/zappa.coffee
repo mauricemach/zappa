@@ -89,6 +89,17 @@ class App
 
     @views = {}
     @layouts = {}
+    @layouts.default = ->
+      doctype 5
+      html ->
+        head ->
+          title (@title or 'Untitled')
+          script(src: @script + '.js') if @script
+          if @scripts
+            for s in @scripts
+              script src: s + '.js'
+          style @style if @style
+        body @content
     
   start: (options) ->
     options ?= {}
@@ -159,7 +170,7 @@ class App
       for k, v of param
         @layouts[k] = v
     else
-      @layouts['default'] = param
+      @layouts.default = param
    
   view: (pairs) ->
     coffeekup = require 'coffeekup'
@@ -226,7 +237,8 @@ class RequestHandler
 
   render: (what, options) ->
     options ?= {}
-    layout = @layouts['default']
+    layout = @layouts.default
+
     view = if typeof what is 'function' then what else @views[what]
 
     inner = coffeekup.render view, context: @context
@@ -283,7 +295,7 @@ class MessageHandler
 
   render: (what, options) ->
     options ?= {}
-    layout = @layouts['default']
+    layout = @layouts.default
     view = if typeof what is 'function' then what else @views[what]
 
     inner = coffeekup.render view, context: @context

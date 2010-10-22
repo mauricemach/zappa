@@ -1,5 +1,11 @@
 get '/': ->
   @user = plan: 'silver'
+
+  @title = 'Post-rendering'
+  @style = '''
+    #quotas div {border: 1px solid #999; background: #eee; padding: 10px; margin: 10px}
+    #quotas .highlighted {border: 3px solid #37697e; background: #d0deea}
+  '''
   render 'index', apply: 'plans'
 
 postrender plans: ->
@@ -32,14 +38,3 @@ view index: ->
       h2 'Staff'
       p 'Disk: 10 GB'
       p 'RAM: 100 GB'
-
-layout ->
-  doctype 5
-  html ->
-    head ->
-      title 'Post-rendering'
-      style '''
-        #quotas div {border: 1px solid #999; background: #eee; padding: 10px; margin: 10px}
-        #quotas .highlighted {border: 3px solid #37697e; background: #d0deea}
-      '''
-    body @content

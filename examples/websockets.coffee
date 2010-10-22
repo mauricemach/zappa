@@ -1,4 +1,7 @@
-get '/': -> render 'index'
+get '/': ->
+  @title = 'Nano Chat'
+  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'http://cdn.socket.io/stable/socket.io', 'index']
+  render 'index'
 
 get '/counter': -> "# of messages so far: #{app.counter}"
 
@@ -34,16 +37,6 @@ client index: ->
 
     socket.connect()
     $('#box').focus()
-
-layout ->
-  doctype 5
-  html ->
-    head ->
-      title 'Nano Chat'
-      script src: 'http://code.jquery.com/jquery-1.4.3.min.js'
-      script src: 'http://cdn.socket.io/stable/socket.io.js'
-      script src: '/index.js'
-    body -> @content
 
 view index: ->
   h1 'Nano Chat'
