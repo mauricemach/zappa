@@ -231,19 +231,19 @@ Helpers are just like defs, except they are modified to have access to the same 
       role 'gm'
       # kill stuff
 
-### Post rendering with server-side jQuery
+### Post-rendering with server-side jQuery
 
-Some things are much more straightforward to render by DOM manipulation than linearly. The best DOM libraries in the world are in javascript, and thanks to the work of Elijah Insua with [jsdom](http://jsdom.org/), you can use some with node too.
+Rendering things linearly is often the approach that makes more sense, but sometimes DOM manipulation can avoid loads of repetition. The best DOM libraries in the world are in javascript, and thanks to the work of Elijah Insua with [jsdom](http://jsdom.org/), you can use some with node too.
 
-Zappa makes it trivial to post-process your rendered templates by applying jQuery against them.
+Zappa makes it trivial to post-process your rendered templates by manipulating them with jQuery:
 
-    postrender roles: ->
-      $('.admin').remove() if @user.role isnt 'admin'
-      $('.' + @user.role).css 'color', '#00f'
+    postrender plans: ->
+      $('.staff').remove() if @user.plan isnt 'staff'
+      $('div.' + @user.plan).addClass 'highlighted'
 
-    get '/': ->
-      @user = role: 'macbeth'
-      render 'index', apply: 'roles'
+    get '/postrender': ->
+      @user = plan: 'staff'
+      render 'index', apply: 'plans'
 
 It currently works with your inner templates only though, not layouts.
 
