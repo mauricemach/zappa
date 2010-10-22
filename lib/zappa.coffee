@@ -216,18 +216,15 @@ class RequestHandler
 
   redirect: (path) -> @response.redirect(path)
 
-  render: (what, postrender_name) ->
+  render: (what, options) ->
+    options ?= {}
     layout = @layouts['default']
-
-    if typeof what is 'function'
-      view = what
-    else
-      view = @views[what]
+    view = if typeof what is 'function' then what else @views[what]
 
     inner = coffeekup.render view, context: @context
 
-    if postrender_name
-      postrender = @postrenders[postrender_name]
+    if typeof options.apply is 'string'
+      postrender = @postrenders[options.apply]
       new_doc ($) =>
         $('body').html inner
         postrender @context, {$: $}
@@ -276,22 +273,21 @@ class MessageHandler
 
     @handler(@locals.context, @locals)
 
-  render: (what, postrender_name) ->
+  render: (what, options) ->
+    options ?= {}
     layout = @layouts['default']
-
-    if typeof what is 'function' then view = what
-    else view = @views[what]
+    view = if typeof what is 'function' then what else @views[what]
 
     inner = coffeekup.render view, context: @context
 
-    if postrender_name
-      postrender = @postrenders[postrender_name]
+    if typeof options.apply is 'string'
+      postrender = @postrenders[options.apply]
       new_doc ($) =>
         $('body').html inner
         postrender @context, {$: $}
         @context.content = $('body').html()
         html = coffeekup.render layout, context: @context
-        @response.send html
+        @send 'render', value: html
     else
       @context.content = inner
       @send 'render', value: (coffeekup.render layout, context: @context)

@@ -1,6 +1,6 @@
 get '/': ->
   @foo = 'ha'
-  render 'index', 'roles'
+  render 'index', apply: 'roles'
 
 postrender roles: ->
   $('.red').css 'color', '#f00'
