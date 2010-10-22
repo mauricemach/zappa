@@ -9,7 +9,7 @@ io = null
 
 class Zappa
   @version: '0.1.0'
-  @app_api: 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view'.split '|'
+  @app_api: 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
 
   constructor: ->
     @locals = {}
@@ -93,11 +93,15 @@ class App
       doctype 5
       html ->
         head ->
-          title (@title or 'Untitled')
-          script(src: @script + '.js') if @script
+          title @title if @title
           if @scripts
             for s in @scripts
               script src: s + '.js'
+          script(src: @script + '.js') if @script
+          if @stylesheets
+            for s in @stylesheets
+              link rel: 'stylesheet', href: s + '.css'
+          link(rel: 'stylesheet', href: @stylesheet + '.css') if @stylesheet
           style @style if @style
         body @content
     
@@ -164,25 +168,32 @@ class App
     for k, v of pairs
       @msg_handlers[k] = new MessageHandler(v, @defs, @helpers, @postrenders, @views, @layouts, @vars)
 
-  layout: (param) ->
+  layout: (arg) ->
+    pairs = if typeof arg is 'object' then arg else {default: arg}
     coffeekup = require 'coffeekup'
-    if typeof param is 'object'
-      for k, v of param
-        @layouts[k] = v
-    else
-      @layouts.default = param
+    for k, v of pairs
+      @layouts[k] = v
    
-  view: (pairs) ->
+  view: (arg) ->
+    pairs = if typeof arg is 'object' then arg else {default: arg}
     coffeekup = require 'coffeekup'
     for k, v of pairs
       @views[k] = v
 
-  client: (pairs) ->
+  client: (arg) ->
+    pairs = if typeof arg is 'object' then arg else {default: arg}
     for k, v of pairs
       code = ";(#{v})();"
       @http_server.get "/#{k}.js", (req, res) ->
         res.contentType 'bla.js'
         res.send code
+
+  style: (arg) ->
+    pairs = if typeof arg is 'object' then arg else {default: arg}
+    for k, v of pairs
+      @http_server.get "/#{k}.css", (req, res) ->
+        res.contentType 'bla.css'
+        res.send v
 
 class RequestHandler
   constructor: (handler, @defs, @helpers, @postrenders, @views, @layouts, @vars) ->
