@@ -279,10 +279,8 @@ class MessageHandler
   render: (what, postrender_name) ->
     layout = @layouts['default']
 
-    if typeof what is 'function'
-      view = what
-    else
-      view = @views[what]
+    if typeof what is 'function' then view = what
+    else view = @views[what]
 
     inner = coffeekup.render view, context: @context
 
@@ -296,9 +294,7 @@ class MessageHandler
         @response.send html
     else
       @context.content = inner
-      @response.send(coffeekup.render layout, context: @context)
-
-    null
+      @send 'render', value: (coffeekup.render layout, context: @context)
 
 build_msg = (title, data) ->
   obj = {}
