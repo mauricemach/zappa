@@ -8,7 +8,7 @@ jsdom = null
 io = null
 
 class Zappa
-  @version: '0.1.0'
+  @version: '0.1.1'
   @app_api: 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
 
   constructor: ->
