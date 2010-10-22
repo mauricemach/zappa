@@ -2,24 +2,16 @@ def sleep: (secs, cb) ->
   setTimeout cb, secs * 1000
 
 get
-  '/': -> redirect '/sync/bar'
+  '/': -> redirect '/bar'
 
-  '/async/:foo': ->
+  '/:foo': ->
     @foo += '?'
     sleep 5, =>
       @foo += '!'
     
       @title = 'Async'
-      render 'index'
+      render 'default'
 
-  '/sync/:foo': ->
-    @foo += '?'
-    sleep 5, =>
-      @foo += '!'
-    
-      @title = 'Sync'
-      render 'index'
-
-view index: ->
+view ->
   h1 @title
   p @foo

@@ -1,7 +1,4 @@
-get '/': ->
-  @title = 'Nano Chat'
-  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'http://cdn.socket.io/stable/socket.io', 'index']
-  render 'index'
+get '/': -> render 'default'
 
 get '/counter': -> "# of messages so far: #{app.counter}"
 
@@ -19,7 +16,7 @@ msg said: ->
   send 'said', id: id, text: @text
   broadcast 'said', id: id, text: @text
 
-client index: ->
+client ->
   $(document).ready ->
     socket = new io.Socket 'localhost', {transports: ['websocket', 'xhr-multipart', 'xhr-polling', 'htmlfile', 'flashsocket']}
 
@@ -38,8 +35,11 @@ client index: ->
     socket.connect()
     $('#box').focus()
 
-view index: ->
-  h1 'Nano Chat'
+view ->
+  @title = 'Nano Chat'
+  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'http://cdn.socket.io/stable/socket.io', 'default']
+
+  h1 @title
   div id: 'log'
   form ->
     input id: 'box'

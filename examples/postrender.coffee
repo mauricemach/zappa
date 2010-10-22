@@ -1,18 +1,19 @@
 get '/': ->
   @user = plan: 'silver'
 
-  @title = 'Post-rendering'
-  @style = '''
-    #quotas div {border: 1px solid #999; background: #eee; padding: 10px; margin: 10px}
-    #quotas .highlighted {border: 3px solid #37697e; background: #d0deea}
-  '''
-  render 'index', apply: 'plans'
+  render 'default', apply: 'plans'
 
 postrender plans: ->
   $('.staff').remove() if @user.plan isnt 'staff'
   $('div.' + @user.plan).addClass 'highlighted'
 
-view index: ->
+view ->
+  @title = 'Post-rendering'
+  @style = '''
+    #quotas div {border: 1px solid #999; background: #eee; padding: 10px; margin: 10px}
+    #quotas .highlighted {border: 3px solid #37697e; background: #d0deea}
+  '''
+
   h1 'Quotas:'
 
   div id: 'quotas', ->

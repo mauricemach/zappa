@@ -1,10 +1,4 @@
 get '/': ->
-  @title = 'Client'
-  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'default', 'named', 'admin/namespaced']
-  @stylesheets = ['default', 'named', 'admin/namespaced']
-  @style = '''
-    .css {font-family: monospace}
-  '''
   render 'default'
 
 client ->
@@ -29,6 +23,13 @@ style 'admin/namespaced': '''
 '''
 
 view ->
+  @title = 'Client'
+  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'default', 'named', 'admin/namespaced']
+  @stylesheets = ['default', 'named', 'admin/namespaced']
+  @style = '''
+    .css {font-family: monospace}
+  '''
+
   h1 @title
   p id: 'default', class: 'css', -> 'default stylesheet'
   p id: 'named', class: 'css', -> 'named stylesheet'
