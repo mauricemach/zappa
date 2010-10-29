@@ -79,6 +79,7 @@ class App
       @http_server.set 'view engine', 'coffee'
     @http_server.configure =>
       @http_server.use express.staticProvider("#{process.cwd()}/public")
+      @http_server.use express.bodyDecoder()
 
     @vars = {}
     
