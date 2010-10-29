@@ -21,6 +21,7 @@ class Zappa
     @locals.app = @app
     @locals.port = @port
     @locals.include = @include
+    @locals.require = require
 
     for name in Zappa.app_api
       @locals[name] = ->
@@ -206,6 +207,7 @@ class RequestHandler
     @locals.app = @vars
     @locals.render = @render
     @locals.redirect = @redirect
+    @locals.send = @send
   
     for k, v of @defs
       @locals[k] = v
@@ -245,7 +247,8 @@ class RequestHandler
     else
       result
 
-  redirect: (path) -> @response.redirect(path)
+  redirect: -> @response.redirect.apply @response, arguments
+  send: -> @response.send.apply @response, arguments
 
   render: (what, options) ->
     options ?= {}
