@@ -213,6 +213,10 @@ Same as `def eco: require 'eco'`:
     get '/': ->
       typeof eco.render # function
 
+You can also do many in a row:
+
+    using 'fs', 'path', 'util'
+
 ### Helpful `helper`
 
 Helpers are just like defs, except they are modified to have access to the same context (@/this) and framework locals as whatever called them (request or message handlers).
