@@ -249,6 +249,7 @@ class RequestHandler
 
   render: (what, options) ->
     options ?= {}
+    options.layout ?= yes
     layout = @layouts.default
 
     view = if typeof what is 'function' then what else @views[what]
@@ -260,12 +261,19 @@ class RequestHandler
       new_doc ($) =>
         $('body').html inner
         postrender @context, {$: $}
-        @context.content = $('body').html()
-        html = coffeekup.render layout, context: @context
-        @response.send html
+        result = $('body').html()
+        if options.layout
+          @context.content = result
+          html = coffeekup.render layout, context: @context
+          @response.send html
+        else @response.send result
     else
-      @context.content = inner
-      @response.send(coffeekup.render layout, context: @context)
+      if options.layout
+        @context.content = inner
+        @response.send(coffeekup.render layout, context: @context)
+      else
+        @response.send inner
+
     null
 
 class MessageHandler
