@@ -140,9 +140,10 @@ class App
       @http_server[verb] path, (req, res, next) ->
         handler.execute(req, res, next)
 
-  using: (name) ->
+  using: ->
     pairs = {}
-    pairs[name] = require(name)
+    for a in arguments
+      pairs[a] = require(a)
     @def pairs
    
   def: (pairs) ->
@@ -265,7 +266,6 @@ class RequestHandler
     else
       @context.content = inner
       @response.send(coffeekup.render layout, context: @context)
-
     null
 
 class MessageHandler
