@@ -1,8 +1,6 @@
 #!/usr/bin/env coffee
 
 zappa = require 'zappa'
-fs = require 'fs'
-exec = require('child_process').exec
 OptionParser = require('coffee-script/optparse').OptionParser
 
 usage = '''
@@ -21,8 +19,13 @@ options = parser.parse process.argv
 args = options.arguments
 delete options.arguments
 
+if options.port
+  options.port = if options.port.match /,/ then options.port.split ',' else [options.port]
+  for i, p of options.port
+    options.port[i] = parseInt(p)
+
 puts parser.help() if options.help or process.argv.length is 0
 puts zappa.version if options.version
 
 if args.length > 0
-  zappa.run(fs.realpathSync(args[0]), options)
+  zappa.run_file(args[0], options)
