@@ -1,76 +1,73 @@
+zappa = exports
 express = require 'express'
 fs = require 'fs'
 sys = require 'sys'
 puts = sys.puts
-coffeekup = null
 coffee = null
-jsdom = null
+jquery = require 'jquery'
 io = null
+coffeekup = null
 
 class Zappa
-  @version: '0.1.1'
-  @app_api: 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
-
   constructor: ->
-    @locals = {}
-    @locals.context = {}
-    @locals.apps = {}
-    @locals.current_app = null
-    @locals.ensure_app = @ensure_app
-    @locals.execute = @execute
-    @locals.app = @app
-    @locals.port = @port
-    @locals.include = @include
-    @locals.require = require
+    @context = {}
+    @apps = {}
+    @current_app = null
 
-    for name in Zappa.app_api
-      @locals[name] = ->
+    @locals =
+      app: (name) => @app name
+      include: (path) => @include path
+      require: require
+
+    for name in 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
+      @locals[name] = =>
         @ensure_app 'default' unless @current_app?
         @current_app[name].apply @current_app, arguments
 
-  execute: (code) ->
-    scoped(code)(@context, @)
+  app: (name) ->
+    @ensure_app name
+    @current_app = @apps[name]
+  
+  include: (file) ->
+    @define_with @read_and_compile(file)
+
+  define_with: (code) ->
+    scoped(code)(@context, @locals)
 
   ensure_app: (name) ->
-    @apps[name] = new App() unless @apps[name]?
+    @apps[name] = new App(name) unless @apps[name]?
     @current_app = @apps[name] unless @current_app?
 
-  app: (name) ->
-    if name?
-      @ensure_app name
-      @current_app = @apps[name]
-      @current_app.name = name
-    else
-      for k, v of @apps
-        return k if v is @current_app
-      null
-    
-  include: (file) ->
-    @execute js_from_file(file)
-
-  run: (path, options) ->
+  read_and_compile: (file) ->
+    coffee = require 'coffee-script'
+    code = @read file
+    coffee.compile code
+  
+  read: (file) -> fs.readFileSync file, 'utf8'
+  
+  run_file: (file, options) ->
+    code = if file.match /\.coffee$/ then @read_and_compile file else @read file
+    @run code, options
+  
+  run: (code, options) ->
     options ?= {}
-    if options.port
-      options.port = if contains options.port, ',' then options.port.split ',' else [parseInt options.port]
 
-    js = if contains path, '.coffee' then js_from_file path else read_file path
-
-    @locals.execute js
+    @define_with code
     
     i = 0
-    for k, v of @locals.apps
+    for k, a of @apps
       opts = {}
       if options.port
         opts.port = if options.port[i]? then options.port[i] else v.port + i
       else if i isnt 0
         opts.port = v.port + i
 
-      v.start opts
+      a.start opts
       i++
 
 class App
-  constructor: ->
-    @name = 'default'
+  constructor: (@name) ->
+    @name ?= 'default'
     @port = 5678
     
     @http_server = express.createServer()
@@ -80,7 +77,10 @@ class App
     @http_server.configure =>
       @http_server.use express.staticProvider("#{process.cwd()}/public")
       @http_server.use express.bodyDecoder()
+      @http_server.use express.cookieDecoder()
+      @http_server.use express.session()
 
+    # App-level vars, exposed to handlers as [app]."
     @vars = {}
     
     @defs = {}
@@ -262,15 +262,15 @@ class RequestHandler
 
     if typeof options.apply is 'string'
       postrender = @postrenders[options.apply]
-      new_doc ($) =>
-        $('body').html inner
-        postrender @context, {$: $}
-        result = $('body').html()
-        if options.layout
-          @context.content = result
-          html = coffeekup.render layout, context: @context
-          @response.send html
-        else @response.send result
+      body = jquery 'body'
+      body.empty().html inner
+      postrender @context, $: jquery
+      result = body.html()
+      if options.layout
+        @context.content = result
+        html = coffeekup.render layout, context: @context
+        @response.send html
+      else @response.send result
     else
       if options.layout
         @context.content = inner
@@ -325,17 +325,17 @@ class MessageHandler
 
     if typeof options.apply is 'string'
       postrender = @postrenders[options.apply]
-      new_doc ($) =>
-        $('body').html inner
-        postrender @context, {$: $}
-        @context.content = $('body').html()
+      body = jquery 'body'
+      body.empty().html inner
+      postrender @context, $: jquery
+      result = body.html()
+      if options.layout
+        @context.content = result
         html = coffeekup.render layout, context: @context
         @send 'render', value: html
     else
       @context.content = inner
       @send 'render', value: (coffeekup.render layout, context: @context)
-
-contains = (haystack, needle) -> haystack.indexOf(needle) > -1
 
 build_msg = (title, data) ->
   obj = {}
@@ -347,17 +347,6 @@ parse_msg = (raw_msg) ->
   for k, v of obj
     return {title: k, params: v}
 
-read_file = (path) -> fs.readFileSync path, 'utf8'
-
-js_from_file = (file) ->
-  coffee = require 'coffee-script'
-  code = read_file file
-  coffee.compile code
-
-new_doc = (cb) ->
-  window = jsdom.jsdom().createWindow()
-  jsdom.jQueryify window, "#{__dirname}/jquery-1.4.2-min.js", (window, $) -> cb($)
-    
 scoped = (code) ->
   bind = 'var __bind = function(func, context){return function(){return func.apply(context, arguments);};};'
   code = String(code)
@@ -372,6 +361,7 @@ publish_api = (from, to, methods) ->
     else
       to[name] = from[name]
   
-zappa = new Zappa()
-exports.version = Zappa.version
-publish_api zappa, exports, 'run'
+z = new Zappa()
+zappa.version = '0.1.1'
+zappa.run = -> z.run.apply z, arguments
+zappa.run_file = -> z.run_file.apply z, arguments
