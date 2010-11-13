@@ -18,7 +18,7 @@ Zappa is a [CoffeeScript](http://coffeescript.org) DSLish layer on top of [Expre
 
 It is heavily influenced by [that legendary framework](http://www.sinatrarb.com) named after another awesome Frank, with also a hint of [Camping](http://camping.rubyforge.org/).
 
-**Put on your helmet!** Zappa is barely past the proof of concept stage and things are loosely placed. Don't use it to control your nuclear launch facility just yet. Most examples work though, and if you come with a spirit of adventure, you shall be rewarded.
+**Put on your helmet!** Zappa is barely past the proof of concept stage and things are loosely placed. Don't use it to control your nuclear launch facility just yet. All examples work though, and if you come with a spirit of adventure, you shall be rewarded.
 
 ### Hi, World
 
