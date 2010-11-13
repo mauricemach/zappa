@@ -113,11 +113,12 @@ class App
 
     if io?
       @ws_server = io.listen @http_server, {log: ->}
-      @ws_server.on 'connection', (client) => @socket_handlers.connection?.execute client
-      @ws_server.on 'clientDisconnect', (client) => @socket_handlers.disconnection?.execute client
-      @ws_server.on 'clientMessage', (raw_msg, client) =>
-        msg = parse_msg raw_msg
-        @msg_handlers[msg.title]?.execute client, msg.params
+      @ws_server.on 'connection', (client) =>
+        @socket_handlers.connection?.execute client
+        client.on 'disconnect', => @socket_handlers.disconnection?.execute client
+        client.on 'message', (raw_msg) =>
+          msg = parse_msg raw_msg
+          @msg_handlers[msg.title]?.execute client, msg.params
 
     @http_server.listen @port
     puts "App \"#{@name}\" listening on port #{@port}..."

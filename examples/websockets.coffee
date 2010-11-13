@@ -18,7 +18,7 @@ msg said: ->
 
 client ->
   $(document).ready ->
-    socket = new io.Socket 'localhost', {transports: ['websocket', 'xhr-multipart', 'xhr-polling', 'htmlfile', 'flashsocket']}
+    socket = new io.Socket()
 
     socket.on 'connect', -> $('#log').append '<p>Connected</p>'
     socket.on 'disconnect', -> $('#log').append '<p>Disconnected</p>'
@@ -37,7 +37,7 @@ client ->
 
 view ->
   @title = 'Nano Chat'
-  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'http://cdn.socket.io/stable/socket.io', 'default']
+  @scripts = ['http://code.jquery.com/jquery-1.4.3.min', '/socket.io/socket.io', '/default']
 
   h1 @title
   div id: 'log'
