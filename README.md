@@ -32,7 +32,7 @@ And drink it!
     $ zappa cuppa.coffee
     => App "default" listening on port 5678...
 
-If you ever need to be able to run your app with the vanilla node command, that's one command away:
+If you ever need to run it with the vanilla node command, we've got that covered:
 
     $ zappa -c cuppa.coffee
     $ node cuppa.js
