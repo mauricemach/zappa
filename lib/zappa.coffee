@@ -208,6 +208,7 @@ class RequestHandler
     @locals = {}
     @locals.app = @vars
     @locals.render = @render
+    @locals.partial = @partial
     @locals.redirect = @redirect
     @locals.send = @send
   
@@ -252,34 +253,40 @@ class RequestHandler
   redirect: -> @response.redirect.apply @response, arguments
   send: -> @response.send.apply @response, arguments
 
-  render: (what, options) ->
+  render: (template, options) ->
     options ?= {}
-    options.layout ?= yes
-    layout = @layouts.default
+    options.layout ?= 'default'
 
-    view = if typeof what is 'function' then what else @views[what]
+    opts = options.options or {} # Options for the templating engine.
+    opts.context ?= @context
+    opts.context.zappa = partial: @partial
+    opts.locals ?= {}
+    opts.locals.partial = (template, context) ->
+      text ck_options.context.zappa.partial template, context
 
-    inner = coffeekup.render view, context: @context
+    template = @views[template] if typeof template is 'string'
+
+    result = coffeekup.render template, opts
 
     if typeof options.apply is 'string'
       postrender = @postrenders[options.apply]
-      body = jquery 'body'
-      body.empty().html inner
-      postrender @context, $: jquery
+      body = jquery('body')
+      body.empty().html(result)
+      postrender opts.context, $: jquery
       result = body.html()
-      if options.layout
-        @context.content = result
-        html = coffeekup.render layout, context: @context
-        @response.send html
-      else @response.send result
-    else
-      if options.layout
-        @context.content = inner
-        @response.send(coffeekup.render layout, context: @context)
-      else
-        @response.send inner
+
+    if options.layout
+      layout = @layouts[options.layout]
+      opts.context.content = result
+      result = coffeekup.render layout, opts
+
+    @response.send result
 
     null
+
+  partial: (template, context) =>
+    template = @views[template]
+    coffeekup.render(template, context: context)
 
 class MessageHandler
   constructor: (handler, @defs, @helpers, @postrenders, @views, @layouts, @vars) ->
