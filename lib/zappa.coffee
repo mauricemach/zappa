@@ -211,6 +211,7 @@ class RequestHandler
     @locals.partial = @partial
     @locals.redirect = @redirect
     @locals.send = @send
+    @locals.puts = puts
   
     for k, v of @defs
       @locals[k] = v
@@ -297,6 +298,7 @@ class MessageHandler
     @locals = {}
     @locals.app = @vars
     @locals.render = @render
+    @locals.puts = puts
   
     for k, v of @defs
       @locals[k] = v

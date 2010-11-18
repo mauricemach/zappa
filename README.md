@@ -32,12 +32,10 @@ And drink it!
     $ zappa cuppa.coffee
     => App "default" listening on port 5678...
 
-If you ever need to prepare your app to be run on vanilla node with no CoffeeScript, that's two commands away:
+If you ever need to be able to run your app with the vanilla node command, that's one command away:
 
-    $ coffee -c cuppa.coffee
-    $ echo "require('zappa').run('cuppa.js')" > zappup.js
-
-You can now run it with `node zappup.js`.
+    $ zappa -c cuppa.coffee
+    $ node cuppa.js
 
 ### OK, but one-line string responses are mostly useless. Can you show me something closer to a real web app?
 
