@@ -30,6 +30,7 @@ class Zappa
   
   include: (file) ->
     @define_with @read_and_compile(file)
+    puts "Included file \"#{file}\""
 
   define_with: (code) ->
     scoped(code)(@context, @locals)
@@ -58,9 +59,9 @@ class Zappa
     for k, a of @apps
       opts = {}
       if options.port
-        opts.port = if options.port[i]? then options.port[i] else v.port + i
+        opts.port = if options.port[i]? then options.port[i] else a.port + i
       else if i isnt 0
-        opts.port = v.port + i
+        opts.port = a.port + i
 
       a.start opts
       i++
@@ -370,8 +371,9 @@ publish_api = (from, to, methods) ->
       to[name] = -> from[name].apply from, arguments
     else
       to[name] = from[name]
-  
+
 z = new Zappa()
+
 zappa.version = '0.1.2'
 zappa.run = -> z.run.apply z, arguments
 zappa.run_file = -> z.run_file.apply z, arguments
