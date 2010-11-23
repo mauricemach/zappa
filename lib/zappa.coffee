@@ -348,6 +348,17 @@ class MessageHandler
       @context.content = inner
       @send 'render', value: (coffeekup.render layout, context: @context)
 
+coffeescript_support = """
+  var __slice = Array.prototype.slice;
+  var __hasProp = Object.prototype.hasOwnProperty;
+  var __bind = function(func, context) {return function(){ return func.apply(context, arguments); };};
+  var __extends = function(child, parent) { var ctor = function(){}; ctor.prototype = parent.prototype;
+    child.prototype = new ctor(); child.prototype.constructor = child;
+    if (typeof parent.extended === "function") parent.extended(child);
+    child.__super__ = parent.prototype;
+  };
+"""
+
 build_msg = (title, data) ->
   obj = {}
   obj[title] = data
@@ -359,10 +370,9 @@ parse_msg = (raw_msg) ->
     return {title: k, params: v}
 
 scoped = (code) ->
-  bind = 'var __bind = function(func, context){return function(){return func.apply(context, arguments);};};'
   code = String(code)
   code = "function () {#{code}}" unless code.indexOf('function') is 0
-  code = "#{bind} with(locals) {return (#{code}).apply(context, args);}"
+  code = "#{coffeescript_support} with(locals) {return (#{code}).apply(context, args);}"
   new Function('context', 'locals', 'args', code)
 
 publish_api = (from, to, methods) ->
