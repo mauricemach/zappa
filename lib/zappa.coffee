@@ -1,8 +1,7 @@
 zappa = exports
 express = require 'express'
 fs = require 'fs'
-sys = require 'sys'
-puts = sys.puts
+puts = console.log
 coffee = null
 jquery = require 'jquery'
 io = null

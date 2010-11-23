@@ -4,14 +4,14 @@ get '/counter': -> "# of messages so far: #{app.counter}"
 
 at connection: ->
   app.counter ?= 0
-  puts "Connected: #{id}"
+  console.log "Connected: #{id}"
   broadcast 'connected', id: id
 
 at disconnection: ->
-  puts "Disconnected: #{id}"
+  console.log "Disconnected: #{id}"
 
 msg said: ->
-  puts "#{id} said: #{@text}"
+  console.log "#{id} said: #{@text}"
   app.counter++
   send 'said', id: id, text: @text
   broadcast 'said', id: id, text: @text
