@@ -298,6 +298,7 @@ class MessageHandler
     @locals = {}
     @locals.app = @vars
     @locals.render = @render
+    @locals.partial = @partial
     @locals.puts = puts
   
     for k, v of @defs
@@ -326,26 +327,40 @@ class MessageHandler
 
     @handler(@locals.context, @locals)
 
-  render: (what, options) ->
+  render: (template, options) ->
     options ?= {}
-    layout = @layouts.default
-    view = if typeof what is 'function' then what else @views[what]
+    options.layout ?= 'default'
 
-    inner = coffeekup.render view, context: @context
+    opts = options.options or {} # Options for the templating engine.
+    opts.context ?= @context
+    opts.context.zappa = partial: @partial
+    opts.locals ?= {}
+    opts.locals.partial = (template, context) ->
+      text ck_options.context.zappa.partial template, context
+
+    template = @views[template] if typeof template is 'string'
+
+    result = coffeekup.render template, opts
 
     if typeof options.apply is 'string'
       postrender = @postrenders[options.apply]
-      body = jquery 'body'
-      body.empty().html inner
-      postrender @context, $: jquery
+      body = jquery('body')
+      body.empty().html(result)
+      postrender opts.context, $: jquery
       result = body.html()
-      if options.layout
-        @context.content = result
-        html = coffeekup.render layout, context: @context
-        @send 'render', value: html
-    else
-      @context.content = inner
-      @send 'render', value: (coffeekup.render layout, context: @context)
+
+    if options.layout
+      layout = @layouts[options.layout]
+      opts.context.content = result
+      result = coffeekup.render layout, opts
+
+    @send 'render', value: result
+
+    null
+
+  partial: (template, context) =>
+    template = @views[template]
+    coffeekup.render(template, context: context)
 
 coffeescript_support = """
   var __slice = Array.prototype.slice;
