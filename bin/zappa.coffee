@@ -26,7 +26,7 @@ switches = [
 
 compile = (coffee_path) ->
   fs.readFile coffee_path, (err, data) ->
-    js = coffee.compile String(data), {'noWrap'}
+    js = coffee.compile String(data), bare: yes
     js = "require('zappa').run(function(){#{js}});"
     js_path = path.basename(coffee_path, path.extname(coffee_path)) + '.js'
     dir = path.dirname coffee_path
