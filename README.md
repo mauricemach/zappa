@@ -32,7 +32,11 @@ And drink it!
     $ zappa cuppa.coffee
     => App "default" listening on port 5678...
 
-If you ever need to run it with the vanilla node command, we've got that covered:
+If you're going to restart it a thousand times per minute while developing like me, just let zappa do the job for you:
+
+    $ zappa -w cuppa.coffee
+
+And if you ever need to run it with the vanilla node command, we've got that covered:
 
     $ zappa -c cuppa.coffee
     $ node cuppa.js
@@ -193,7 +197,7 @@ This is the first of a series of planned features to ease client/server integrat
 
 In order to gain automatic access to framework locals, request and message handlers lose automatic access to their parent scope. To make things available to them though, you can use `def`:
 
-    foo: 'bar'
+    foo = 'bar'
     def ping: 'pong'
     def zig: -> 'zag'
 

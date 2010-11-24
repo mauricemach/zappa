@@ -398,6 +398,6 @@ publish_api = (from, to, methods) ->
 
 z = new Zappa()
 
-zappa.version = '0.1.2'
+zappa.version = '0.1.3'
 zappa.run = -> z.run.apply z, arguments
 zappa.run_file = -> z.run_file.apply z, arguments
