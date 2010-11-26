@@ -45,7 +45,7 @@ spawn_child = ->
       watch path.join(path.dirname(file), included) unless included in watching
       watching.push included
     puts data
-  child.stderr.on 'data', (data) -> puts data
+  child.stderr.on 'data', (data) -> puts String(data)
 
 watch = (file) ->
   fs.watchFile file, {persistent: true, interval: 500}, (curr, prev) ->
