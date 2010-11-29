@@ -2,6 +2,7 @@ zappa = exports
 express = require 'express'
 fs = require 'fs'
 puts = console.log
+inspect = require('sys').inspect
 coffee = null
 jquery = require 'jquery'
 io = null
@@ -165,12 +166,12 @@ class App
   at: (pairs) ->
     io = require 'socket.io'
     for k, v of pairs
-      @socket_handlers[k] = new MessageHandler(v, @defs, @helpers, @postrenders, @views, @layouts, @vars)
+      @socket_handlers[k] = new MessageHandler(v, @)
 
   msg: (pairs) ->
     io = require 'socket.io'
     for k, v of pairs
-      @msg_handlers[k] = new MessageHandler(v, @defs, @helpers, @postrenders, @views, @layouts, @vars)
+      @msg_handlers[k] = new MessageHandler(v, @)
 
   layout: (arg) ->
     pairs = if typeof arg is 'object' then arg else {default: arg}
@@ -290,27 +291,27 @@ class RequestHandler
     coffeekup.render(template, context: context)
 
 class MessageHandler
-  constructor: (handler, @defs, @helpers, @postrenders, @views, @layouts, @vars) ->
+  constructor: (handler, @app) ->
     @handler = scoped(handler)
     @locals = null
 
   init_locals: ->
     @locals = {}
-    @locals.app = @vars
+    @locals.app = @app.vars
     @locals.render = @render
     @locals.partial = @partial
     @locals.puts = puts
   
-    for k, v of @defs
+    for k, v of @app.defs
       @locals[k] = v
 
-    for k, v of @helpers
+    for k, v of @app.helpers
       @locals[k] = ->
         v(@context, @, arguments)
 
-    @locals.postrenders = @postrenders
-    @locals.views = @views
-    @locals.layouts = @layouts
+    @locals.postrenders = @app.postrenders
+    @locals.views = @app.views
+    @locals.layouts = @app.layouts
 
   execute: (client, params) ->
     @init_locals() unless @locals?
@@ -318,9 +319,14 @@ class MessageHandler
     @locals.context = {}
     @locals.params = @locals.context
     @locals.client = client
+    # TODO: Move this to context.
     @locals.id = client.sessionId
-    @locals.send = (title, data) -> client.send build_msg(title, data)
-    @locals.broadcast = (title, data) -> client.broadcast build_msg(title, data)
+    @locals.send = (title, data) => client.send build_msg(title, data)
+    @locals.broadcast = (title, data, except) =>
+      except ?= []
+      if except not instanceof Array then except = [except]
+      except.push @locals.id
+      @app.ws_server.broadcast build_msg(title, data), except
 
     for k, v of params
       @locals.context[k] = v
@@ -338,7 +344,7 @@ class MessageHandler
     opts.locals.partial = (template, context) ->
       text ck_options.context.zappa.partial template, context
 
-    template = @views[template] if typeof template is 'string'
+    template = @app.views[template] if typeof template is 'string'
 
     result = coffeekup.render template, opts
 
@@ -359,7 +365,7 @@ class MessageHandler
     null
 
   partial: (template, context) =>
-    template = @views[template]
+    template = @app.views[template]
     coffeekup.render(template, context: context)
 
 coffeescript_support = """
