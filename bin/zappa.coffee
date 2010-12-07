@@ -73,11 +73,18 @@ puts zappa.version if options.version
 
 if args.length > 0
   file = args[0]
-  if options.compile then compile file
-  else
-    if options.watch
-      remove_watch_option()
-      spawn_child()
-      watch file
+  
+  path.exists file, (exists) ->
+    if !exists
+      console.log "#{file} not found."
+      process.exit -1
+    
+    if options.compile
+      compile file
     else
-      zappa.run_file file, options
+      if options.watch
+        remove_watch_option()
+        spawn_child()
+        watch file
+      else
+        zappa.run_file file, options
