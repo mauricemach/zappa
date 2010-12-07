@@ -298,6 +298,6 @@ If there's a `./public` dir on the same level as your app's main file, static fi
 
 ## Whew!
 
-That's it for now. Big thanks to all behind the libs that are making this little experiment possible. Special thanks to Jeremy Ashkenas for CoffeeScript, the "little" language is simply amazing and incredibly flexible. To Blake Mizerany for Sinatra, the framework that made me redefine simple. To why the lucky stiff, that made me redefine hacking. And finally to Frank Zappa, for the spirit of nonconformity and experimentation that inspires me to push forward. No to mention providing the soundtrack.
+That's it for now. Big thanks to all behind the libs that are making this little experiment possible. Special thanks to Jeremy Ashkenas for CoffeeScript, the "little" language is simply amazing and incredibly flexible. To Blake Mizerany for Sinatra, the framework that made me redefine simple. To why the lucky stiff, that made me redefine hacking. And finally to Frank Zappa, for the spirit of nonconformity and experimentation that inspires me to push forward. Not to mention providing the soundtrack.
 
 "Why do you necessarily have to be wrong just because a few million people think you are?" - FZ
