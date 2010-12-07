@@ -4,7 +4,7 @@ fs = require 'fs'
 puts = console.log
 inspect = require('sys').inspect
 coffee = null
-jquery = require 'jquery'
+jquery = null
 io = null
 coffeekup = null
 
@@ -159,7 +159,7 @@ class App
       @helpers[k] = scoped(v)
 
   postrender: (pairs) ->
-    jsdom = require 'jsdom'
+    jquery = require 'jquery'
     for k, v of pairs
       @postrenders[k] = scoped(v)
 
