@@ -5,6 +5,7 @@ coffee = require 'coffee-script'
 fs = require 'fs'
 path = require 'path'
 puts = console.log
+inspect = require('util').inspect
 spawn = require('child_process').spawn
 OptionParser = require('coffee-script/optparse').OptionParser
 child = null
@@ -34,7 +35,10 @@ compile = (coffee_path) ->
     fs.writeFile js_path, js
 
 remove_watch_option = ->
-  process.argv.splice(process.argv.indexOf('-w'), 1).splice(process.argv.indexOf('--watch'), 1)
+  i = process.argv.indexOf('-w')
+  process.argv.splice(i, 1) if i > -1
+  i = process.argv.indexOf('--watch')
+  process.argv.splice(i, 1) if i > -1
 
 spawn_child = ->
   child = spawn 'zappa', process.argv
