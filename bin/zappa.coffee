@@ -76,7 +76,7 @@ if args.length > 0
   
   path.exists file, (exists) ->
     if !exists
-      console.log "#{file} not found."
+      console.log "\"#{file}\" not found."
       process.exit -1
     
     if options.compile
