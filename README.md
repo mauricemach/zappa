@@ -296,8 +296,32 @@ Or by subject:
 
 If there's a `./public` dir on the same level as your app's main file, static files will be automatically served from there. 
 
+## Testing
+
+At the moment there are no unit tests or specs. However the tests currently provided are "headed" tests which run in the browser via "remote control". Pretty radical.
+
+To run the headed, awesome, remote-control, in-browser tests you need Firefox 3.
+
+First install soda from [npm](http://npmjs.org/)
+
+    npm install soda
+
+Before the tests can be run, the [Selenium RC](http://seleniumhq.org/projects/remote-control/) daemon must be running...
+
+    java -jar selenium-server.jar
+  
+You can get the Selenium RC from http://selenium.googlecode.com/files/selenium-remote-control-1.0.3.zip.
+
+Once it's running, simply launch the automated tests...
+
+    cake test
+  
+What happens next is mind-blowingly amazing; but I'll leave that as a special surprise for the brave and fearless testers.
+
+P.S: The tests are asynchronous ... *drool*
+
 ## Whew!
 
-That's it for now. Big thanks to all behind the libs that are making this little experiment possible. Special thanks to Jeremy Ashkenas for CoffeeScript, the "little" language is simply amazing and incredibly flexible. To Blake Mizerany for Sinatra, the framework that made me redefine simple. To why the lucky stiff, that made me redefine hacking. And finally to Frank Zappa, for the spirit of nonconformity and experimentation that inspires me to push forward. No to mention providing the soundtrack.
+That's it for now. Big thanks to all behind the libs that are making this little experiment possible. Special thanks to Jeremy Ashkenas for CoffeeScript, the "little" language is simply amazing and incredibly flexible. To Blake Mizerany for Sinatra, the framework that made me redefine simple. To why the lucky stiff, that made me redefine hacking. And finally to Frank Zappa, for the spirit of nonconformity and experimentation that inspires me to push forward. Not to mention providing the soundtrack.
 
 "Why do you necessarily have to be wrong just because a few million people think you are?" - FZ

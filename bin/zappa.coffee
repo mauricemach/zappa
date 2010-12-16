@@ -75,7 +75,7 @@ if args.length > 0
   file = args[0]
   
   path.exists file, (exists) ->
-    if !exists
+    if not exists
       console.log "\"#{file}\" not found."
       process.exit -1
     
