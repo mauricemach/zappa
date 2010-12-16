@@ -19,9 +19,10 @@ class Zappa
       include: (path) => @include path
       require: require
 
+    @ensure_app 'default' unless @current_app?
+
     for name in 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
       @locals[name] = =>
-        @ensure_app 'default' unless @current_app?
         @current_app[name].apply @current_app, arguments
 
   app: (name) ->
@@ -54,6 +55,7 @@ class Zappa
     options ?= {}
 
     @define_with code
+    puts inspect @apps
     
     i = 0
     for k, a of @apps
