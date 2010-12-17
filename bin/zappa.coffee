@@ -20,7 +20,8 @@ usage = '''
 switches = [
   ['-h', '--help', 'Displays this wonderful, elucidative help message']
   ['-v', '--version', 'Shows zappa version']
-  ['-p', '--port [NUMBER]', 'The port(s) for the app(s). Ex.: 8080 or 4567,80,3000']
+  ['-p', '--port [NUMBER]', 'The port(s) the app(s) will listen on. Ex.: 8080 or 4567,80,3000']
+  ['-n', '--hostname [STRING]', 'If omitted, will accept connections to any ipv4 address (INADDR_ANY)']
   ['-c', '--compile', 'Compiles the app(s) to a .js file instead of running them.']
   ['-w', '--watch', 'Keeps watching the file and restarts the app when it changes.']
 ]
@@ -68,15 +69,16 @@ if options.port
   for i, p of options.port
     options.port[i] = parseInt(p)
 
-puts parser.help() if options.help or process.argv.length is 0
-puts zappa.version if options.version
-
-if args.length > 0
+if args.length is 0
+  puts parser.help() if options.help or process.argv.length is 0
+  puts zappa.version if options.version
+  process.exit()
+else
   file = args[0]
   
   path.exists file, (exists) ->
     if not exists
-      console.log "\"#{file}\" not found."
+      puts "\"#{file}\" not found."
       process.exit -1
     
     if options.compile

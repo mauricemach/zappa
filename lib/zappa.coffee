@@ -55,7 +55,6 @@ class Zappa
     options ?= {}
 
     @define_with code
-    puts inspect @apps
     
     i = 0
     for k, a of @apps
@@ -64,6 +63,8 @@ class Zappa
         opts.port = if options.port[i]? then options.port[i] else a.port + i
       else if i isnt 0
         opts.port = a.port + i
+
+      opts.hostname = options.hostname if options.hostname
 
       a.start opts
       i++
@@ -113,6 +114,7 @@ class App
   start: (options) ->
     options ?= {}
     @port = options.port if options.port
+    @hostname = options.hostname if options.hostname
 
     if io?
       @ws_server = io.listen @http_server, {log: ->}
@@ -123,8 +125,10 @@ class App
           msg = parse_msg raw_msg
           @msg_handlers[msg.title]?.execute client, msg.params
 
-    @http_server.listen @port
-    puts "App \"#{@name}\" listening on port #{@port}..."
+    if @hostname? then @http_server.listen @port, @hostname
+    else @http_server.listen @port
+    
+    puts "App \"#{@name}\" listening on #{if @hostname? then @hostname + ':' else '*:'}#{@port}..."
     @http_server
 
   get: -> @route 'get', arguments
