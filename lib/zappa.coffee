@@ -219,7 +219,7 @@ class RequestHandler
     @locals.redirect = @redirect
     @locals.send = @send
     @locals.puts = puts
-  
+
     for k, v of @defs
       @locals[k] = v
 
@@ -227,6 +227,7 @@ class RequestHandler
       @locals[k] = ->
         v(@context, @, arguments)
 
+    @locals.defs = @defs
     @locals.postrenders = @postrenders
     @locals.views = @views
     @locals.layouts = @layouts
@@ -280,7 +281,7 @@ class RequestHandler
       postrender = @postrenders[options.apply]
       body = jquery('body')
       body.empty().html(result)
-      postrender opts.context, $: jquery
+      postrender opts.context, jquery.extend(@defs, {$: jquery})
       result = body.html()
 
     if options.layout
@@ -315,6 +316,7 @@ class MessageHandler
       @locals[k] = ->
         v(@context, @, arguments)
 
+    @locals.defs = @app.defs
     @locals.postrenders = @app.postrenders
     @locals.views = @app.views
     @locals.layouts = @app.layouts
@@ -358,7 +360,7 @@ class MessageHandler
       postrender = @postrenders[options.apply]
       body = jquery('body')
       body.empty().html(result)
-      postrender opts.context, $: jquery
+      postrender opts.context, jquery.extend(@defs, {$: jquery})
       result = body.html()
 
     if options.layout
