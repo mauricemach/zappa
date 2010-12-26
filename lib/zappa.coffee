@@ -22,8 +22,9 @@ class Zappa
     @ensure_app 'default' unless @current_app?
 
     for name in 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
-      @locals[name] = =>
-        @current_app[name].apply @current_app, arguments
+      do (name) =>
+        @locals[name] = =>
+          @current_app[name].apply @current_app, arguments
 
   app: (name) ->
     @ensure_app name
@@ -379,11 +380,12 @@ class MessageHandler
 coffeescript_support = """
   var __slice = Array.prototype.slice;
   var __hasProp = Object.prototype.hasOwnProperty;
-  var __bind = function(func, context) {return function(){ return func.apply(context, arguments); };};
-  var __extends = function(child, parent) { var ctor = function(){}; ctor.prototype = parent.prototype;
-    child.prototype = new ctor(); child.prototype.constructor = child;
-    if (typeof parent.extended === "function") parent.extended(child);
-    child.__super__ = parent.prototype;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;
+    return child;
   };
 """
 

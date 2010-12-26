@@ -11,6 +11,7 @@ OptionParser = require('coffee-script/optparse').OptionParser
 child = null
 file = null
 watching = []
+argv = process.argv.splice 2, process.argv.length - 2
 
 usage = '''
   Usage:
@@ -36,13 +37,13 @@ compile = (coffee_path) ->
     fs.writeFile js_path, js
 
 remove_watch_option = ->
-  i = process.argv.indexOf('-w')
-  process.argv.splice(i, 1) if i > -1
-  i = process.argv.indexOf('--watch')
-  process.argv.splice(i, 1) if i > -1
+  i = argv.indexOf('-w')
+  argv.splice(i, 1) if i > -1
+  i = argv.indexOf('--watch')
+  argv.splice(i, 1) if i > -1
 
 spawn_child = ->
-  child = spawn 'zappa', process.argv
+  child = spawn 'zappa', argv
   child.stdout.on 'data', (data) ->
     data = String(data)
     if data.match /^Included file \".*\.coffee\"/
@@ -60,7 +61,7 @@ watch = (file) ->
     spawn_child()
 
 parser = new OptionParser switches, usage
-options = parser.parse process.argv
+options = parser.parse argv
 args = options.arguments
 delete options.arguments
 
@@ -70,7 +71,7 @@ if options.port
     options.port[i] = parseInt(p)
 
 if args.length is 0
-  puts parser.help() if options.help or process.argv.length is 0
+  puts parser.help() if options.help or argv.length is 0
   puts zappa.version if options.version
   process.exit()
 else
