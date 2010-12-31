@@ -18,6 +18,9 @@ class Zappa
       app: (name) => @app name
       include: (path) => @include path
       require: require
+      global: global
+      process: process
+      module: module
 
     @ensure_app 'default' unless @current_app?
 
@@ -49,6 +52,9 @@ class Zappa
   read: (file) -> fs.readFileSync file, 'utf8'
   
   run_file: (file, options) ->
+    @locals.__filename = require('path').join(process.cwd(), file)
+    @locals.__dirname = process.cwd()
+    @locals.module.filename = @locals.__filename
     code = if file.match /\.coffee$/ then @read_and_compile file else @read file
     @run code, options
   
@@ -195,17 +201,19 @@ class App
   client: (arg) ->
     pairs = if typeof arg is 'object' then arg else {default: arg}
     for k, v of pairs
-      code = ";(#{v})();"
-      @http_server.get "/#{k}.js", (req, res) ->
-        res.contentType 'bla.js'
-        res.send code
+      do (k, v) ->
+        code = ";(#{v})();"
+        @http_server.get "/#{k}.js", (req, res) ->
+          res.contentType 'bla.js'
+          res.send code
 
   style: (arg) ->
     pairs = if typeof arg is 'object' then arg else {default: arg}
     for k, v of pairs
-      @http_server.get "/#{k}.css", (req, res) ->
-        res.contentType 'bla.css'
-        res.send v
+      do (k, v) ->
+        @http_server.get "/#{k}.css", (req, res) ->
+          res.contentType 'bla.css'
+          res.send v
 
 class RequestHandler
   constructor: (handler, @defs, @helpers, @postrenders, @views, @layouts, @vars) ->
@@ -225,8 +233,9 @@ class RequestHandler
       @locals[k] = v
 
     for k, v of @helpers
-      @locals[k] = ->
-        v(@context, @, arguments)
+      do (k, v) ->
+        @locals[k] = ->
+          v(@context, @, arguments)
 
     @locals.defs = @defs
     @locals.postrenders = @postrenders
@@ -314,8 +323,9 @@ class MessageHandler
       @locals[k] = v
 
     for k, v of @app.helpers
-      @locals[k] = ->
-        v(@context, @, arguments)
+      do (k, v) ->
+        @locals[k] = ->
+          v(@context, @, arguments)
 
     @locals.defs = @app.defs
     @locals.postrenders = @app.postrenders
@@ -407,10 +417,11 @@ scoped = (code) ->
 
 publish_api = (from, to, methods) ->
   for name in methods.split '|'
-    if typeof from[name] is 'function'
-      to[name] = -> from[name].apply from, arguments
-    else
-      to[name] = from[name]
+    do (name) ->
+      if typeof from[name] is 'function'
+        to[name] = -> from[name].apply from, arguments
+      else
+        to[name] = from[name]
 
 z = new Zappa()
 
