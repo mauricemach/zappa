@@ -61,7 +61,14 @@ watch = (file) ->
     spawn_child()
 
 parser = new OptionParser switches, usage
-options = parser.parse argv
+# Get the file to compile and run, typically server.coffee
+# For coffee-script@0.9.6 args is [filename],
+# For coffee-script@1.0.0 args looks like ["node", "path/to/coffee", filename]
+if process.argv[0] == 'node' and process.argv.length >= 3
+  options = parser.parse process.argv[2..-1]
+else
+  options = parser.parse process.argv
+args = options.arguments
 args = options.arguments
 delete options.arguments
 
