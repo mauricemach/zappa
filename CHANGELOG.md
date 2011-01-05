@@ -1,3 +1,13 @@
+**v0.1.4** (2010-01-05):
+
+  - Updated to CoffeeScript 1.0.0 and node 0.2.6/0.3.3.
+  - Soda tests by Nicholas Kinsey.
+  - `broadcast` passing along optional `except` param to socket.io.
+  - Empty app files now start a default "blank" app, serving files at /public.
+  - `zappa -n/--hostname` to listen on a specific hostname or IP.
+  - Made defs available to postrenders' scope.
+  - Bug fixes.
+
 **v0.1.3** (2010-11-13):
 
   - Updated to CoffeeScript 0.9.5 and node 0.2.5/0.3.1.

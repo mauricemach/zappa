@@ -5,16 +5,16 @@ coffee = require 'coffee-script'
 fs = require 'fs'
 path = require 'path'
 puts = console.log
-inspect = require('util').inspect
-spawn = require('child_process').spawn
-OptionParser = require('coffee-script/optparse').OptionParser
+{inspect} = require 'util'
+{spawn} = require 'child_process'
+{OptionParser} = require 'coffee-script/optparse'
 child = null
 file = null
 watching = []
 
 # On coffee-script@0.9.6, argv looks like [filename],
 # On coffee-script@1.0.0, argv looks like ["node", "path/to/coffee", filename]
-if process.argv[0] is 'node' and process.argv.length >= 3
+if process.argv[0] is 'node' and process.argv.length >= 2
   argv = process.argv[2..]
 else
   argv = process.argv[0..]
@@ -33,14 +33,18 @@ switches = [
   ['-w', '--watch', 'Keeps watching the file and restarts the app when it changes.']
 ]
 
-compile = (coffee_path) ->
+compile = (coffee_path, callback) ->
   fs.readFile coffee_path, (err, data) ->
-    js = coffee.compile String(data), bare: yes
-    js = "require('zappa').run(function(){#{js}});"
-    js_path = path.basename(coffee_path, path.extname(coffee_path)) + '.js'
-    dir = path.dirname coffee_path
-    js_path = path.join dir, js_path
-    fs.writeFile js_path, js
+    if err then callback(err)
+    else
+      js = coffee.compile String(data), bare: yes
+      js = "require('zappa').run(function(){#{js}});"
+      js_path = path.basename(coffee_path, path.extname(coffee_path)) + '.js'
+      dir = path.dirname coffee_path
+      js_path = path.join dir, js_path
+      fs.writeFile js_path, js, (err) ->
+        if err then callback(err)
+        else callback()
 
 remove_watch_option = ->
   i = argv.indexOf('-w')
@@ -89,7 +93,9 @@ else
       process.exit -1
     
     if options.compile
-      compile file
+      compile file, (err) ->
+        if err then puts err; process.exit -1
+        else process.exit()
     else
       if options.watch
         remove_watch_option()

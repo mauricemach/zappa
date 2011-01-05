@@ -2,7 +2,7 @@ zappa = exports
 express = require 'express'
 fs = require 'fs'
 puts = console.log
-inspect = require('sys').inspect
+{inspect} = require 'sys'
 coffee = null
 jquery = null
 io = null
@@ -22,11 +22,10 @@ class Zappa
       process: process
       module: module
 
-    @ensure_app 'default' unless @current_app?
-
     for name in 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
       do (name) =>
         @locals[name] = =>
+          @ensure_app 'default' unless @current_app?
           @current_app[name].apply @current_app, arguments
 
   app: (name) ->
@@ -431,6 +430,6 @@ publish_api = (from, to, methods) ->
 
 z = new Zappa()
 
-zappa.version = '0.1.3'
+zappa.version = '0.1.4'
 zappa.run = -> z.run.apply z, arguments
 zappa.run_file = -> z.run_file.apply z, arguments

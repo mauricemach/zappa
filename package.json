@@ -1,22 +1,24 @@
 {
   "name": "zappa",
-  "description": "Razor-sharp DSL for modern web apps.",
-  "version": "0.1.3",
+  "description": "Web development, cut-the-crap style.",
+  "version": "0.1.4",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "contributors": [ 
     {"name": "Maurice Machado", "email": "maurice@bitbending.com"},
+    {"name": "Nicholas Kinsey", "email": "nicholas.kinsey@feistystudios.com"},
+    {"name": "Jae Kwon", "email": "jae@flywheelnetworks.com"},
     {"name": "Vladimir Dronnikov", "email": "dronnikov@gmail.com"},
     {"name": "Isaac Wolkerstorfer", "email": "agnoster@gmail.com"}
   ],
   "dependencies": {
-    "express": "1.0.0",
-    "coffeekup": ">= 0.2.1",
-    "coffee-script": ">= 0.9.5",
-    "socket.io": ">= 0.6.1",
+    "express": ">= 1.0.1",
+    "coffeekup": ">= 0.2.2",
+    "coffee-script": ">= 1.0.0",
+    "socket.io": ">= 0.6.3",
     "jquery": ">= 1.4.3"
   },
   "keywords": ["framework", "websockets", "coffeescript"],
   "bin": { "zappa": "./bin/zappa.coffee" },
   "directories": { "lib": "./lib" },
-  "engines": { "node": ">= 0.2.5" }
+  "engines": { "node": ">= 0.2.6" }
 }

@@ -298,7 +298,7 @@ If there's a `./public` dir on the same level as your app's main file, static fi
 
 ## Testing
 
-At the moment there are no unit tests or specs. However the tests currently provided are "headed" tests which run in the browser via "remote control". Pretty radical.
+At the moment there are no unit tests or specs. However the tests currently provided are "headed" tests which run in the browser via "remote control".
 
 To run the headed, awesome, remote-control, in-browser tests you need Firefox 3.
 
@@ -312,13 +312,9 @@ Before the tests can be run, the [Selenium RC](http://seleniumhq.org/projects/re
   
 You can get the Selenium RC from http://selenium.googlecode.com/files/selenium-remote-control-1.0.3.zip.
 
-Once it's running, simply launch the automated tests...
+Once it's running, simply launch the automated tests:
 
     cake test
-  
-What happens next is mind-blowingly amazing; but I'll leave that as a special surprise for the brave and fearless testers.
-
-P.S: The tests are asynchronous ... *drool*
 
 ## Whew!
 
