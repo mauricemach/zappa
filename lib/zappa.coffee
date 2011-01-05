@@ -201,7 +201,7 @@ class App
   client: (arg) ->
     pairs = if typeof arg is 'object' then arg else {default: arg}
     for k, v of pairs
-      do (k, v) ->
+      do (k, v) =>
         code = ";(#{v})();"
         @http_server.get "/#{k}.js", (req, res) ->
           res.contentType 'bla.js'
@@ -210,7 +210,7 @@ class App
   style: (arg) ->
     pairs = if typeof arg is 'object' then arg else {default: arg}
     for k, v of pairs
-      do (k, v) ->
+      do (k, v) =>
         @http_server.get "/#{k}.css", (req, res) ->
           res.contentType 'bla.css'
           res.send v
@@ -233,7 +233,7 @@ class RequestHandler
       @locals[k] = v
 
     for k, v of @helpers
-      do (k, v) ->
+      do (k, v) =>
         @locals[k] = ->
           v(@context, @, arguments)
 
@@ -323,7 +323,7 @@ class MessageHandler
       @locals[k] = v
 
     for k, v of @app.helpers
-      do (k, v) ->
+      do (k, v) =>
         @locals[k] = ->
           v(@context, @, arguments)
 
