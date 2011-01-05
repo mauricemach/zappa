@@ -397,6 +397,12 @@ coffeescript_support = """
     ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;
     return child;
   };
+  var __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
 """
 
 build_msg = (title, data) ->
