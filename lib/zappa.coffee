@@ -88,7 +88,8 @@ class App
       @http_server.use express.staticProvider("#{process.cwd()}/public")
       @http_server.use express.bodyDecoder()
       @http_server.use express.cookieDecoder()
-      @http_server.use express.session()
+      # TODO: Make the secret configurable.
+      @http_server.use express.session(secret: 'hackme')
 
     # App-level vars, exposed to handlers as [app]."
     @vars = {}
