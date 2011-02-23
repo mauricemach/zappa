@@ -20,5 +20,6 @@
   "keywords": ["framework", "websockets", "coffeescript"],
   "bin": { "zappa": "./bin/zappa.coffee" },
   "directories": { "lib": "./lib" },
+  "main": "./lib/index",
   "engines": { "node": ">= 0.2.6" }
 }
