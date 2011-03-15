@@ -85,9 +85,9 @@ class App
       @http_server.register '.coffee', coffeekup
       @http_server.set 'view engine', 'coffee'
     @http_server.configure =>
-      @http_server.use express.staticProvider("#{process.cwd()}/public")
-      @http_server.use express.bodyDecoder()
-      @http_server.use express.cookieDecoder()
+      @http_server.use express.static("#{process.cwd()}/public")
+      @http_server.use express.bodyParser()
+      @http_server.use express.cookieParser()
       # TODO: Make the secret configurable.
       @http_server.use express.session(secret: 'hackme')
 
