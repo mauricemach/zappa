@@ -1,3 +1,7 @@
+**v0.1.5** (2010-05-06):
+
+  - Reworked packaging for npm 1.x.
+
 **v0.1.4** (2010-01-05):
 
   - Updated to CoffeeScript 1.0.0 and node 0.2.6/0.3.3.

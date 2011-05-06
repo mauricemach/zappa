@@ -1,9 +1,9 @@
 {spawn, exec} = require 'child_process'
 
-{puts} = require 'sys'
+{puts} = console.log
 
 task 'build', ->
-  exec 'coffee -c lib/zappa.coffee', (err) ->
+  exec 'coffee -o lib -c src/*.coffee', (err) ->
     puts err if err
 
 task 'test', ->

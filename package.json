@@ -1,7 +1,7 @@
 {
   "name": "zappa",
   "description": "Web development, cut-the-crap style.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "contributors": [ 
     {"name": "Maurice Machado", "email": "maurice@bitbending.com"},
@@ -10,16 +10,16 @@
     {"name": "Vladimir Dronnikov", "email": "dronnikov@gmail.com"},
     {"name": "Isaac Wolkerstorfer", "email": "agnoster@gmail.com"}
   ],
+  "repository": {"type": "git", "url": "http://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "express": ">= 1.0.1",
-    "coffeekup": ">= 0.2.2",
-    "coffee-script": ">= 1.0.0",
+    "express": ">= 2.3.0",
+    "coffeekup": ">= 0.2.3",
+    "coffee-script": ">= 1.0.1",
     "socket.io": ">= 0.6.3",
-    "jquery": ">= 1.4.3"
+    "jquery": ">= 1.5.1"
   },
   "keywords": ["framework", "websockets", "coffeescript"],
-  "bin": { "zappa": "./bin/zappa.coffee" },
-  "directories": { "lib": "./lib" },
-  "main": "./lib/index",
-  "engines": { "node": ">= 0.2.6" }
+  "bin": "./bin/zappa",
+  "main": "./lib/zappa",
+  "engines": { "node": ">= 0.4.1" }
 }

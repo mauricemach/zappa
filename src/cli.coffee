@@ -1,6 +1,4 @@
-#!/usr/bin/env coffee
-
-zappa = require 'zappa'
+zappa = require './zappa'
 coffee = require 'coffee-script'
 fs = require 'fs'
 path = require 'path'
@@ -12,12 +10,8 @@ child = null
 file = null
 watching = []
 
-# On coffee-script@0.9.6, argv looks like [filename],
-# On coffee-script@1.0.0, argv looks like ["node", "path/to/coffee", filename]
-if process.argv[0] is 'node' and process.argv.length >= 2
-  argv = process.argv[2..]
-else
-  argv = process.argv[0..]
+argv = process.argv[2..]
+options = null
 
 usage = '''
   Usage:
@@ -70,36 +64,37 @@ watch = (file) ->
     child.kill() # Infanticide!
     spawn_child()
 
-parser = new OptionParser switches, usage
-options = parser.parse argv
-args = options.arguments
-delete options.arguments
+@run = ->
+  parser = new OptionParser switches, usage
+  options = parser.parse argv
+  args = options.arguments
+  delete options.arguments
 
-if options.port
-  options.port = if options.port.match /,/ then options.port.split ',' else [options.port]
-  for i, p of options.port
-    options.port[i] = parseInt(p)
+  if options.port
+    options.port = if options.port.match /,/ then options.port.split ',' else [options.port]
+    for i, p of options.port
+      options.port[i] = parseInt(p)
 
-if args.length is 0
-  puts parser.help() if options.help or argv.length is 0
-  puts zappa.version if options.version
-  process.exit()
-else
-  file = args[0]
-  
-  path.exists file, (exists) ->
-    if not exists
-      puts "\"#{file}\" not found."
-      process.exit -1
+  if args.length is 0
+    puts parser.help() if options.help or argv.length is 0
+    puts zappa.version if options.version
+    process.exit()
+  else
+    file = args[0]
     
-    if options.compile
-      compile file, (err) ->
-        if err then puts err; process.exit -1
-        else process.exit()
-    else
-      if options.watch
-        remove_watch_option()
-        spawn_child()
-        watch file
+    path.exists file, (exists) ->
+      if not exists
+        puts "\"#{file}\" not found."
+        process.exit -1
+      
+      if options.compile
+        compile file, (err) ->
+          if err then puts err; process.exit -1
+          else process.exit()
       else
-        zappa.run_file file, options
+        if options.watch
+          remove_watch_option()
+          spawn_child()
+          watch file
+        else
+          zappa.run_file file, options
