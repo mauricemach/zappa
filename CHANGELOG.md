@@ -1,6 +1,6 @@
 **v0.1.5** (2010-05-06):
 
-  - Reworked packaging for npm 1.x.
+  - Compatible with npm 1.x.
 
 **v0.1.4** (2010-01-05):
 
