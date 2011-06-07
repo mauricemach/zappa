@@ -52,7 +52,7 @@ spawn_child = ->
     data = String(data)
     if data.match /^Included file \".*\.coffee\"/
       included = data.match(/^Included file \"(.*\.coffee)\"/)[1]
-      watch path.join(path.dirname(file), included) unless included in watching
+      watch path.resolve included unless included in watching
       watching.push included
     puts data
   child.stderr.on 'data', (data) -> puts String(data)
