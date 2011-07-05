@@ -125,7 +125,7 @@ class App
 
     if io?
       @ws_server = io.listen @http_server, {log: ->}
-      @ws_server.on 'connection', (client) =>
+      @ws_server.sockets.on 'connection', (client) =>
         @socket_handlers.connection?.execute client
         client.on 'disconnect', => @socket_handlers.disconnection?.execute client
         client.on 'message', (raw_msg) =>
@@ -345,7 +345,7 @@ class MessageHandler
       except ?= []
       if except not instanceof Array then except = [except]
       except.push @locals.id
-      @app.ws_server.broadcast build_msg(title, data), except
+      client.broadcast.emit build_msg(title, data), except
 
     for k, v of params
       @locals.context[k] = v
