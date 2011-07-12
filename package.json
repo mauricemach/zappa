@@ -1,7 +1,7 @@
 {
   "name": "zappa",
-  "description": "Web development, cut-the-crap style.",
-  "version": "0.1.5",
+  "description": "CoffeeScript DSL-ish interface to node development.",
+  "version": "0.2.0",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "contributors": [ 
     {"name": "Maurice Machado", "email": "maurice@bitbending.com"},
@@ -12,14 +12,11 @@
   ],
   "repository": {"type": "git", "url": "http://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "express": ">= 2.3.0",
-    "coffeekup": ">= 0.2.3",
-    "coffee-script": ">= 1.0.1",
-    "socket.io": ">= 0.6.3",
-    "jquery": ">= 1.5.1"
+    "express": ">= 2.4.2",
+    "coffee-script": ">= 1.1.1",
+    "socket.io": ">= 0.7.6"
   },
   "keywords": ["framework", "websockets", "coffeescript"],
-  "bin": "./bin/zappa",
   "main": "./lib/zappa",
-  "engines": { "node": ">= 0.4.1" }
+  "engines": { "node": ">= 0.4.9" }
 }

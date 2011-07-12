@@ -1,393 +1,17 @@
-zappa = exports
-express = require 'express'
+# **Zappa** is a [CoffeeScript](http://coffeescript.org) DSL-ish interface for building web apps on the
+# [node.js](http://nodejs.org) runtime, integrating [express](http://expressjs.com), [socket.io](http://socket.io)
+# and other best-of-breed libraries.
+
+log = console.log
 fs = require 'fs'
-puts = console.log
-{inspect} = require 'sys'
-coffee = null
-jquery = null
-io = null
-coffeekup = null
 
-class Zappa
-  constructor: ->
-    @context = {}
-    @apps = {}
-    @current_app = null
+@version = '0.2.0'
 
-    @locals =
-      app: (name) => @app name
-      include: (path) => @include path
-      require: require
-      global: global
-      process: process
-      module: module
-
-    for name in 'get|post|put|del|route|at|msg|client|using|def|helper|postrender|layout|view|style'.split '|'
-      do (name) =>
-        @locals[name] = =>
-          @ensure_app 'default' unless @current_app?
-          @current_app[name].apply @current_app, arguments
-
-  app: (name) ->
-    @ensure_app name
-    @current_app = @apps[name]
-  
-  include: (file) ->
-    @define_with @read_and_compile(file)
-    puts "Included file \"#{file}\""
-
-  define_with: (code) ->
-    scoped(code)(@context, @locals)
-
-  ensure_app: (name) ->
-    @apps[name] = new App(name) unless @apps[name]?
-    @current_app = @apps[name] unless @current_app?
-
-  read_and_compile: (file) ->
-    coffee = require 'coffee-script'
-    code = @read file
-    coffee.compile code
-  
-  read: (file) -> fs.readFileSync file, 'utf8'
-  
-  run_file: (file, options) ->
-    @locals.__filename = require('path').join(process.cwd(), file)
-    @locals.__dirname = process.cwd()
-    @locals.module.filename = @locals.__filename
-    code = if file.match /\.coffee$/ then @read_and_compile file else @read file
-    @run code, options
-  
-  run: (code, options) ->
-    options ?= {}
-
-    @define_with code
-    
-    i = 0
-    for k, a of @apps
-      opts = {}
-      if options.port
-        opts.port = if options.port[i]? then options.port[i] else a.port + i
-      else if i isnt 0
-        opts.port = a.port + i
-
-      opts.hostname = options.hostname if options.hostname
-
-      a.start opts
-      i++
-
-class App
-  constructor: (@name) ->
-    @name ?= 'default'
-    @port = 5678
-    
-    @http_server = express.createServer()
-    if coffeekup?
-      @http_server.register '.coffee', coffeekup
-      @http_server.set 'view engine', 'coffee'
-    @http_server.configure =>
-      @http_server.use express.static("#{process.cwd()}/public")
-      @http_server.use express.bodyParser()
-      @http_server.use express.cookieParser()
-      # TODO: Make the secret configurable.
-      @http_server.use express.session(secret: 'hackme')
-
-    # App-level vars, exposed to handlers as [app]."
-    @vars = {}
-    
-    @defs = {}
-    @helpers = {}
-    @postrenders = {}
-    @socket_handlers = {}
-    @msg_handlers = {}
-
-    @views = {}
-    @layouts = {}
-    @layouts.default = ->
-      doctype 5
-      html ->
-        head ->
-          title @title if @title
-          if @scripts
-            for s in @scripts
-              script src: s + '.js'
-          script(src: @script + '.js') if @script
-          if @stylesheets
-            for s in @stylesheets
-              link rel: 'stylesheet', href: s + '.css'
-          link(rel: 'stylesheet', href: @stylesheet + '.css') if @stylesheet
-          style @style if @style
-        body @content
-    
-  start: (options) ->
-    options ?= {}
-    @port = options.port if options.port
-    @hostname = options.hostname if options.hostname
-
-    if io?
-      @ws_server = io.listen @http_server, {log: ->}
-      @ws_server.on 'connection', (client) =>
-        @socket_handlers.connection?.execute client
-        client.on 'disconnect', => @socket_handlers.disconnection?.execute client
-        client.on 'message', (raw_msg) =>
-          msg = parse_msg raw_msg
-          @msg_handlers[msg.title]?.execute client, msg.params
-
-    if @hostname? then @http_server.listen @port, @hostname
-    else @http_server.listen @port
-    
-    puts "App \"#{@name}\" listening on #{if @hostname? then @hostname + ':' else '*:'}#{@port}..."
-    @http_server
-
-  get: -> @route 'get', arguments
-  post: -> @route 'post', arguments
-  put: -> @route 'put', arguments
-  del: -> @route 'del', arguments
-  route: (verb, args) ->
-    if typeof args[0] isnt 'object'
-      @register_route verb, args[0], args[1]
-    else
-      for k, v of args[0]
-        @register_route verb, k, v
-
-  register_route: (verb, path, response) ->
-    if typeof response isnt 'function'
-      @http_server[verb] path, (req, res) -> res.send String(response)
-    else
-      handler = new RequestHandler(response, @defs, @helpers, @postrenders, @views, @layouts, @vars)
-      @http_server[verb] path, (req, res, next) ->
-        handler.execute(req, res, next)
-
-  using: ->
-    pairs = {}
-    for a in arguments
-      pairs[a] = require(a)
-    @def pairs
-   
-  def: (pairs) ->
-    for k, v of pairs
-      @defs[k] = v
-   
-  helper: (pairs) ->
-    for k, v of pairs
-      @helpers[k] = scoped(v)
-
-  postrender: (pairs) ->
-    jquery = require 'jquery'
-    for k, v of pairs
-      @postrenders[k] = scoped(v)
-
-  at: (pairs) ->
-    io = require 'socket.io'
-    for k, v of pairs
-      @socket_handlers[k] = new MessageHandler(v, @)
-
-  msg: (pairs) ->
-    io = require 'socket.io'
-    for k, v of pairs
-      @msg_handlers[k] = new MessageHandler(v, @)
-
-  layout: (arg) ->
-    pairs = if typeof arg is 'object' then arg else {default: arg}
-    coffeekup = require 'coffeekup'
-    for k, v of pairs
-      @layouts[k] = v
-   
-  view: (arg) ->
-    pairs = if typeof arg is 'object' then arg else {default: arg}
-    coffeekup = require 'coffeekup'
-    for k, v of pairs
-      @views[k] = v
-
-  client: (arg) ->
-    pairs = if typeof arg is 'object' then arg else {default: arg}
-    for k, v of pairs
-      do (k, v) =>
-        code = ";(#{v})();"
-        @http_server.get "/#{k}.js", (req, res) ->
-          res.contentType 'bla.js'
-          res.send code
-
-  style: (arg) ->
-    pairs = if typeof arg is 'object' then arg else {default: arg}
-    for k, v of pairs
-      do (k, v) =>
-        @http_server.get "/#{k}.css", (req, res) ->
-          res.contentType 'bla.css'
-          res.send v
-
-class RequestHandler
-  constructor: (handler, @defs, @helpers, @postrenders, @views, @layouts, @vars) ->
-    @handler = scoped(handler)
-    @locals = null
-
-  init_locals: ->
-    @locals = {}
-    @locals.app = @vars
-    @locals.render = @render
-    @locals.partial = @partial
-    @locals.redirect = @redirect
-    @locals.send = @send
-    @locals.puts = puts
-
-    for k, v of @defs
-      @locals[k] = v
-
-    for k, v of @helpers
-      do (k, v) =>
-        @locals[k] = ->
-          v(@context, @, arguments)
-
-    @locals.defs = @defs
-    @locals.postrenders = @postrenders
-    @locals.views = @views
-    @locals.layouts = @layouts
-
-  execute: (request, response, next) ->
-    @init_locals() unless @locals?
-
-    @locals.context = {}
-    @locals.params = @locals.context
-
-    @locals.request = request
-    @locals.response = response
-    @locals.next = next
-
-    @locals.session = request.session
-    @locals.cookies = request.cookies
-
-    for k, v of request.query
-      @locals.context[k] = v
-    for k, v of request.params
-      @locals.context[k] = v
-    for k, v of request.body
-      @locals.context[k] = v
-
-    result = @handler(@locals.context, @locals)
-
-    if typeof result is 'string'
-      response.send result
-    else
-      result
-
-  redirect: -> @response.redirect.apply @response, arguments
-  send: -> @response.send.apply @response, arguments
-
-  render: (template, options) ->
-    options ?= {}
-    options.layout ?= 'default'
-
-    opts = options.options or {} # Options for the templating engine.
-    opts.context ?= @context
-    opts.context.zappa = partial: @partial
-    opts.locals ?= {}
-    opts.locals.partial = (template, context) ->
-      text ck_options.context.zappa.partial template, context
-
-    template = @views[template] if typeof template is 'string'
-
-    result = coffeekup.render template, opts
-
-    if typeof options.apply is 'string'
-      postrender = @postrenders[options.apply]
-      body = jquery('body')
-      body.empty().html(result)
-      postrender opts.context, jquery.extend(@defs, {$: jquery})
-      result = body.html()
-
-    if options.layout
-      layout = @layouts[options.layout]
-      opts.context.content = result
-      result = coffeekup.render layout, opts
-
-    @response.send result
-
-    null
-
-  partial: (template, context) =>
-    template = @views[template]
-    coffeekup.render(template, context: context)
-
-class MessageHandler
-  constructor: (handler, @app) ->
-    @handler = scoped(handler)
-    @locals = null
-
-  init_locals: ->
-    @locals = {}
-    @locals.app = @app.vars
-    @locals.render = @render
-    @locals.partial = @partial
-    @locals.puts = puts
-  
-    for k, v of @app.defs
-      @locals[k] = v
-
-    for k, v of @app.helpers
-      do (k, v) =>
-        @locals[k] = ->
-          v(@context, @, arguments)
-
-    @locals.defs = @app.defs
-    @locals.postrenders = @app.postrenders
-    @locals.views = @app.views
-    @locals.layouts = @app.layouts
-
-  execute: (client, params) ->
-    @init_locals() unless @locals?
-
-    @locals.context = {}
-    @locals.params = @locals.context
-    @locals.client = client
-    # TODO: Move this to context.
-    @locals.id = client.sessionId
-    @locals.send = (title, data) => client.send build_msg(title, data)
-    @locals.broadcast = (title, data, except) =>
-      except ?= []
-      if except not instanceof Array then except = [except]
-      except.push @locals.id
-      @app.ws_server.broadcast build_msg(title, data), except
-
-    for k, v of params
-      @locals.context[k] = v
-
-    @handler(@locals.context, @locals)
-
-  render: (template, options) ->
-    options ?= {}
-    options.layout ?= 'default'
-
-    opts = options.options or {} # Options for the templating engine.
-    opts.context ?= @context
-    opts.context.zappa = partial: @partial
-    opts.locals ?= {}
-    opts.locals.partial = (template, context) ->
-      text ck_options.context.zappa.partial template, context
-
-    template = @app.views[template] if typeof template is 'string'
-
-    result = coffeekup.render template, opts
-
-    if typeof options.apply is 'string'
-      postrender = @postrenders[options.apply]
-      body = jquery('body')
-      body.empty().html(result)
-      postrender opts.context, jquery.extend(@defs, {$: jquery})
-      result = body.html()
-
-    if options.layout
-      layout = @layouts[options.layout]
-      opts.context.content = result
-      result = coffeekup.render layout, opts
-
-    @send 'render', value: result
-
-    null
-
-  partial: (template, context) =>
-    template = @app.views[template]
-    coffeekup.render(template, context: context)
-
-coffeescript_support = """
+# CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
+# a function (see below) though, it loses access to its parent scope, and consequently to
+# any helpers it might need. So we need to reintroduce these helpers manually inside any
+# "rewritten" function.
+coffeescript_helpers = """
   var __slice = Array.prototype.slice;
   var __hasProp = Object.prototype.hasOwnProperty;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -395,42 +19,372 @@ coffeescript_support = """
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;
-    return child;
-  };
+    return child; };
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
-    }
-    return -1;
-  };
-"""
+    } return -1; };
+""".replace /\n/g, ''
 
-build_msg = (title, data) ->
-  obj = {}
-  obj[title] = data
-  JSON.stringify(obj)
-
-parse_msg = (raw_msg) ->
-  obj = JSON.parse(raw_msg)
-  for k, v of obj
-    return {title: k, params: v}
-
-scoped = (code) ->
-  code = String(code)
-  code = "function () {#{code}}" unless code.indexOf('function') is 0
-  code = "#{coffeescript_support} with(locals) {return (#{code}).apply(context, args);}"
+# "Rewrites" a function so that it accepts the value of @/this ("context")
+# and local variables as parameters.
+# The names of local variables to be "extracted" have to be provided beforehand.
+# The function will lose access to its parent scope in the process.
+rewrite_function = (func, locals_names) ->
+  code = String(func)
+  code = "function () {#{code}}" unless code.indexOf 'function' is 0
+  code = "#{coffeescript_helpers}return (#{code}).apply(context, args);"
+  for name in locals_names
+    code = "var #{name} = locals.#{name};" + code
   new Function('context', 'locals', 'args', code)
 
-publish_api = (from, to, methods) ->
-  for name in methods.split '|'
-    do (name) ->
-      if typeof from[name] is 'function'
-        to[name] = -> from[name].apply from, arguments
+# Takes in a function and builds express/socket.io apps based on the rules contained in it.
+@app = (root_function) ->
+  # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
+  # Helpers and defs will be known after we execute the user-provided `root_function`.
+  # TODO: __filename and __dirname won't work this way. Find another solution.
+  globals = ['global', 'process', 'console', 'require', '__filename', '__dirname',
+    'module', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']  
+  # TODO: using?, route?, postrender?, enable, disable, settings, error
+  root_locals_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
+    'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'client', 'coffee', 'js', 'css',
+    'enable', 'disable']
+  # TODO: app? (something shared with ws_handlers), app.clients?
+  http_locals_names = ['response', 'request', 'next', 'params', 'send', 'render', 'redirect']
+  # TODO: emit?, broadcast, render?, app? (shared between http-ws, persistent)
+  ws_locals_names = ['socket', 'id', 'params', 'client']
+  helpers_names = []
+  defs_names = []
+
+  # Storage for the functions provided by the user.
+  routes = []
+  ws_handlers = {}
+  helpers = {}
+  defs = {}
+  views = {}
+  
+  # Builds the applications's root scope.
+  express = require 'express'
+  socketio = require 'socket.io'
+
+  # Monkeypatch express to support inline templates. Such is life.
+  express.View.prototype.__defineGetter__ 'exists', ->
+    return true if views[@view]?
+    try
+      fs.statSync(@path)
+      return true
+    catch err
+      return false
+  express.View.prototype.__defineGetter__ 'contents', ->
+    return views[@view] if views[@view]?
+    fs.readFileSync @path, 'utf8'
+
+  app = express.createServer()
+  io = socketio.listen(app)
+  io.set 'log level', 1
+
+  root_context = {}
+  root_locals = {express, io, app}
+  root_locals[g] = eval(g) for g in globals
+
+  for verb in ['get', 'post', 'put', 'del']
+    do (verb) ->
+      root_locals[verb] = ->
+        if typeof arguments[0] isnt 'object'
+          routes.push verb: verb, path: arguments[0], handler: arguments[1]
+        else
+          for k, v of arguments[0]
+            routes.push verb: verb, path: k, handler: v
+
+  root_locals.client = (obj) ->
+    app.enable 'zappa serve client'
+    for k, v of obj
+      js = ";zappa.run(#{v});"
+      routes.push verb: 'get', path: k, handler: js, contentType: 'js'
+
+  root_locals.coffee = (obj) ->
+    for k, v of obj
+      js = ";#{coffeescript_helpers}(#{v})();"
+      routes.push verb: 'get', path: k, handler: js, contentType: 'js'
+
+  root_locals.js = (obj) ->
+    for k, v of obj
+      js = String(v)
+      routes.push verb: 'get', path: k, handler: js, contentType: 'js'
+
+  root_locals.css = (obj) ->
+    for k, v of obj
+      css = String(v)
+      routes.push verb: 'get', path: k, handler: css, contentType: 'css'
+
+  root_locals.helper = (obj) ->
+    for k, v of obj
+      helpers_names.push k
+      helpers[k] = v
+
+  root_locals.def = (obj) ->
+    for k, v of obj
+      defs_names.push k
+      defs[k] = v
+
+  root_locals.at = (obj) ->
+    for k, v of obj
+      ws_handlers[k] = v
+
+  root_locals.view = (obj) ->
+    for k, v of obj
+      views[k] = v
+
+  root_locals.set = (obj) ->
+    for k, v of obj
+      app.set k, v
+
+  root_locals.use = (obj) ->
+    app.use.apply app, arguments
+
+  root_locals.configure = ->
+    app.configure.apply app, arguments
+
+  root_locals.include = (name) ->
+    sub = require name
+    rewritten_sub = rewrite_function(sub, root_locals_names.concat(globals))
+    rewritten_sub(root_context, root_locals)
+
+  # Executes the (rewriten) end-user function and learns how the app should be structured.
+  rewritten_root = rewrite_function(root_function, root_locals_names.concat(globals))
+  rewritten_root(root_context, root_locals)
+
+  # Implements the application according to the specification.
+
+  for k, v of helpers
+    helpers[k] = rewrite_function(v, http_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
+
+  for k, v of ws_handlers
+    ws_handlers[k] = rewrite_function(v, ws_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
+
+  if app.settings['zappa serve client']
+    app.get '/zappa/zappa.js', (req, res) ->
+      res.contentType 'js'
+      res.send ";#{coffeescript_helpers}(#{zappa_client_js})();"
+
+  if app.settings['zappa serve jquery']
+    app.get '/zappa/jquery.js', (req, res) ->
+      res.contentType 'js'
+      fs.readFile 'node_modules/jquery/dist/node-jquery.min.js', (err, data) ->
+        res.send data.toString()
+
+  if app.settings['zappa serve sammy']
+    app.get '/zappa/sammy.js', (req, res) ->
+      res.contentType 'js'
+      fs.readFile 'sammy.min.js', (err, data) ->
+        res.send data.toString()
+
+  # Implements the http server with express.
+  for r in routes
+    do (r) ->
+      if typeof r.handler is 'string'
+        app[r.verb] r.path, (req, res) ->
+          res.contentType r.contentType if r.contentType?
+          res.send r.handler
       else
-        to[name] = from[name]
+        rewritten_handler = rewrite_function(r.handler,
+          http_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
 
-z = new Zappa()
+        context = null
+        locals = {}
+        locals[g] = eval(g) for g in globals
 
-zappa.version = '0.1.5'
-zappa.run = -> z.run.apply z, arguments
-zappa.run_file = -> z.run_file.apply z, arguments
+        for name, def of defs
+          locals[name] = def
+
+        for name, helper of helpers
+          locals[name] = ->
+            helper(context, locals, arguments)
+            
+        app[r.verb] r.path, (req, res, next) ->
+          context = {}
+          context[k] = v for k, v of req.query
+          context[k] = v for k, v of req.params
+          context[k] = v for k, v of req.body
+          locals.params = context
+          locals.request = req
+          locals.response = res
+          locals.next = next
+          locals.send = -> res.send.apply res, arguments
+          locals.render = ->
+            args = []
+            args.push a for a in arguments
+            args[1] ?= {}
+            args[1][k] = v for k, v of context
+            res.render.apply res, args
+          locals.redirect = -> res.redirect.apply res, arguments
+          result = rewritten_handler(context, locals)
+          res.contentType(r.contentType) if r.contentType?
+          if typeof result is 'string' then res.send result
+          else return result
+
+  # Implements the websockets server with socket.io.
+  io.sockets.on 'connection', (socket) ->
+    context = {}
+    locals = {socket, id: socket.id, client: {}}
+    locals[g] = eval(g) for g in globals
+
+    for name, def of defs
+      locals[name] = def
+
+    for name, helper of helpers
+      locals[name] = ->
+        helper(context, locals, arguments)
+    
+    ws_handlers.connection(context, locals) if ws_handlers.connection?
+
+    socket.on 'disconnect', ->
+      context = {}
+      ws_handlers.disconnect(context, locals) if ws_handlers.disconnect?
+
+    for name, h of ws_handlers
+      if name isnt 'connection' and name isnt 'disconnect'
+        socket.on name, (data) ->
+          context = {}
+          locals.params = context
+          for k, v of data
+            context[k] = v
+          h(context, locals)
+
+  {app, io}
+
+# Takes a function and runs it as a zappa app. Optionally accepts a number for port,
+# and/or a string for hostname (any order).
+# Returns an object where `app` is the express server and `io` is the socket.io handle.
+# Ex.:
+#     require('zappa').run -> get '/': 'hi'
+#     require('zappa').run 80, -> get '/': 'hi'
+#     require('zappa').run 'domain.com', 80, -> get '/': 'hi'
+@run = ->
+  host = null
+  port = 5678
+  root_function = null
+
+  for a in arguments
+    switch typeof a
+      when 'string' then host = a
+      when 'number' then port = a
+      when 'function' then root_function = a
+
+  zapp = @app(root_function)
+
+  if host? then zapp.app.listen port, host
+  else zapp.app.listen port
+
+  zapp
+
+# Client-side zappa.
+zappa_client = ->
+  zappa = window.zappa = {}
+  zappa.version = null
+
+  coffeescript_helpers = null
+  rewrite_function = null
+
+  zappa.run = (root_function) ->
+    root_locals_names = ['def', 'helper', 'get', 'socket', 'connect', 'at']
+    sammy_locals_names = []
+    ws_locals_names = ['socket', 'id', 'params', 'client']
+    helpers_names = []
+    defs_names = []
+
+    # Storage for the functions provided by the user.
+    routes = []
+    ws_handlers = {}
+    helpers = {}
+    defs = {}
+
+    socket = null
+    app = Sammy() if Sammy?
+
+    root_context = {}
+    root_locals = {}
+
+    root_locals.get = ->
+      if typeof arguments[0] isnt 'object'
+        routes.push({path: arguments[0], handler: arguments[1]})
+      else
+        for k, v of arguments[0]
+          routes.push({path: k, handler: v})
+
+    root_locals.helper = (obj) ->
+      for k, v of obj
+        helpers_names.push k
+        helpers[k] = v
+
+    root_locals.def = (obj) ->
+      for k, v of obj
+        defs_names.push k
+        defs[k] = v
+
+    root_locals.at = (obj) ->
+      for k, v of obj
+        ws_handlers[k] = v
+
+    root_locals.connect = ->
+      socket = io.connect.apply io, arguments
+
+    # Executes the (rewriten) end-user function and learns how the app should be structured.
+    rewritten_root = rewrite_function(root_function, root_locals_names)
+    rewritten_root(root_context, root_locals)
+
+    # Implements the application according to the specification.
+
+    for k, v of helpers
+      helpers[k] = rewrite_function(v, http_locals_names.concat(helpers_names).concat(defs_names))
+
+    for k, v of ws_handlers
+      ws_handlers[k] = rewrite_function(v, ws_locals_names.concat(helpers_names).concat(defs_names))
+
+    for r in routes
+      do (r) ->
+        rewritten_handler = rewrite_function(r.handler,
+          sammy_locals_names.concat(helpers_names).concat(defs_names))
+
+        context = null
+        locals = {}
+
+        for name, def of defs
+          locals[name] = def
+
+        for name, helper of helpers
+          locals[name] = ->
+            helper(context, locals, arguments)
+
+        app.get r.path, ->
+          context = {}
+          locals.params = context
+          rewritten_handler(context, locals)
+
+    # Implements the websockets client with socket.io.
+    if socket?
+      context = {}
+      locals = {socket}
+
+      for name, def of defs
+        locals[name] = def
+
+      for name, helper of helpers
+        locals[name] = ->
+          helper(context, locals, arguments)
+
+      for name, h of ws_handlers
+        socket.on name, (data) ->
+          context = {}
+          locals.params = context
+          for k, v of data
+            context[k] = v
+          h(context, locals)
+
+    $(-> app.run '#/')
+
+zappa_client_js = String(zappa_client)
+  .replace('version = null;', "version = '#{@version}';")
+  .replace('coffeescript_helpers = null;', "var coffeescript_helpers = '#{coffeescript_helpers}';")
+  .replace('rewrite_function = null;', "var rewrite_function = #{rewrite_function};")
+  .replace /(\n)/g, ''
