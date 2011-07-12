@@ -16,7 +16,7 @@
     partials, etc), while retaining the ability to define templates in-file with the `view` function and
     pass variables to the template through `@/this`. 
 
-  - The `include` function now is implemented through the standard `require`. Files `include`'d files should
+  - The `include` function now is implemented through the standard `require`. Files `include`'d should
     just add a `module.exports = ->` line.
 
   - Using the new socket.io 0.7.x API which is a lot closer to how zappa works.
