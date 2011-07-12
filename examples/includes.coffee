@@ -1,2 +1,3 @@
-include 'hi.coffee'
-include 'multiple.coffee'
+require('zappa').run ->
+  include './hi'
+  include './multiple'

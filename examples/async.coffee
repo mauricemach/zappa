@@ -1,17 +1,18 @@
-def sleep: (secs, cb) ->
-  setTimeout cb, secs * 1000
+require('zappa').run ->
+  def sleep: (secs, cb) ->
+    setTimeout cb, secs * 1000
 
-get
-  '/': -> redirect '/bar'
+  get
+    '/': -> redirect '/bar'
 
-  '/:foo': ->
-    @foo += '?'
-    sleep 5, =>
-      @foo += '!'
+    '/:foo': ->
+      @foo += '?'
+      sleep 5, =>
+        @foo += '!'
     
-      @title = 'Async'
-      render 'default'
+        @title = 'Async'
+        render 'index'
 
-view ->
-  h1 @title
-  p @foo
+  view index: ->
+    h1 @title
+    p @foo

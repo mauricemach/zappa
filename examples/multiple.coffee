@@ -1,7 +1,12 @@
-get '/': 'blog'
+zappa = require 'zappa'
 
-app 'chat'
-get '/': 'chat'
+zappa.run 8000, ->
+  get '/': 'blog'
 
-app 'wiki'
-get '/': 'wiki'
+zappa.run 8001, ->
+  #app 'chat'
+  get '/': 'chat'
+
+zappa.run 8002, ->
+  #app 'wiki'
+  get '/': 'wiki'

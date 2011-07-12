@@ -1,1 +1,2 @@
-get '/': 'hi'
+require('zappa').run ->
+  get '/': 'hi'

@@ -5,9 +5,9 @@ get '/': ->
     {name: 'python', url: 'http://python.org'}
   ]
 
-  render 'default', options: {format: yes}
+  render 'index', options: {format: yes}
 
-view ->
+view index: ->
   ul ->
     for i in @items
       partial 'item', i: i
