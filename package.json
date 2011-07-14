@@ -1,6 +1,6 @@
 {
   "name": "zappa",
-  "description": "CoffeeScript DSL-ish interface to node development.",
+  "description": "CoffeeScript DSL-ish interface to express and socket.io.",
   "version": "0.2.0beta",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "contributors": [ 
@@ -12,10 +12,10 @@
   ],
   "repository": {"type": "git", "url": "http://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "express": ">= 2.4.2",
-    "socket.io": ">= 0.7.6"
+    "express": ">= 2.4.3",
+    "socket.io": ">= 0.7.7"
   },
-  "keywords": ["framework", "websockets", "coffeescript"],
+  "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sinatra"],
   "main": "./lib/zappa",
   "engines": { "node": ">= 0.4.9" }
 }
