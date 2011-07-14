@@ -1,7 +1,7 @@
 {
   "name": "zappa",
   "description": "CoffeeScript DSL-ish interface to node development.",
-  "version": "0.2.0",
+  "version": "0.2.0beta",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "contributors": [ 
     {"name": "Maurice Machado", "email": "maurice@bitbending.com"},

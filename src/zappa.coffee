@@ -5,7 +5,7 @@
 log = console.log
 fs = require 'fs'
 
-@version = '0.2.0'
+@version = '0.2.0beta'
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 # a function (see below) though, it loses access to its parent scope, and consequently to
