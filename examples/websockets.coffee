@@ -18,7 +18,7 @@ msg said: ->
 
 client ->
   $(document).ready ->
-    socket = new io.Socket()
+    socket = io.connect()
 
     socket.on 'connect', -> $('#log').append '<p>Connected</p>'
     socket.on 'disconnect', -> $('#log').append '<p>Disconnected</p>'
@@ -32,7 +32,6 @@ client ->
       $('#box').val('').focus()
       false
 
-    socket.connect()
     $('#box').focus()
 
 view ->

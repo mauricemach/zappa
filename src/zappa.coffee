@@ -339,13 +339,10 @@ class MessageHandler
     @locals.params = @locals.context
     @locals.client = client
     # TODO: Move this to context.
-    @locals.id = client.sessionId
+    @locals.id = client.id
     @locals.send = (title, data) => client.send build_msg(title, data)
-    @locals.broadcast = (title, data, except) =>
-      except ?= []
-      if except not instanceof Array then except = [except]
-      except.push @locals.id
-      client.broadcast.emit build_msg(title, data), except
+    @locals.broadcast = (title, data) =>
+      client.broadcast.send build_msg(title, data)
 
     for k, v of params
       @locals.context[k] = v
