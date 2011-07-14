@@ -1,3 +1,3 @@
-require('zappa').run ->
+require('../src/zappa').run ->
   include './hi'
   include './multiple'

@@ -1,4 +1,4 @@
-require('zappa').run ->
+require('../src/zappa').run ->
   get '/': ->
     render 'index'
 

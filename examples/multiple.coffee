@@ -1,4 +1,4 @@
-zappa = require 'zappa'
+zappa = require '../src/zappa'
 
 zappa.run 8000, ->
   get '/': 'blog'
