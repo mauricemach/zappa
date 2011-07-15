@@ -120,13 +120,13 @@ Meanwhile, adding the app's root dir to the front of the lookup stack.</p>      
       <span class="nx">app</span><span class="p">.</span><span class="nx">set</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span>
       
   <span class="nv">root_locals.enable = </span><span class="o">-&gt;</span>
-    <span class="nx">app</span><span class="p">.</span><span class="nx">enable</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">app</span><span class="p">,</span> <span class="nx">arguments</span>
+    <span class="nx">app</span><span class="p">.</span><span class="nx">enable</span> <span class="nx">i</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">arguments</span>
 
   <span class="nv">root_locals.disable = </span><span class="o">-&gt;</span>
-    <span class="nx">app</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">app</span><span class="p">,</span> <span class="nx">arguments</span>
+    <span class="nx">app</span><span class="p">.</span><span class="nx">disable</span> <span class="nx">i</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">arguments</span>
 
   <span class="nv">root_locals.use = </span><span class="o">-&gt;</span>
-    <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">app</span><span class="p">,</span> <span class="nx">arguments</span>
+    <span class="nx">app</span><span class="p">.</span><span class="nx">use</span> <span class="nx">i</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">arguments</span>
 
   <span class="nv">root_locals.configure = </span><span class="o">-&gt;</span>
     <span class="nx">app</span><span class="p">.</span><span class="nx">configure</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">app</span><span class="p">,</span> <span class="nx">arguments</span>

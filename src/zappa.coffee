@@ -156,13 +156,13 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       app.set k, v
       
   root_locals.enable = ->
-    app.enable.apply app, arguments
+    app.enable i for i in arguments
 
   root_locals.disable = ->
-    app.disable.apply app, arguments
+    app.disable i for i in arguments
 
   root_locals.use = ->
-    app.use.apply app, arguments
+    app.use i for i in arguments
 
   root_locals.configure = ->
     app.configure.apply app, arguments
