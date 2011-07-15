@@ -235,7 +235,7 @@ Ex.:
     require('zappa').run 80, -> get '/': 'hi'
     require('zappa').run 'domain.com', 80, -> get '/': 'hi'</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="vi">@run = </span><span class="o">-&gt;</span>
   <span class="nv">host = </span><span class="kc">null</span>
-  <span class="nv">port = </span><span class="mi">5678</span>
+  <span class="nv">port = </span><span class="mi">3000</span>
   <span class="nv">root_function = </span><span class="kc">null</span>
 
   <span class="k">for</span> <span class="nx">a</span> <span class="k">in</span> <span class="nx">arguments</span>
@@ -246,7 +246,7 @@ Ex.:
 
   <span class="nv">zapp = </span><span class="nx">@app</span><span class="p">(</span><span class="nx">root_function</span><span class="p">)</span>
 
-  <span class="k">if</span> <span class="nx">host</span><span class="o">?</span> <span class="k">then</span> <span class="nx">zapp</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span> <span class="nx">port</span><span class="p">,</span> <span class="nx">host</span>
+  <span class="k">if</span> <span class="nx">host</span> <span class="k">then</span> <span class="nx">zapp</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span> <span class="nx">port</span><span class="p">,</span> <span class="nx">host</span>
   <span class="k">else</span> <span class="nx">zapp</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span> <span class="nx">port</span>
 
   <span class="nx">zapp</span></pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <p>Client-side zappa.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa_client = </span><span class="o">-&gt;</span>

@@ -289,7 +289,7 @@ rewrite_function = (func, locals_names) ->
 #     require('zappa').run 'domain.com', 80, -> get '/': 'hi'
 @run = ->
   host = null
-  port = 5678
+  port = 3000
   root_function = null
 
   for a in arguments
@@ -300,7 +300,7 @@ rewrite_function = (func, locals_names) ->
 
   zapp = @app(root_function)
 
-  if host? then zapp.app.listen port, host
+  if host then zapp.app.listen port, host
   else zapp.app.listen port
 
   zapp
