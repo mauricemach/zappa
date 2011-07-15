@@ -113,7 +113,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
             routes.push verb: verb, path: k, handler: v
 
   root_locals.client = (obj) ->
-    app.enable 'serve client'
+    app.enable 'zappa client'
     for k, v of obj
       js = ";zappa.run(#{v});"
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
@@ -198,18 +198,18 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   for k, v of ws_handlers
     ws_handlers[k] = rewrite_function(v, ws_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
 
-  if app.settings['serve client']
+  if app.settings['zappa client']
     app.get '/zappa/zappa.js', (req, res) ->
       res.contentType 'js'
       res.send ";#{coffeescript_helpers}(#{client})();"
 
-  if app.settings['serve jquery']
+  if app.settings['jquery']
     app.get '/zappa/jquery.js', (req, res) ->
       res.contentType 'js'
       fs.readFile '../vendor/jquery-1.6.2.min.js', (err, data) ->
         res.send data.toString()
 
-  if app.settings['serve sammy']
+  if app.settings['sammy']
     app.get '/zappa/sammy.js', (req, res) ->
       res.contentType 'js'
       fs.readFile '../vendor/sammy-latest.min.js', (err, data) ->
