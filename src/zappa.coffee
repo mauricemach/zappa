@@ -51,18 +51,21 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # but locals to each module.
   globals = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
     'require', 'module', '__filename', '__dirname']
-  # TODO: using?, route?, postrender?, settings, error
+
+  # TODO: using?, route?, error
   root_locals_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'client', 'coffee', 'js', 'css',
-    'enable', 'disable']
-  # TODO: app? (something shared with ws_handlers), app.clients?
-  http_locals_names = ['response', 'request', 'next', 'params', 'send', 'render', 'redirect']
-  # TODO: emit?, broadcast, render?, app? (shared between http-ws, persistent)
-  ws_locals_names = ['socket', 'id', 'params', 'client']
+    'enable', 'disable', 'settings']
+
+  # TODO: something shared with ws_handlers, clients list
+  http_locals_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
+
+  # TODO: something shared with http_handlers, clients list, emit?, broadcast, render?
+  ws_locals_names = ['app', 'settings', 'socket', 'id', 'params', 'client']
   helpers_names = []
   defs_names = []
 
-  # Storage for the functions provided by the user.
+  # Storage for the user-provided handlers.
   routes = []
   ws_handlers = {}
   helpers = {}
@@ -166,6 +169,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   root_locals.configure = ->
     app.configure.apply app, arguments
+    
+  root_locals.settings = app.settings
 
   root_locals.include = (name) ->
     sub = root_locals.require name
@@ -254,6 +259,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
             args[1][k] = v for k, v of context
             res.render.apply res, args
           locals.redirect = -> res.redirect.apply res, arguments
+          locals.app = app
+          locals.settings = app.settings
           result = rewritten_handler(context, locals)
           res.contentType(r.contentType) if r.contentType?
           if typeof result is 'string' then res.send result
@@ -283,6 +290,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
         socket.on name, (data) ->
           context = {}
           locals.params = context
+          locals.app = app
+          locals.settings = app.settings
           for k, v of data
             context[k] = v
           h(context, locals)
