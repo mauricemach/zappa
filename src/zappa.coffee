@@ -51,7 +51,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # but locals to each module.
   globals = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
     'require', 'module', '__filename', '__dirname']
-  # TODO: using?, route?, postrender?, enable, disable, settings, error
+  # TODO: using?, route?, postrender?, settings, error
   root_locals_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'client', 'coffee', 'js', 'css',
     'enable', 'disable']
@@ -154,8 +154,14 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   root_locals.set = (obj) ->
     for k, v of obj
       app.set k, v
+      
+  root_locals.enable = ->
+    app.enable.apply app, arguments
 
-  root_locals.use = (obj) ->
+  root_locals.disable = ->
+    app.disable.apply app, arguments
+
+  root_locals.use = ->
     app.use.apply app, arguments
 
   root_locals.configure = ->
