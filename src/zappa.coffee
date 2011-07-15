@@ -302,8 +302,12 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       when 'function' then root_function = a
 
   zapp = @app(root_function)
+  app = zapp.app
 
-  if host then zapp.app.listen port, host
-  else zapp.app.listen port
+  if host then app.listen port, host
+  else app.listen port
+
+  log 'Express server listening on port %d in %s mode',
+    app.address().port, app.settings.env
 
   zapp
