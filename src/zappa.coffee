@@ -4,6 +4,7 @@
 
 log = console.log
 fs = require 'fs'
+path = require 'path'
 
 @version = '0.2.0beta'
 
@@ -42,9 +43,11 @@ rewrite_function = (func, locals_names) ->
 @app = (root_function) ->
   # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
   # Helpers and defs will be known after we execute the user-provided `root_function`.
-  # TODO: __filename and __dirname won't work this way. Find another solution.
-  globals = ['global', 'process', 'console', 'require', '__filename', '__dirname',
-    'module', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']  
+
+  # The last four (`require`, `module`, `__filename` and `__dirname`) are not actually real globals,
+  # but locals to each module.
+  globals = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
+    'require', 'module', '__filename', '__dirname']
   # TODO: using?, route?, postrender?, enable, disable, settings, error
   root_locals_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'client', 'coffee', 'js', 'css',
@@ -86,7 +89,17 @@ rewrite_function = (func, locals_names) ->
   root_context = {}
   root_locals = {express, io, app}
   root_locals[g] = eval(g) for g in globals
-
+  
+  # These "globals" are actually local to each module, so we get our values
+  # from our parent model.
+  root_locals.module = module.parent
+  root_locals.__filename = module.parent.filename
+  root_locals.__dirname = path.dirname(module.parent.filename)
+  # TODO: Find out how to pass the correct `require` (the module's, not zappa's) to the app.
+  # root_locals.require = ???
+  # Meanwhile, adding the app's root dir to the front of the lookup stack.
+  require.paths.unshift root_locals.__dirname
+  
   for verb in ['get', 'post', 'put', 'del']
     do (verb) ->
       root_locals[verb] = ->
@@ -146,9 +159,23 @@ rewrite_function = (func, locals_names) ->
     app.configure.apply app, arguments
 
   root_locals.include = (name) ->
-    sub = require name
+    sub = root_locals.require name
     rewritten_sub = rewrite_function(sub, root_locals_names.concat(globals))
-    rewritten_sub(root_context, root_locals)
+
+    include_locals = {}
+    include_locals[k] = v for k, v of root_locals
+
+    include_module = require.cache[require.resolve(name)]
+    
+    # These "globals" are actually local to each module, so we get our values
+    # from the required module.
+    include_locals.module = include_module
+    include_locals.__filename = include_module.filename
+    include_locals.__dirname = path.dirname(include_module.filename)
+    # TODO: Find out how to pass the correct `require` (the module's, not zappa's) to the include.
+    # include_locals.require = ???
+
+    rewritten_sub(root_context, include_locals)
 
   # Executes the (rewriten) end-user function and learns how the app should be structured.
   rewritten_root = rewrite_function(root_function, root_locals_names.concat(globals))
