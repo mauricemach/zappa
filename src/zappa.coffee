@@ -91,7 +91,7 @@ rewrite_function = (func, locals_names) ->
   root_locals[g] = eval(g) for g in globals
   
   # These "globals" are actually local to each module, so we get our values
-  # from our parent model.
+  # from our parent module.
   root_locals.module = module.parent
   root_locals.__filename = module.parent.filename
   root_locals.__dirname = path.dirname(module.parent.filename)
