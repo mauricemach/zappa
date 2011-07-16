@@ -94,7 +94,6 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # Zappa's default settings.
   app.set 'view engine', 'coffeekup'
   app.register '.coffee', require 'coffeekup'
-  io.set 'log level', 1
 
   root_context = {}
   root_locals = {express, io, app}
