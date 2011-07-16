@@ -1,6 +1,6 @@
 {
   "name": "zappa",
-  "description": "CoffeeScript DSL-ish interface to express and socket.io.",
+  "description": "CoffeeScript-targeted, minimalist interface to express and socket.io.",
   "version": "0.2.0beta",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "contributors": [ 
