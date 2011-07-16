@@ -90,6 +90,10 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   app = express.createServer()
   io = socketio.listen(app)
+
+  # Zappa's default settings.
+  app.set 'view engine', 'coffeekup'
+  app.register '.coffee', require 'coffeekup'
   io.set 'log level', 1
 
   root_context = {}
