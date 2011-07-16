@@ -43,25 +43,30 @@ rewrite_function = (func, locals_names) ->
 client = require('./client').build(@version, coffeescript_helpers, rewrite_function)
 
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
-@app = (root_function) ->
+# The optional data object allows passing variables from the outside to the root scope.
+@app = (root_function, data = {}) ->
   # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
   # Helpers and defs will be known after we execute the user-provided `root_function`.
 
   # The last four (`require`, `module`, `__filename` and `__dirname`) are not actually real globals,
   # but locals to each module.
-  globals = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
+  globals_names = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
     'require', 'module', '__filename', '__dirname']
 
   # TODO: using?, route?, error
-  root_locals_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
+  root_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'client', 'coffee', 'js', 'css',
     'enable', 'disable', 'settings']
 
   # TODO: something shared with ws_handlers, clients list
-  http_locals_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
+  http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
   # TODO: something shared with http_handlers, clients list
-  ws_locals_names = ['app', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
+  ws_names = ['app', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
+  
+  externals_names = []
+  externals_names.push k for k, v of data
+  
   helpers_names = []
   defs_names = []
 
@@ -97,7 +102,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   root_context = {}
   root_locals = {express, io, app}
-  root_locals[g] = eval(g) for g in globals
+  root_locals[k] = v for k, v of data
+  root_locals[g] = eval(g) for g in globals_names
   
   # These "globals" are actually local to each module, so we get our values
   # from our parent module.
@@ -177,7 +183,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   root_locals.include = (name) ->
     sub = root_locals.require name
-    rewritten_sub = rewrite_function(sub, root_locals_names.concat(globals))
+    rewritten_sub = rewrite_function(sub, root_names.concat(globals_names).concat(externals_names))
 
     include_locals = {}
     include_locals[k] = v for k, v of root_locals
@@ -195,16 +201,16 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
     rewritten_sub(root_context, include_locals)
 
   # Executes the (rewriten) end-user function and learns how the app should be structured.
-  rewritten_root = rewrite_function(root_function, root_locals_names.concat(globals))
+  rewritten_root = rewrite_function(root_function, root_names.concat(globals_names).concat(externals_names))
   rewritten_root(root_context, root_locals)
 
   # Implements the application according to the specification.
 
   for k, v of helpers
-    helpers[k] = rewrite_function(v, http_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
+    helpers[k] = rewrite_function(v, http_names.concat(helpers_names).concat(defs_names).concat(globals_names))
 
   for k, v of ws_handlers
-    ws_handlers[k] = rewrite_function(v, ws_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
+    ws_handlers[k] = rewrite_function(v, ws_names.concat(helpers_names).concat(defs_names).concat(globals_names))
 
   if app.settings['zappa client']
     app.get '/zappa/zappa.js', (req, res) ->
@@ -232,12 +238,12 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
           res.send r.handler
       else
         rewritten_handler = rewrite_function(r.handler,
-          http_locals_names.concat(helpers_names).concat(defs_names).concat(globals))
+          http_names.concat(helpers_names).concat(defs_names).concat(globals_names))
 
         context = null
         locals = {}
         # TODO: fix pseudo-globals here too.
-        locals[g] = eval(g) for g in globals
+        locals[g] = eval(g) for g in globals_names
 
         for name, def of defs
           locals[name] = def
@@ -283,7 +289,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       broadcast: socket.broadcast.emit
 
     # TODO: fix pseudo-globals here too.
-    locals[g] = eval(g) for g in globals
+    locals[g] = eval(g) for g in globals_names
 
     for name, def of defs
       locals[name] = def
@@ -319,14 +325,16 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   host = null
   port = 3000
   root_function = null
+  data = null
 
   for a in arguments
     switch typeof a
       when 'string' then host = a
       when 'number' then port = a
       when 'function' then root_function = a
+      when 'object' then data = a
 
-  zapp = @app(root_function)
+  zapp = @app(root_function, data)
   app = zapp.app
 
   if host then app.listen port, host
