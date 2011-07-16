@@ -335,4 +335,6 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   log 'Express server listening on port %d in %s mode',
     app.address().port, app.settings.env
 
+  log "Zappa #{@version} orchestrating the show"
+
   zapp
