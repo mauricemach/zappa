@@ -12,8 +12,8 @@
   ],
   "repository": {"type": "git", "url": "http://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "express": ">= 2.4.3",
-    "socket.io": ">= 0.7.7",
+    "express": "2.4.3",
+    "socket.io": "0.7.7",
     "coffeekup": "0.2.4beta"
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sinatra"],
