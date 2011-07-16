@@ -44,7 +44,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
 # The optional data object allows passing variables from the outside to the root scope.
-@app = (root_function, data = {}) ->
+@app = (data = {}, root_function) ->
   # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
   # Helpers and defs will be known after we execute the user-provided `root_function`.
 
@@ -229,6 +229,10 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   for k, v of ws_handlers
     ws_handlers[k] = rewrite_function(v, ws_names.concat(helpers_names).concat(defs_names).concat(globals_names))
 
+  # TODO: See if there's a way to remove middleware, if so add this by default.
+  if app.settings['static']
+    app.use express.static(root_locals.__dirname + '/public')
+
   if app.settings['zappa client']
     app.get '/zappa/zappa.js', (req, res) ->
       res.contentType 'js'
@@ -351,7 +355,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       when 'function' then root_function = a
       when 'object' then data = a
 
-  zapp = @app(root_function, data)
+  zapp = @app(data, root_function)
   app = zapp.app
 
   if host then app.listen port, host
