@@ -60,8 +60,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # TODO: something shared with ws_handlers, clients list
   http_locals_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
-  # TODO: something shared with http_handlers, clients list, broadcast
-  ws_locals_names = ['app', 'settings', 'socket', 'id', 'params', 'client', 'emit']
+  # TODO: something shared with http_handlers, clients list
+  ws_locals_names = ['app', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
   helpers_names = []
   defs_names = []
 
@@ -270,7 +270,14 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # Implements the websockets server with socket.io.
   io.sockets.on 'connection', (socket) ->
     context = {}
-    locals = {app, settings: app.settings, socket, id: socket.id, client: {}, emit: socket.emit}
+    locals =
+      app: app
+      settings: app.settings
+      socket: socket
+      id: socket.id
+      client: {}
+      emit: socket.emit
+      broadcast: socket.broadcast.emit
 
     # TODO: fix pseudo-globals here too.
     locals[g] = eval(g) for g in globals
