@@ -99,6 +99,23 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # Zappa's default settings.
   app.set 'view engine', 'coffeekup'
   app.register '.coffee', require 'coffeekup'
+  
+  # Default layout.
+  views.layout = ->
+    doctype 5
+    html ->
+      head ->
+        title @title if @title
+        if @scripts
+          for s in @scripts
+            script src: s + '.js'
+        script(src: @script + '.js') if @script
+        if @stylesheets
+          for s in @stylesheets
+            link rel: 'stylesheet', href: s + '.css'
+        link(rel: 'stylesheet', href: @stylesheet + '.css') if @stylesheet
+        style @style if @style
+      body @body
 
   root_context = {}
   root_locals = {express, io, app}
