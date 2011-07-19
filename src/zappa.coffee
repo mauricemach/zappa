@@ -99,23 +99,6 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
   app.register '.coffee', require('coffeekup').adapters.express
-  
-  # Default layout.
-  views.layout = ->
-    doctype 5
-    html ->
-      head ->
-        title @title if @title
-        if @scripts
-          for s in @scripts
-            script src: s + '.js'
-        script(src: @script + '.js') if @script
-        if @stylesheets
-          for s in @stylesheets
-            link rel: 'stylesheet', href: s + '.css'
-        link(rel: 'stylesheet', href: @stylesheet + '.css') if @stylesheet
-        style @style if @style
-      body @body
 
   root_context = {}
   root_locals = {express, io, app}
@@ -249,6 +232,23 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       res.contentType 'js'
       fs.readFile '../vendor/sammy-latest.min.js', (err, data) ->
         res.send data.toString()
+
+  if app.settings['default layout']
+    views.layout = ->
+      doctype 5
+      html ->
+        head ->
+          title @title if @title
+          if @scripts
+            for s in @scripts
+              script src: s + '.js'
+          script(src: @script + '.js') if @script
+          if @stylesheets
+            for s in @stylesheets
+              link rel: 'stylesheet', href: s + '.css'
+          link(rel: 'stylesheet', href: @stylesheet + '.css') if @stylesheet
+          style @style if @style
+        body @body
 
   # Implements the http server with express.
   for r in routes
