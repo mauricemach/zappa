@@ -97,8 +97,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   io = socketio.listen(app)
 
   # Zappa's default settings.
-  app.set 'view engine', 'coffeekup'
-  app.register '.coffee', require 'coffeekup'
+  app.set 'view engine', 'coffee'
+  app.register '.coffee', require('coffeekup').adapters.express
   
   # Default layout.
   views.layout = ->
