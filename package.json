@@ -14,7 +14,7 @@
   "dependencies": {
     "express": "2.4.3",
     "socket.io": "0.7.7",
-    "coffeekup": "0.2.4beta"
+    "coffeekup": "0.3.0beta"
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sinatra"],
   "main": "./lib/zappa",
