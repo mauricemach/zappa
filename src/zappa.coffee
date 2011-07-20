@@ -55,7 +55,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   # TODO: using?, route?, error
   root_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
-    'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'client', 'coffee', 'js', 'css',
+    'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'enable', 'disable', 'settings']
 
   # TODO: something shared with ws_handlers, clients list
@@ -181,6 +181,15 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
     
   root_locals.settings = app.settings
 
+  root_locals.shared = (obj) ->
+    app.enable 'zappa client'
+    for k, v of obj
+      js = ";zappa.run(#{v});"
+      routes.push verb: 'get', path: k, handler: js, contentType: 'js'
+
+      rewritten_shared = rewrite_function(v, root_names.concat(globals_names).concat(externals_names))
+      rewritten_shared(root_context, root_locals)
+
   root_locals.include = (name) ->
     sub = root_locals.require name
     rewritten_sub = rewrite_function(sub, root_names.concat(globals_names).concat(externals_names))
@@ -224,13 +233,13 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   if app.settings['jquery']
     app.get '/zappa/jquery.js', (req, res) ->
       res.contentType 'js'
-      fs.readFile '../vendor/jquery-1.6.2.min.js', (err, data) ->
+      fs.readFile __dirname + '/../vendor/jquery-1.6.2.min.js', (err, data) ->
         res.send data.toString()
 
   if app.settings['sammy']
     app.get '/zappa/sammy.js', (req, res) ->
       res.contentType 'js'
-      fs.readFile '../vendor/sammy-latest.min.js', (err, data) ->
+      fs.readFile __dirname + '/../vendor/sammy-latest.min.js', (err, data) ->
         res.send data.toString()
 
   if app.settings['default layout']
