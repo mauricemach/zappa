@@ -44,7 +44,15 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
 # The optional data object allows passing variables from the outside to the root scope.
-@app = (data = {}, root_function) ->
+@app = ->
+  data = null
+  root_function = null
+  
+  for a in arguments
+    switch typeof a
+      when 'function' then root_function = a
+      when 'object' then data = a
+
   # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
   # Helpers and defs will be known after we execute the user-provided `root_function`.
 
