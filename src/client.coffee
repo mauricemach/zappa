@@ -7,9 +7,9 @@ skeleton = ->
   rewrite_function = null
 
   zappa.run = (root_function) ->
-    root_locals_names = ['def', 'helper', 'get', 'socket', 'connect', 'at']
+    root_locals_names = ['app', 'socket', 'emit', 'def', 'helper', 'get', 'connect', 'at']
     sammy_locals_names = []
-    ws_locals_names = ['socket', 'id', 'params', 'client']
+    ws_locals_names = ['app', 'socket', 'emit', 'id', 'params', 'client']
     helpers_names = []
     defs_names = []
 
@@ -19,11 +19,11 @@ skeleton = ->
     helpers = {}
     defs = {}
 
-    socket = null
     app = Sammy() if Sammy?
+    socket = null
 
     root_context = {}
-    root_locals = {}
+    root_locals = {app, socket}
 
     root_locals.get = ->
       if typeof arguments[0] isnt 'object'
@@ -48,6 +48,9 @@ skeleton = ->
 
     root_locals.connect = ->
       socket = io.connect.apply io, arguments
+      
+    root_locals.emit = ->
+      socket.emit.apply socket, arguments
 
     # Executes the (rewriten) end-user function and learns how the app should be structured.
     rewritten_root = rewrite_function(root_function, root_locals_names)
@@ -84,7 +87,10 @@ skeleton = ->
     # Implements the websockets client with socket.io.
     if socket?
       context = {}
-      locals = {socket}
+      locals = {app, socket}
+      
+      locals.emit = ->
+        socket.emit.apply socket, arguments
 
       for name, def of defs
         locals[name] = def
@@ -101,7 +107,7 @@ skeleton = ->
             context[k] = v
           h(context, locals)
 
-    $(-> app.run '#/')
+    $(-> app.run '#/') if app?
 
 @build = (version, coffeescript_helpers, rewrite_function) ->
   String(skeleton)

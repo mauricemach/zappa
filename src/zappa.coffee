@@ -70,7 +70,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
   # TODO: something shared with http_handlers, clients list
-  ws_names = ['app', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
+  ws_names = ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
   
   externals_names = []
   externals_names.push k for k, v of data
@@ -319,12 +319,13 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
     context = {}
     locals =
       app: app
+      io: io
       settings: app.settings
       socket: socket
       id: socket.id
       client: {}
-      emit: socket.emit
-      broadcast: socket.broadcast.emit
+      emit: -> socket.emit.apply socket, arguments
+      broadcast: -> socket.broadcast.emit.apply socket.broadcast, arguments
 
     # TODO: fix pseudo-globals here too.
     locals[g] = eval(g) for g in globals_names
@@ -343,12 +344,13 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       ws_handlers.disconnect(context, locals) if ws_handlers.disconnect?
 
     for name, h of ws_handlers
-      if name isnt 'connection' and name isnt 'disconnect'
-        socket.on name, (data) ->
-          context = {}
-          locals.params = context
-          context[k] = v for k, v of data
-          h(context, locals)
+      do (name, h) ->
+        if name isnt 'connection' and name isnt 'disconnect'
+          socket.on name, (data) ->
+            context = {}
+            locals.params = context
+            context[k] = v for k, v of data
+            h(context, locals)
 
   {app, io}
 
