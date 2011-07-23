@@ -200,7 +200,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   root_locals.include = (name) ->
     sub = root_locals.require name
-    rewritten_sub = rewrite_function(sub, root_names.concat(globals_names).concat(externals_names))
+    rewritten_sub = rewrite_function(sub.include, root_names.concat(globals_names).concat(externals_names))
 
     include_locals = {}
     include_locals[k] = v for k, v of root_locals
