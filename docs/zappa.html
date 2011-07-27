@@ -69,7 +69,7 @@ but locals to each module.</p>             </td>             <td class="code">  
     
   <span class="nv">app = </span><span class="nx">express</span><span class="p">.</span><span class="nx">createServer</span><span class="p">()</span>
   <span class="nv">io = </span><span class="nx">socketio</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">app</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>Zappa's default settings.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">app</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;view engine&#39;</span><span class="p">,</span> <span class="s1">&#39;coffee&#39;</span>
-  <span class="nx">app</span><span class="p">.</span><span class="nx">register</span> <span class="s1">&#39;.coffee&#39;</span><span class="p">,</span> <span class="nx">@adapter</span><span class="p">(</span><span class="s1">&#39;coffeekup&#39;</span><span class="p">)</span>
+  <span class="nx">app</span><span class="p">.</span><span class="nx">register</span> <span class="s1">&#39;.coffee&#39;</span><span class="p">,</span> <span class="nx">@adapter</span> <span class="s1">&#39;coffeekup&#39;</span><span class="p">,</span> <span class="nv">blacklist: </span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="s1">&#39;autoescape&#39;</span><span class="p">,</span> <span class="s1">&#39;locals&#39;</span><span class="p">,</span> <span class="s1">&#39;hardcode&#39;</span><span class="p">,</span> <span class="s1">&#39;cache&#39;</span><span class="p">]</span>
 
   <span class="nv">root_context = </span><span class="p">{}</span>
   <span class="nv">root_locals = </span><span class="p">{</span><span class="nv">zappa: </span><span class="err">@</span><span class="p">,</span> <span class="nx">express</span><span class="p">,</span> <span class="nx">io</span><span class="p">,</span> <span class="nx">app</span><span class="p">}</span>
@@ -316,13 +316,22 @@ Ex.:
   <span class="nx">zapp</span></pre></div>             </td>           </tr>                               <tr id="section-27">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-27">&#182;</a>               </div>               <p>Creates a zappa view adapter for templating engine <code>name</code>. This adapter
 can be used with <code>app.register</code> and creates params "shortcuts".</p>
 
-<p>Zappa automatically sends all request params to views, inside the <code>params</code>
-local. This adapter adds a "root local" for each of these params, <em>only</em> 
-if a local with the same name doesn't exist already.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="vi">@adapter = </span><span class="nf">(name) -&gt;</span>
+<p>Zappa, by default, automatically sends all request params to templates,
+but inside the <code>params</code> local.</p>
+
+<p>This adapter adds a "root local" for each of these params, <em>only</em> 
+if a local with the same name doesn't exist already, <em>and</em> the name is not
+in the optional blacklist.</p>
+
+<p>The blacklist is useful to prevent request params from triggering unset
+template engine options.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="vi">@adapter = </span><span class="nf">(name, options = {}) -&gt;</span>
+  <span class="nx">options</span><span class="p">.</span><span class="nx">blacklist</span> <span class="o">?=</span> <span class="p">[]</span>
   <span class="nv">compile: </span><span class="nf">(template, data) -&gt;</span>
     <span class="nv">orig = </span><span class="nx">require</span><span class="p">(</span><span class="nx">name</span><span class="p">).</span><span class="nx">compile</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
     <span class="nf">(data) -&gt;</span>
-      <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">?=</span> <span class="nx">v</span> <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">data</span><span class="p">.</span><span class="nx">params</span>
+      <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">data</span><span class="p">.</span><span class="nx">params</span>
+        <span class="k">if</span> <span class="k">typeof</span> <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">is</span> <span class="s1">&#39;undefined&#39;</span> <span class="o">and</span> <span class="nx">k</span> <span class="o">not</span> <span class="k">in</span> <span class="nx">options</span><span class="p">.</span><span class="nx">blacklist</span>
+          <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span>
       <span class="nx">orig</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -108,7 +108,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
-  app.register '.coffee', @adapter('coffeekup')
+  app.register '.coffee', @adapter 'coffeekup', blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
 
   root_context = {}
   root_locals = {zappa: @, express, io, app}
@@ -390,12 +390,21 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 # Creates a zappa view adapter for templating engine `name`. This adapter
 # can be used with `app.register` and creates params "shortcuts".
 # 
-# Zappa automatically sends all request params to views, inside the `params`
-# local. This adapter adds a "root local" for each of these params, *only* 
-# if a local with the same name doesn't exist already.
-@adapter = (name) ->
+# Zappa, by default, automatically sends all request params to templates,
+# but inside the `params` local.
+#
+# This adapter adds a "root local" for each of these params, *only* 
+# if a local with the same name doesn't exist already, *and* the name is not
+# in the optional blacklist.
+#
+# The blacklist is useful to prevent request params from triggering unset
+# template engine options.
+@adapter = (name, options = {}) ->
+  options.blacklist ?= []
   compile: (template, data) ->
     orig = require(name).compile(template, data)
     (data) ->
-      data[k] ?= v for k, v of data.params
+      for k, v of data.params
+        if typeof data[k] is 'undefined' and k not in options.blacklist
+          data[k] = v
       orig(data)
