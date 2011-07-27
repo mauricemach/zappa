@@ -62,7 +62,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
     'require', 'module', '__filename', '__dirname']
 
   # TODO: using?, route?, error
-  root_names = ['zappa', 'express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
+  root_names = ['zappa', 'express', 'io', 'requiring', 'app', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'enable', 'disable', 'settings']
 
@@ -185,6 +185,12 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   root_locals.use = ->
     app.use i for i in arguments
+    
+  root_locals.requiring = ->
+    pairs = {}
+    for a in arguments
+      pairs[a] = require a
+    root_locals.def pairs
 
   root_locals.configure = ->
     app.configure.apply app, arguments
