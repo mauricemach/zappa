@@ -92,6 +92,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   # Monkeypatch express to support inline templates. Such is life.
   express.View.prototype.__defineGetter__ 'exists', ->
     return true if views[@view]?
+    return true if views[path.basename(@view)]?
     try
       fs.statSync(@path)
       return true
@@ -99,8 +100,9 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       return false
   express.View.prototype.__defineGetter__ 'contents', ->
     return views[@view] if views[@view]?
+    return views[path.basename(@view)] if views[path.basename(@view)]?
     fs.readFileSync @path, 'utf8'
-
+    
   app = express.createServer()
   io = socketio.listen(app)
 
