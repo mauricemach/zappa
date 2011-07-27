@@ -7,9 +7,9 @@ skeleton = ->
   rewrite_function = null
 
   zappa.run = (root_function) ->
-    root_locals_names = ['app', 'socket', 'emit', 'def', 'helper', 'get', 'connect', 'at']
-    sammy_locals_names = []
-    ws_locals_names = ['app', 'socket', 'emit', 'id', 'params', 'client']
+    root_locals_names = ['app', 'socket', 'def', 'helper', 'get', 'connect', 'at', 'emit']
+    sammy_locals_names = ['app', 'context', 'params', 'render', 'redirect']
+    ws_locals_names = ['app', 'socket', 'id', 'params', 'emit']
     helpers_names = []
     defs_names = []
 
@@ -70,7 +70,7 @@ skeleton = ->
           sammy_locals_names.concat(helpers_names).concat(defs_names))
 
         context = null
-        locals = {}
+        locals = {app}
 
         for name, def of defs
           locals[name] = def
@@ -79,19 +79,24 @@ skeleton = ->
           locals[name] = ->
             helper(context, locals, arguments)
 
-        app.get r.path, ->
+        app.get r.path, (sammy_context) ->
           context = {}
+          context[k] = v for k, v of sammy_context.params
           locals.params = context
+          locals.context = sammy_context
+          locals.render = -> sammy_context.render.apply res, arguments
+          locals.redirect = -> sammy_context.redirect.apply res, arguments
           rewritten_handler(context, locals)
 
     # Implements the websockets client with socket.io.
     if socket?
       context = {}
-      locals = {app, socket}
+      locals =
+        app: app
+        socket: socket
+        id: socket.id
+        emit: -> socket.emit.apply socket, arguments
       
-      locals.emit = ->
-        socket.emit.apply socket, arguments
-
       for name, def of defs
         locals[name] = def
 
@@ -102,9 +107,8 @@ skeleton = ->
       for name, h of ws_handlers
         socket.on name, (data) ->
           context = {}
+          context[k] = v for k, v of data
           locals.params = context
-          for k, v of data
-            context[k] = v
           h(context, locals)
 
     $(-> app.run '#/') if app?

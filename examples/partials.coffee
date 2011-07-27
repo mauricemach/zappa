@@ -6,7 +6,7 @@ require('../src/zappa').run ->
       {name: 'python', url: 'http://python.org'}
     ]
 
-    render 'index', options: {format: yes}
+    render 'index', {@items, format: yes}
 
   view index: ->
     ul ->

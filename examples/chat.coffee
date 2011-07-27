@@ -1,6 +1,6 @@
 require('../src/zappa').run ->
   get '/': ->
-    render 'index'
+    render 'index', layout: no
   
   at 'set nickname': ->
     client.nickname = @nickname
@@ -11,8 +11,9 @@ require('../src/zappa').run ->
   client '/index.js': ->
     connect()
 
-    at said: -> $('#panel').append "<p>#{@nickname} said: #{@text}</p>"
-
+    at said: ->
+      $('#panel').append "<p>#{@nickname} said: #{@text}</p>"
+    
     $().ready ->
       emit 'set nickname', nickname: prompt('Pick a nickname')
       

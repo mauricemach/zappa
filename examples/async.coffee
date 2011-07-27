@@ -6,13 +6,11 @@ require('../src/zappa').run ->
     '/': -> redirect '/bar'
 
     '/:foo': ->
-      @foo += '?'
-      sleep 5, =>
-        @foo += '!'
-    
-        @title = 'Async'
+      @foo += '!'
+      sleep 3, =>
+        @foo += '?'
         render 'index'
 
   view index: ->
-    h1 @title
+    h1 'Async'
     p @foo

@@ -1,4 +1,6 @@
 require('../src/zappa').run ->
+  enable 'default layout'
+  
   get '/': ->
     render 'index'
 

@@ -62,7 +62,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
     'require', 'module', '__filename', '__dirname']
 
   # TODO: using?, route?, error
-  root_names = ['express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
+  root_names = ['zappa', 'express', 'io', 'app', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'enable', 'disable', 'settings']
 
@@ -106,10 +106,10 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
-  app.register '.coffee', require('coffeekup').adapters.express
+  app.register '.coffee', @adapter('coffeekup')
 
   root_context = {}
-  root_locals = {express, io, app}
+  root_locals = {zappa: @, express, io, app}
   root_locals[k] = v for k, v of data
   root_locals[g] = eval(g) for g in globals_names
   
@@ -279,7 +279,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
           http_names.concat(helpers_names).concat(defs_names).concat(globals_names))
 
         context = null
-        locals = {}
+        locals = {app, settings: app.settings}
+        
         # TODO: fix pseudo-globals here too.
         locals[g] = eval(g) for g in globals_names
 
@@ -300,15 +301,12 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
           locals.response = res
           locals.next = next
           locals.send = -> res.send.apply res, arguments
-          locals.render = ->
-            args = []
-            args.push a for a in arguments
+          locals.render = (args...) ->
             args[1] ?= {}
-            args[1][k] = v for k, v of context
+            args.splice 1, 0, {} if typeof args[1] is 'function'
+            args[1].params ?= locals.params
             res.render.apply res, args
           locals.redirect = -> res.redirect.apply res, arguments
-          locals.app = app
-          locals.settings = app.settings
           result = rewritten_handler(context, locals)
           res.contentType(r.contentType) if r.contentType?
           if typeof result is 'string' then res.send result
@@ -348,8 +346,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
         if name isnt 'connection' and name isnt 'disconnect'
           socket.on name, (data) ->
             context = {}
-            locals.params = context
             context[k] = v for k, v of data
+            locals.params = context
             h(context, locals)
 
   {app, io}
@@ -386,3 +384,16 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   log "Zappa #{@version} orchestrating the show"
 
   zapp
+
+# Creates a zappa view adapter for templating engine `name`. This adapter
+# can be used with `app.register` and creates params "shortcuts".
+# 
+# Zappa automatically sends all request params to views, inside the `params`
+# local. This adapter adds a "root local" for each of these params, *only* 
+# if a local with the same name doesn't exist already.
+@adapter = (name) ->
+  compile: (template, data) ->
+    orig = require(name).compile(template, data)
+    (data) ->
+      data[k] ?= v for k, v of data.params
+      orig(data)
