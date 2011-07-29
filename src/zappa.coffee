@@ -5,6 +5,9 @@
 log = console.log
 fs = require 'fs'
 path = require 'path'
+zappa = @
+express = require 'express'
+socketio = require 'socket.io'
 
 @version = '0.2.0beta'
 
@@ -61,15 +64,15 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   globals_names = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
     'require', 'module', '__filename', '__dirname']
 
-  # TODO: using?, route?, error
-  root_names = ['zappa', 'express', 'io', 'requiring', 'app', 'get', 'post', 'put', 'del', 'at',
+  # TODO: route?, error
+  root_names = ['zappa', 'express', 'app', 'io', 'requiring', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'enable', 'disable', 'settings']
 
-  # TODO: something shared with ws_handlers, clients list
+  # TODO: session, postrender, app data, clients list
   http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
-  # TODO: something shared with http_handlers, clients list
+  # TODO: app data, clients list
   ws_names = ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
   
   externals_names = []
@@ -85,11 +88,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   defs = {}
   views = {}
   
-  # Builds the applications's root scope.
-  express = require 'express'
-  socketio = require 'socket.io'
-
   # Monkeypatch express to support inline templates. Such is life.
+  # TODO: this doesn't work for multiple apps.
   express.View.prototype.__defineGetter__ 'exists', ->
     return true if views[@view]?
     return true if views[path.basename(@view)]?
@@ -98,11 +98,12 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       return true
     catch err
       return false
+      
   express.View.prototype.__defineGetter__ 'contents', ->
     return views[@view] if views[@view]?
     return views[path.basename(@view)] if views[path.basename(@view)]?
     fs.readFileSync @path, 'utf8'
-    
+  
   app = express.createServer()
   io = socketio.listen(app)
 
@@ -111,8 +112,10 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   app.register '.coffee', @adapter require('coffeekup').adapters.express,
     blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
 
+  # Builds the applications's root scope.    
+
   root_context = {}
-  root_locals = {zappa: @, express, io, app}
+  root_locals = {zappa, express, app, io}
   root_locals[k] = v for k, v of data
   root_locals[g] = eval(g) for g in globals_names
   
@@ -185,7 +188,20 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
     app.disable i for i in arguments
 
   root_locals.use = ->
-    app.use i for i in arguments
+    wrappers =
+      static: (path = root_locals.__dirname + '/public') -> express.static(path)
+
+    use = (name, arg = null) ->
+      if wrappers[name]
+        app.use wrappers[name](arg)
+      else if typeof express[name] is 'function'
+        app.use express[name](arg)
+     
+    for a in arguments
+      switch typeof a
+        when 'function' then app.use a
+        when 'string' then use a
+        when 'object' then use k, v for k, v of a
     
   root_locals.requiring = ->
     pairs = {}
@@ -237,10 +253,6 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   for k, v of ws_handlers
     ws_handlers[k] = rewrite_function(v, ws_names.concat(helpers_names).concat(defs_names).concat(globals_names))
-
-  # TODO: See if there's a way to remove middleware, if so add this by default.
-  if app.settings['static']
-    app.use express.static(root_locals.__dirname + '/public')
 
   if app.settings['zappa client']
     app.get '/zappa/zappa.js', (req, res) ->
