@@ -1,0 +1,1 @@
+require('../src/zappa').run -> use 'static'
