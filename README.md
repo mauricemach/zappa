@@ -1,47 +1,38 @@
-    8888888888P        d8888 8888888b.  8888888b.     d8888          @@@    @@@        
-          d88P        d88888 888   Y88b 888   Y88b   d88888        @@@@@@@@@@@@@@          
-         d88P        d88P888 888    888 888    888  d88P888       @@@@@@@@@@@@@@@@           
-        d88P        d88P 888 888   d88P 888   d88P d88P 888      @@@@@@@@  @@@@@@@@            
-       d88P        d88P  888 8888888P"  8888888P" d88P  888      @@@            @@@             
-      d88P        d88P   888 888        888      d88P   888      @@   @@@@@@@@   @@             
-     d88P        d8888888888 888        888     d8888888888           @@@@@@@@                  
-    d8888888888 d88P     888 888        888    d88P     888            @@@@@@                           
-             
+    8888888888P        d8888 8888888b.  8888888b.     d8888          @@@    @@@ 
+          d88P        d88888 888   Y88b 888   Y88b   d88888        @@@@@@@@@@@@@@
+         d88P        d88P888 888    888 888    888  d88P888       @@@@@@@@@@@@@@@@
+        d88P        d88P 888 888   d88P 888   d88P d88P 888      @@@@@@@@  @@@@@@@@
+       d88P        d88P  888 8888888P"  8888888P" d88P  888      @@@            @@@
+      d88P        d88P   888 888        888      d88P   888      @@   @@@@@@@@   @@
+     d88P        d8888888888 888        888     d8888888888           @@@@@@@@    
+    d8888888888 d88P     888 888        888    d88P     888            @@@@@@     
 
-### Razor-sharp DSL for modern web apps
+### Node development for the lazy
+            
+**Zappa** is a [CoffeeScript](http://coffeescript.org)-optimized, radically minimalist interface orchestrating [Express](http://expressjs.com), [Socket.IO](http://socket.io), [Sammy](http://sammyjs.org) and other best-of-breed libs, with two obsessions in mind:
 
-Zappa is a [CoffeeScript](http://coffeescript.org) DSLish layer on top of [Express](http://expressjs.com), [Socket.IO](http://socket.io) and other libs, with two obssessions in mind:
+- Providing an extremely focused interface for building web apps, delaying my carpal tunnel a few years.
 
-- Providing a radically focused interface for building web apps, delaying my carpal tunnel a few years.
+- Taking advantage of possibilities brought by new web technologies and the node runtime: trivialization of websockets/comet, client-server smoother integration and code sharing, server-side DOM manipulation, etc.
 
-- Exploring possibilities opened by new web technologies and the node runtime: trivialization of websockets/comet, client-server smoother integration and code sharing, server-side DOM manipulation, etc.
-
-It is heavily influenced by [that legendary framework](http://www.sinatrarb.com) named after another awesome Frank, with also a hint of [Camping](http://camping.rubyforge.org/).
-
-**Put on your helmet!** Zappa is barely past the proof of concept stage and things are loosely placed. Don't use it to control your nuclear launch facility just yet. All examples work though, and if you come with a spirit of adventure, you shall be rewarded.
+It is heavily influenced by [that legendary framework](http://www.sinatrarb.com) named after another rockstar Frank, with also a hint of [Camping](http://camping.rubyforge.org/).
 
 ### Hi, World
 
 Put this in your `cuppa.coffee`:
 
-    get '/': 'hi'
+    require('zappa').run ->
+      get '/': 'hi'
 
 And drink it!
 
     $ npm install zappa
-    $ zappa cuppa.coffee
-    => App "default" listening on port 5678...
+    $ coffee cuppa.coffee    
+       info  - socket.io started
+    Express server listening on port 3000 in development mode
+    Zappa 0.2.0beta orchestrating the show
 
-If you're going to restart it a thousand times per minute while developing like me, just let zappa do the job for you:
-
-    $ zappa -w cuppa.coffee
-
-And if you ever need to run it with the vanilla node command, we've got that covered:
-
-    $ zappa -c cuppa.coffee
-    $ node cuppa.js
-
-### OK, but one-line string responses are mostly useless. Can you show me something closer to a real web app?
+### Nice, but one-line string responses are mostly useless. Can you show me something closer to a real web app?
 
     get '*': '''
       <!DOCTYPE html>
@@ -53,33 +44,54 @@ And if you ever need to run it with the vanilla node command, we've got that cov
 
 ### Seriously.
 
-Right. This is what a route with a handler function looks like:
+Right. This is what a basic route with a handler function looks like:
 
     get '/:name': ->
       "Hi, #{@name}"
 
-Handler functions are executed within a scope that is optimized for the work of taking the input, processing it, and giving a response back, probably rendered by a template, all with minimal wiring:
-
-    get '/:foo': ->
-      @foo += '!'
-      render 'index'
-
-    view index: ->
-      h1 'You said:'
-      p @foo
-
-    layout ->
-      html ->
-        head -> title "You said: #{@foo}"
-        body -> @content
-
-(Templating is currently [CoffeeKup](http://github.com/mauricemach/coffeekup) only, but support for arbitrary engines is under way)
-
-All your input variables are available at '@/this'. This context is also shared with your views (along with any vars you created there yourself).
-
-The API to deal with the request and response is available in the form of locals. Those are: request/response/next (directly from express), send/redirect/session/cookies (shortcuts), params (reference to @), render (different implementation from express' response.render at the moment) and app (see bi-directional messaging below).
-
 If you return a string, it will automatically be sent as the response.
+
+Now for a more typical scenario:
+
+    get '/users/:id': ->
+      User.findById @id, (@err, @user) =>
+        render 'user'
+
+    view user: ->
+      if @err
+        @title = 'Error'
+        p "Something terrible happened: #{@err}."
+      else
+        @title = "#{@user.name}'s Home"
+        p "Hullo, #{@user.name}!"
+
+    view layout: ->
+      html ->
+        head -> title @title
+        body ->
+          h1 @title
+          @body
+
+Handler functions are executed within a specially crafted scope that is optimized for the typical scenario of taking the input, processing it, rendering a view with this data and sending a response, all with *minimal wiring*.
+
+You have certain local variables automatically available such as `request`, `response` and `next` (straight from Express). You also have shortcuts such as `send`, `redirect` and `render`.
+
+Besides being able to read your input through the standard API (ex.: `request.query.foo` and friends), you also have access to a merged collection of them, as `@foo` and the alias `params.foo`.
+
+All variables at `@`/`params` (from input or put there by you) are automatically made available to templates as `params.foo` (in CoffeeKup, `@params.foo`).
+
+In addition, if you're using the *zappa view adapter* (as is the case by default, with CoffeeKup), they're also made available at the template's "root namespace" (`foo` or CoffeeKup's `@foo`).
+
+Since in express templating data is usually mixed up with framework locals and template options, the adapter will only put variables in the template root if there isn't a variable there with the same name already, *and* the name is not blacklisted.
+
+To use this feature with other templating engines:
+
+    blacklist = 'scope|self|locals|filename|debug|compiler|compileDebug|inline'.split '|'
+    app.register '.jade', zappa.adapter 'jade', blacklist
+
+To disable it on default zappa:
+
+    app.register '.coffee', require('coffeekup').adapters.express
 
 ### Fine. But this is node! What about some async?
 
@@ -87,21 +99,23 @@ Both examples below will produce `bar?!` if you request `/bar`:
 
     get '/:foo': ->
       @foo += '?'
-      actbusy =>
+      
+      sleep 3, =>
         @foo += '!'
         render 'index'
 
-Or if you can't / don't want to use the fat arrow to bind "@/this":
+Or if you can't / don't want to use the fat arrow to bind `@`:
 
     get '/:foo': ->
-      @foo += '?'
-      actbusy ->
+      params.foo += '?'
+      
+      sleep 3, ->
         params.foo += '!'
         render 'index'
 
 ### Let me guess. You can also post/put/del, use regexes, routes are matched first to last, all like any self-respecting sinatra clone.
 
-Exactly. Actually, when it comes to HTTP zappa hands over all the serious work to express, so there are no big surprises here:
+Exactly. Actually, when it comes to HTTP zappa hands over all the serious work to Express, so there are no big surprises here:
 
     get '/': 'got'
     post '/': 'posted'
@@ -111,7 +125,7 @@ Exactly. Actually, when it comes to HTTP zappa hands over all the serious work t
 
 ### Route combo
 
-The routing functions accept an object where the keys are the paths for the routes, and the values are the responses. This means we can define multiple routes in one go:
+The routing functions accept an object where each key is a route path, and each values the response. This means we can define multiple routes in one go:
 
     get '/foo': 'bar', '/ping': 'pong', '/zig': 'zag'
 
@@ -122,19 +136,19 @@ Better yet:
       '/ping': 'pong'
       '/zig': 'zag'
 
-You can also use the syntax where the first param is the path, and the second the response. This is mostly to allow for regexes:
+You can also use the default syntax where the first param is the path, and the second the response. This is mostly to allow for regexes:
 
     get '/foo', 'bar'
     get /^\/ws-(.*)/, ->
       'bloatware-' + params[0]
 
-### Bi-directional messaging (WebSockets/Comet)
+### Bi-directional events (WebSockets/Comet)
 
-But the web is not just about HTTP requests anymore. WebSockets are soon to become available on all major browsers but IE. For this sucker and legacy browsers, there's a collection of hacks that are ugly but work, and thanks to Socket.IO, we don't even have to care.
+But the web is not just about HTTP requests anymore. WebSockets are soon to become available on all major browsers but IE. For this sucker and legacy browsers, there's a collection of ugly hacks that work (comet), and thanks to Socket.IO, we don't even have to care.
 
-Zappa pushes this trivialization a bit further by removing some of the boilerplate, and providing some integration. The goal is to make messaging feel more like a first-class citizen along with request handling, readily available, instead of an exotic feature you bolt on your app.
+Zappa pushes this trivialization a bit further by removing some of the boilerplate, and providing some integration. The goal is to make event handling feel more like a first-class citizen along with request handling, readily available, instead of an exotic feature you bolt on your app.
 
-All you have to do to handle bi-directional messaging in your apps is declare the handlers, side by side with your HTTP ones:
+All you have to do to handle bi-directional events in your apps is declare the handlers, side by side with your HTTP ones:
 
     get '/chat': ->
       render 'chat'
@@ -144,84 +158,126 @@ All you have to do to handle bi-directional messaging in your apps is declare th
 
     at connection: ->
       app.counter ?= 0
-      send 'welcome', time: new Date()
+      emit 'welcome', time: new Date()
       broadcast "#{id} connected"
 
-    at disconnection: ->
+    at disconnect: ->
       broadcast "#{id} is gone!"
 
-    msg said: ->
+    at said: ->
       app.counter++
-      broadcast 'said', id: id, text: @text
+      broadcast 'said', {id, @text}
 
-    msg afk: ->
-      broadcast 'afk', id: id
+    at afk: ->
+      broadcast 'afk', {id}
 
-When your app starts, if you defined one of those handlers, zappa will automatically require Socket.IO and fire it up. It will not take up a dedicated port, since Socket.IO can attach itself to the HTTP server and intercept websocket/comet related messages.
+When your app starts, if you defined one of those handlers, zappa will automatically require Socket.IO and fire it up. It will not take up a dedicated port, since Socket.IO can attach itself to the HTTP server and intercept WebSockets/comet traffic.
 
-Zappa uses a minimal protocol to enable handler wiring. If you send this message from the client:
+Event and request handlers are designed to behave as similarly as possible. There are locals for the standard API (`io`, `socket`), shortcuts (`emit`, `broadcast`) and input variables are also available at `@`.
 
-    {said: {text: "hi"}}
+### But what about the client-side?
 
-It will automatically JSON.parse it, and call the handler named `said`, putting the value of `text` in its context.
+That's an interesting question! Let's start with the basics.
 
-Conversely, when you call `send 'welcome', online: 7`, the following string will be sent to the client:
-
-    {welcome: {online: "7"}}
-
-Message and request handlers are designed to behave as similarly as possible. The context (@/this) receives the input and is shared with templates, and there are local variables readily available to deal with the task at hand. In this case, they are: client, id, send, broadcast, render, and app.
-
-Both types of handlers have access to the `app` variable, which is persistent throughout the application lifecycle. You can store temporary, app-level data here to provide some integration between your app's two "sides", like in the message counter example.
-
-### Client-side code embedding
-
-With `client` you can define a route `/name.js` that will respond with your CoffeeScript code in JS form, and the correct content-type set. No compilation involved, since we already have you function's string representation from the runtime.
+First there's `coffee` with which you can define a route `/file.js`, that will respond with your CoffeeScript code in JS form, and the correct content-type set. No compilation involved, since we already have you function's string representation from the runtime.
 
     get '/': -> render 'index'
 
-    client index: ->
+    coffee '/index.js': ->
       alert 'hullo'
 
     view index: ->
       h1 'Client embedding example'
 
-    layout ->
+    view layout: ->
       html ->
         head -> title 'bla'
         script src: '/index.js'
-      body -> @content
+      body @body
 
-This is the first of a series of planned features to ease client/server integration. Next on the list is function/class sharing between your handlers and your clients.
+On a step further, you have `client`, which gives you access to a matching zappa client-side API:
+
+    get '/': -> render 'index', layout: no
+    
+    at connection: -> emit 'server time', time: new Date()
+    
+    client '/index.js': ->
+      def sum: (a, b) -> a + b
+    
+      get '#/': ->
+        alert 'index'
+      
+      at 'server time': ->
+        alert "Server time: #{@time}"
+        
+      connect 'http://localhost'
+        
+    view index: ->
+      doctype 5
+      html ->
+        head ->
+          title 'Client-side zappa'
+          script src: '/socket.io/socket.io.js'
+          script src: '/zappa/zappa.js'
+          script src: '/index.js'
+        body ''
+        
+Finally, there's also `shared`. Certain zappa "keywords" work exactly the same on the server and client side. Guess what? If you define them inside a `shared` block, they're available at both environments!
+
+    shared '/index.js', ->
+      def sum: (a, b) -> a + b
+
+      helper role: (name) ->
+        unless @user.role is name
+          if request? then redirect '/login'
+          else if window? then alert "This is not the page you're looking for."
+          else if socket? then client.disconnect()
+    
+    get '/admin': ->
+      role 'admin'
+      # admin stuff
+      
+    at 'delete everything': ->
+      role 'admin'
+      
+    client '/index.js': ->
+      get '#/admin': ->
+        role 'admin'
+        # admin stuff
 
 ### Scope and `def`
 
-In order to gain automatic access to framework locals, request and message handlers lose automatic access to their parent scope. To make things available to them though, you can use `def`:
+In order to gain all these specialized scopes, we lose closures.
+
+To make things available at the root scope:
+
+    foo = 'bar'
+    require('zappa').run {foo}, ->
+      console.log foo   # 'bar'
+
+To make things available to handlers, use `def`:
 
     foo = 'bar'
     def ping: 'pong'
     def zig: -> 'zag'
 
     get '/': ->
-      foo # undefined
-      ping # 'pong'
+      foo   # undefined
+      ping  # 'pong'
       zig() # 'zag'
 
-### Using `using`
+### But `def foo: require 'foo'` is stupid repetition! I'm lazy!
 
-Same as `def eco: require 'eco'`:
+Luckily for you, so am I. Meet `requiring`, `require`'s less patient brother.
 
-    using 'eco'
+    requiring 'fs', 'path', 'util'
 
     get '/': ->
-      typeof eco.render # function
+      console.log fs, path, util
 
-You can also do many in a row:
+### Santa's little `helper`s
 
-    using 'fs', 'path', 'util'
-
-### Helpful `helper`
-
-Helpers are just like defs, except they are modified to have access to the same context (@/this) and framework locals as whatever called them (request or message handlers).
+Helpers are just like defs, except they are modified to have access to the same context (@/this) and framework locals as whatever called them (request or event handlers).
 
     helper role: (name) ->
       if request?
@@ -233,7 +289,7 @@ Helpers are just like defs, except they are modified to have access to the same 
       role 'gm'
       # see stuff
 
-    msg kill: ->
+    at kill: ->
       role 'gm'
       # kill stuff
 
@@ -249,75 +305,96 @@ Zappa makes it trivial to post-process your rendered templates by manipulating t
 
     get '/postrender': ->
       @user = plan: 'staff'
-      render 'index', apply: 'plans'
-
-It currently works with your inner templates only though, not layouts.
+      render 'index', postrender: plans
 
 ### App combo
 
-There are no "run" blocking calls in node, so you can have multiple apps listening to different ports on the same process. To do that with zappa, just name your apps:
+Node.js servers don't block when calling `listen`, so you can run many apps in the same process:
 
-    get '/': 'blog'
+    zappa = require 'zappa'
+    
+    zappa.run 8001, -> get '/': 'blog'
+    zappa.run 8002, -> get '/': 'chat'
+    zappa.run 8003, -> get '/': 'wiki'
+  
+    $ coffee apps.coffee
+    
+You can also take advantage of Express/Connect vhost middleware:
 
-    app 'chat'
-    get '/': 'chat'
+    zappa = require 'zappa'
+    
+    chat = zappa.app -> get '/': 'chat'
+    blog = zappa.app -> get '/': 'blog'
+    
+    zappa.run 80, {chat, blog}, ->
+      use express.vhost 'chat.com', chat
+      use express.vhost 'blog.com', blog
 
-    app 'wiki'
-    get '/': 'wiki'
+### Splitting it up
 
-    $ zappa apps.coffee
-    => App "default" started on port 5678
-    => App "chat" started on port 5679
-    => App "wiki" started on port 5680
+If your single file of doom is becoming unwieldy, you can split it up based on whatever organization suits you better:
 
-To specify the ports:
-
-    $ zappa -p 3000,4567,8080 apps.coffee
-
-### Splitting up
-
-If your single file of doom is becoming unwieldy, you can split it up with whatever organization is better suited to the project(s) at hand:
-
-    include 'model.coffee'
-    include 'controllers/http.coffee'
-    include 'controllers/websockets.coffee'
-    include 'controllers/client.coffee'
-    include 'controllers/common.coffee'
-    include 'views.coffee'
+    include 'model'
+    include 'controllers/http'
+    include 'controllers/websockets'
+    include 'controllers/client'
+    include 'controllers/common'
+    include 'views'
 
 Or by subject:
 
-    include 'users.coffee'
-    include 'widgets.coffee'
-    include 'gadgets.coffee'
-    include 'funzos.coffee'
+    include 'users'
+    include 'widgets'
+    include 'gadgets'
+    include 'funzos'
+    
+The files to be included just have to export an `include` function:
 
-### Static files
+    # Could be `module.exports.include` as well.
+    @include = ->
+      get '/': 'This is a route inside an included file.'
 
-If there's a `./public` dir on the same level as your app's main file, static files will be automatically served from there. 
+### Connect(ing) middleware
 
-## Testing
+You can specify your middleware through the standard `app.use`, or zappa's shortcut `use`. The latter can be used in a number of additional ways:
 
-At the moment there are no unit tests or specs. However the tests currently provided are "headed" tests which run in the browser via "remote control".
+- It accepts many params in a row. Ex.:
 
-To run the headed, awesome, remote-control, in-browser tests you need Firefox 3.
+        use express.bodyParser(), app.router, express.cookies()
 
-First install soda from [npm](http://npmjs.org/)
+- It accepts strings as parameters. This is syntactic sugar to the equivalent express middleware with no arguments. Ex.:
 
-    npm install soda
+        use 'bodyParser', app.router, 'cookies'
 
-Before the tests can be run, the [Selenium RC](http://seleniumhq.org/projects/remote-control/) daemon must be running...
+- You can also specify parameters by using objects. Ex.:
 
-    java -jar selenium-server.jar
-  
-You can get the Selenium RC from http://selenium.googlecode.com/files/selenium-remote-control-1.0.3.zip.
+        use 'bodyParser', static: __dirname + '/public', session: {secret: 'fnord'}, 'cookies'
 
-Once it's running, simply launch the automated tests:
+- Finally, when using strings and objects, zappa will intercept some specific middleware and add behaviour, usually default parameters. Ex.:
 
-    cake test
+        use 'static'
+        
+        # Syntactic sugar for:
+        app.use express.static(__dirname + '/public')
 
-## Whew!
+## Thanks loads
 
-That's it for now. Big thanks to all behind the libs that are making this little experiment possible. Special thanks to Jeremy Ashkenas for CoffeeScript, the "little" language is simply amazing and incredibly flexible. To Blake Mizerany for Sinatra, the framework that made me redefine simple. To why the lucky stiff, that made me redefine hacking. And finally to Frank Zappa, for the spirit of nonconformity and experimentation that inspires me to push forward. Not to mention providing the soundtrack.
+To all people behind the excellent libs that made this little project possible, more specifically: 
+
+- Jeremy Ashkenas for CoffeeScript, the "little" language is nothing short of revolutionary to me.
+
+- TJ Holowaychuk for the robust and flexible cornerstone that's Express.
+
+- Guillermo Rauch for solving (as far as I'm concerned) the comet problem once and for all.
+
+- Ryan Dahl for Node.js, without which nothing of this would be possible.
+
+Also:
+
+- Blake Mizerany for Sinatra, the framework that made me redefine simple.
+
+- why the lucky stiff, for making me redefine hacking.
+
+- And last but not least Frank Zappa, for the spirit of nonconformity and experimentation that inspires me to push forward. Not to mention providing the soundtrack.
 
 "Why do you necessarily have to be wrong just because a few million people think you are?" - FZ
