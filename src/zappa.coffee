@@ -108,7 +108,8 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
-  app.register '.coffee', @adapter 'coffeekup', blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
+  app.register '.coffee', @adapter require('coffeekup').adapters.express,
+    blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
 
   root_context = {}
   root_locals = {zappa: @, express, io, app}
@@ -393,7 +394,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   zapp
 
-# Creates a zappa view adapter for templating engine `name`. This adapter
+# Creates a zappa view adapter for templating engine `engine`. This adapter
 # can be used with `app.register` and creates params "shortcuts".
 # 
 # Zappa, by default, automatically sends all request params to templates,
@@ -405,12 +406,16 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 #
 # The blacklist is useful to prevent request params from triggering unset
 # template engine options.
-@adapter = (name, options = {}) ->
+#
+# If `engine` is a string, the adapter will use `require(engine)`. Otherwise,
+# it will assume the `engine` param is an object with a `compile` function.
+@adapter = (engine, options = {}) ->
   options.blacklist ?= []
+  engine = require(engine) if typeof engine is 'string'
   compile: (template, data) ->
-    orig = require(name).compile(template, data)
+    template = engine.compile(template, data)
     (data) ->
       for k, v of data.params
         if typeof data[k] is 'undefined' and k not in options.blacklist
           data[k] = v
-      orig(data)
+      template(data)
