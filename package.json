@@ -1,22 +1,15 @@
 {
   "name": "zappa",
-  "description": "CoffeeScript-targeted, minimalist interface to express and socket.io.",
+  "description": "Node development for the lazy",
   "version": "0.2.0beta",
   "author": "Maurice Machado <maurice@bitbending.com>",
-  "contributors": [ 
-    {"name": "Maurice Machado", "email": "maurice@bitbending.com"},
-    {"name": "Nicholas Kinsey", "email": "nicholas.kinsey@feistystudios.com"},
-    {"name": "Jae Kwon", "email": "jae@flywheelnetworks.com"},
-    {"name": "Vladimir Dronnikov", "email": "dronnikov@gmail.com"},
-    {"name": "Isaac Wolkerstorfer", "email": "agnoster@gmail.com"}
-  ],
-  "repository": {"type": "git", "url": "http://github.com/mauricemach/zappa.git"},
+  "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
   "dependencies": {
     "express": "2.4.3",
     "socket.io": "0.7.7",
     "coffeekup": "0.3.0beta"
   },
-  "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sinatra"],
+  "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "main": "./lib/zappa",
-  "engines": { "node": ">= 0.4.9" }
+  "engines": { "node": ">= 0.4.7" }
 }
