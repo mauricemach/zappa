@@ -95,7 +95,7 @@ Meanwhile, adding the app's root dir to the front of the lookup stack.</p>      
             <span class="nx">routes</span><span class="p">.</span><span class="nx">push</span> <span class="nv">verb: </span><span class="nx">verb</span><span class="p">,</span> <span class="nv">path: </span><span class="nx">k</span><span class="p">,</span> <span class="nv">handler: </span><span class="nx">v</span>
 
   <span class="nv">root_locals.client = </span><span class="nf">(obj) -&gt;</span>
-    <span class="nx">app</span><span class="p">.</span><span class="nx">enable</span> <span class="s1">&#39;zappa client&#39;</span>
+    <span class="nx">app</span><span class="p">.</span><span class="nx">enable</span> <span class="s1">&#39;serve zappa&#39;</span>
     <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">obj</span>
       <span class="nv">js = </span><span class="s2">&quot;;zappa.run(#{v});&quot;</span>
       <span class="nx">routes</span><span class="p">.</span><span class="nx">push</span> <span class="nv">verb: </span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="nv">path: </span><span class="nx">k</span><span class="p">,</span> <span class="nv">handler: </span><span class="nx">js</span><span class="p">,</span> <span class="nv">contentType: </span><span class="s1">&#39;js&#39;</span>
@@ -171,7 +171,7 @@ Meanwhile, adding the app's root dir to the front of the lookup stack.</p>      
   <span class="nv">root_locals.settings = </span><span class="nx">app</span><span class="p">.</span><span class="nx">settings</span>
 
   <span class="nv">root_locals.shared = </span><span class="nf">(obj) -&gt;</span>
-    <span class="nx">app</span><span class="p">.</span><span class="nx">enable</span> <span class="s1">&#39;zappa client&#39;</span>
+    <span class="nx">app</span><span class="p">.</span><span class="nx">enable</span> <span class="s1">&#39;serve zappa&#39;</span>
     <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">obj</span>
       <span class="nv">js = </span><span class="s2">&quot;;zappa.run(#{v});&quot;</span>
       <span class="nx">routes</span><span class="p">.</span><span class="nx">push</span> <span class="nv">verb: </span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="nv">path: </span><span class="nx">k</span><span class="p">,</span> <span class="nv">handler: </span><span class="nx">js</span><span class="p">,</span> <span class="nv">contentType: </span><span class="s1">&#39;js&#39;</span>
@@ -198,18 +198,18 @@ include_locals.require = ???</p>             </td>             <td class="code">
   <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">ws_handlers</span>
     <span class="nx">ws_handlers</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rewrite_function</span><span class="p">(</span><span class="nx">v</span><span class="p">,</span> <span class="nx">ws_names</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">helpers_names</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="nx">defs_names</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="nx">globals_names</span><span class="p">))</span>
 
-  <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;zappa client&#39;</span><span class="p">]</span>
+  <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;serve zappa&#39;</span><span class="p">]</span>
     <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;/zappa/zappa.js&#39;</span><span class="p">,</span> <span class="nf">(req, res) -&gt;</span>
       <span class="nx">res</span><span class="p">.</span><span class="nx">contentType</span> <span class="s1">&#39;js&#39;</span>
       <span class="nx">res</span><span class="p">.</span><span class="nx">send</span> <span class="s2">&quot;;#{coffeescript_helpers}(#{client})();&quot;</span>
 
-  <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;jquery&#39;</span><span class="p">]</span>
+  <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;serve jquery&#39;</span><span class="p">]</span>
     <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;/zappa/jquery.js&#39;</span><span class="p">,</span> <span class="nf">(req, res) -&gt;</span>
       <span class="nx">res</span><span class="p">.</span><span class="nx">contentType</span> <span class="s1">&#39;js&#39;</span>
       <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/../vendor/jquery-1.6.2.min.js&#39;</span><span class="p">,</span> <span class="nf">(err, data) -&gt;</span>
         <span class="nx">res</span><span class="p">.</span><span class="nx">send</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
 
-  <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;sammy&#39;</span><span class="p">]</span>
+  <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;serve sammy&#39;</span><span class="p">]</span>
     <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;/zappa/sammy.js&#39;</span><span class="p">,</span> <span class="nf">(req, res) -&gt;</span>
       <span class="nx">res</span><span class="p">.</span><span class="nx">contentType</span> <span class="s1">&#39;js&#39;</span>
       <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/../vendor/sammy-latest.min.js&#39;</span><span class="p">,</span> <span class="nf">(err, data) -&gt;</span>
