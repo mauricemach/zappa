@@ -209,8 +209,9 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       pairs[a] = require a
     root_locals.def pairs
 
-  root_locals.configure = ->
-    app.configure.apply app, arguments
+  root_locals.configure = (p) ->
+    if typeof p is 'function' then app.configure p
+    else app.configure k, v for k, v of p
     
   root_locals.settings = app.settings
 
