@@ -7,9 +7,9 @@
      d88P        d8888888888 888        888     d8888888888           @@@@@@@@    
     d8888888888 d88P     888 888        888    d88P     888            @@@@@@     
 
-### Node development for the lazy
+### Not your mom's node framework
             
-**Zappa** is a [CoffeeScript](http://coffeescript.org)-optimized, radically minimalist interface orchestrating [Express](http://expressjs.com), [Socket.IO](http://socket.io), [Sammy](http://sammyjs.org) and other best-of-breed libs, with two obsessions in mind:
+**Zappa** is a [CoffeeScript](http://coffeescript.org)-optimized, radically minimalist interface orchestrating [Express](http://expressjs.com), [Socket.IO](http://socket.io), [Sammy](http://sammyjs.org) and other top talent, with two obsessions in mind:
 
 - Providing an extremely focused interface for building web apps, delaying my carpal tunnel a few years.
 
@@ -19,12 +19,12 @@ It is heavily influenced by [that legendary framework](http://www.sinatrarb.com)
 
 ### Hi, World
 
-Put this in your `cuppa.coffee`:
+Get a `cuppa.coffee`:
 
     require('zappa').run ->
       get '/': 'hi'
 
-And drink it!
+And give your foot a push:
 
     $ npm install zappa
     $ coffee cuppa.coffee    
