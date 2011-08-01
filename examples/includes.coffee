@@ -1,2 +1,2 @@
-require('../src/zappa').run ->
+require('zappa') ->
   include 'included'

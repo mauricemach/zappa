@@ -1,4 +1,4 @@
-require('../src/zappa').run ->
+require('zappa') ->
   get '/': ->
     @user = plan: 'silver'
 

@@ -1,4 +1,4 @@
-require('../src/zappa').run ->
+require('zappa') ->
   enable 'serve sammy', 'serve jquery'
 
   get '/': ->

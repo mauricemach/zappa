@@ -1,1 +1,1 @@
-require('../src/zappa').run -> use 'static'
+require('zappa') -> use 'static'

@@ -1,13 +1,12 @@
 <!DOCTYPE html>  <html> <head>   <title>zappa.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               zappa.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p><strong>Zappa</strong> is a <a href="http://coffeescript.org">CoffeeScript</a> DSL-ish interface for building web apps on the
 <a href="http://nodejs.org">node.js</a> runtime, integrating <a href="http://expressjs.com">express</a>, <a href="http://socket.io">socket.io</a>
-and other best-of-breed libraries.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">log = </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span>
+and other best-of-breed libraries.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa = version: </span><span class="s1">&#39;0.2.0beta&#39;</span>
+
+<span class="nv">log = </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span>
 <span class="nv">fs = </span><span class="nx">require</span> <span class="s1">&#39;fs&#39;</span>
 <span class="nv">path = </span><span class="nx">require</span> <span class="s1">&#39;path&#39;</span>
-<span class="nv">zappa = </span><span class="err">@</span>
 <span class="nv">express = </span><span class="nx">require</span> <span class="s1">&#39;express&#39;</span>
-<span class="nv">socketio = </span><span class="nx">require</span> <span class="s1">&#39;socket.io&#39;</span>
-
-<span class="vi">@version = </span><span class="s1">&#39;0.2.0beta&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
+<span class="nv">socketio = </span><span class="nx">require</span> <span class="s1">&#39;socket.io&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 a function (see below) though, it loses access to its parent scope, and consequently to
 any helpers it might need. So we need to reintroduce these helpers manually inside any
 "rewritten" function.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">coffeescript_helpers = </span><span class="s2">&quot;&quot;&quot;</span>
@@ -32,8 +31,8 @@ The function will lose access to its parent scope in the process.</p>           
   <span class="nv">code = </span><span class="s2">&quot;#{coffeescript_helpers}return (#{code}).apply(context, args);&quot;</span>
   <span class="k">for</span> <span class="nx">name</span> <span class="k">in</span> <span class="nx">locals_names</span>
     <span class="nv">code = </span><span class="s2">&quot;var #{name} = locals.#{name};&quot;</span> <span class="o">+</span> <span class="nx">code</span>
-  <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;locals&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="nx">code</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>The stringified zappa client.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">client = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./client&#39;</span><span class="p">).</span><span class="nx">build</span><span class="p">(</span><span class="nx">@version</span><span class="p">,</span> <span class="nx">coffeescript_helpers</span><span class="p">,</span> <span class="nx">rewrite_function</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Takes in a function and builds express/socket.io apps based on the rules contained in it.
-The optional data object allows passing variables from the outside to the root scope.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="vi">@app = </span><span class="o">-&gt;</span>
+  <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;locals&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="nx">code</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>The stringified zappa client.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">client = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./client&#39;</span><span class="p">).</span><span class="nx">build</span><span class="p">(</span><span class="nx">zappa</span><span class="p">.</span><span class="nx">version</span><span class="p">,</span> <span class="nx">coffeescript_helpers</span><span class="p">,</span> <span class="nx">rewrite_function</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Takes in a function and builds express/socket.io apps based on the rules contained in it.
+The optional data object allows passing variables from the outside to the root scope.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa.app = </span><span class="o">-&gt;</span>
   <span class="nv">data = </span><span class="kc">null</span>
   <span class="nv">root_function = </span><span class="kc">null</span>
   
@@ -73,7 +72,7 @@ TODO: this doesn't work for multiple apps.</p>             </td>             <td
   
   <span class="nv">app = </span><span class="nx">express</span><span class="p">.</span><span class="nx">createServer</span><span class="p">()</span>
   <span class="nv">io = </span><span class="nx">socketio</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">app</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>Zappa's default settings.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">app</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;view engine&#39;</span><span class="p">,</span> <span class="s1">&#39;coffee&#39;</span>
-  <span class="nx">app</span><span class="p">.</span><span class="nx">register</span> <span class="s1">&#39;.coffee&#39;</span><span class="p">,</span> <span class="nx">@adapter</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;coffeekup&#39;</span><span class="p">).</span><span class="nx">adapters</span><span class="p">.</span><span class="nx">express</span><span class="p">,</span>
+  <span class="nx">app</span><span class="p">.</span><span class="nx">register</span> <span class="s1">&#39;.coffee&#39;</span><span class="p">,</span> <span class="nx">zappa</span><span class="p">.</span><span class="nx">adapter</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;coffeekup&#39;</span><span class="p">).</span><span class="nx">adapters</span><span class="p">.</span><span class="nx">express</span><span class="p">,</span>
     <span class="nv">blacklist: </span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">,</span> <span class="s1">&#39;autoescape&#39;</span><span class="p">,</span> <span class="s1">&#39;locals&#39;</span><span class="p">,</span> <span class="s1">&#39;hardcode&#39;</span><span class="p">,</span> <span class="s1">&#39;cache&#39;</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>Builds the applications's root scope.    </p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">root_context = </span><span class="p">{}</span>
   <span class="nv">root_locals = </span><span class="p">{</span><span class="nx">zappa</span><span class="p">,</span> <span class="nx">express</span><span class="p">,</span> <span class="nx">app</span><span class="p">,</span> <span class="nx">io</span><span class="p">}</span>
   <span class="nx">root_locals</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span> <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">data</span>
@@ -309,9 +308,9 @@ include_locals.require = ???</p>             </td>             <td class="code">
 and/or a string for hostname (any order).
 Returns an object where <code>app</code> is the express server and <code>io</code> is the socket.io handle.
 Ex.:
-    require('zappa').run -> get '/': 'hi'
+    require('zappa') -> get '/': 'hi'
     require('zappa').run 80, -> get '/': 'hi'
-    require('zappa').run 'domain.com', 80, -> get '/': 'hi'</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="vi">@run = </span><span class="o">-&gt;</span>
+    require('zappa') -> 'domain.com', 80, -> get '/': 'hi'</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa.run = </span><span class="o">-&gt;</span>
   <span class="nv">host = </span><span class="kc">null</span>
   <span class="nv">port = </span><span class="mi">3000</span>
   <span class="nv">root_function = </span><span class="kc">null</span>
@@ -324,7 +323,7 @@ Ex.:
       <span class="k">when</span> <span class="s1">&#39;function&#39;</span> <span class="k">then</span> <span class="nv">root_function = </span><span class="nx">a</span>
       <span class="k">when</span> <span class="s1">&#39;object&#39;</span> <span class="k">then</span> <span class="nv">data = </span><span class="nx">a</span>
 
-  <span class="nv">zapp = </span><span class="nx">@app</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">root_function</span><span class="p">)</span>
+  <span class="nv">zapp = </span><span class="nx">zappa</span><span class="p">.</span><span class="nx">app</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">root_function</span><span class="p">)</span>
   <span class="nv">app = </span><span class="nx">zapp</span><span class="p">.</span><span class="nx">app</span>
 
   <span class="k">if</span> <span class="nx">host</span> <span class="k">then</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span> <span class="nx">port</span><span class="p">,</span> <span class="nx">host</span>
@@ -333,7 +332,7 @@ Ex.:
   <span class="nx">log</span> <span class="s1">&#39;Express server listening on port %d in %s mode&#39;</span><span class="p">,</span>
     <span class="nx">app</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">port</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">env</span>
 
-  <span class="nx">log</span> <span class="s2">&quot;Zappa #{@version} orchestrating the show&quot;</span>
+  <span class="nx">log</span> <span class="s2">&quot;Zappa #{zappa.version} orchestrating the show&quot;</span>
 
   <span class="nx">zapp</span></pre></div>             </td>           </tr>                               <tr id="section-26">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-26">&#182;</a>               </div>               <p>Creates a zappa view adapter for templating engine <code>engine</code>. This adapter
 can be used with <code>app.register</code> and creates params "shortcuts".</p>
@@ -349,7 +348,7 @@ in the optional blacklist.</p>
 template engine options.</p>
 
 <p>If <code>engine</code> is a string, the adapter will use <code>require(engine)</code>. Otherwise,
-it will assume the <code>engine</code> param is an object with a <code>compile</code> function.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="vi">@adapter = </span><span class="nf">(engine, options = {}) -&gt;</span>
+it will assume the <code>engine</code> param is an object with a <code>compile</code> function.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa.adapter = </span><span class="nf">(engine, options = {}) -&gt;</span>
   <span class="nx">options</span><span class="p">.</span><span class="nx">blacklist</span> <span class="o">?=</span> <span class="p">[]</span>
   <span class="nv">engine = </span><span class="nx">require</span><span class="p">(</span><span class="nx">engine</span><span class="p">)</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">engine</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
   <span class="nv">compile: </span><span class="nf">(template, data) -&gt;</span>
@@ -359,5 +358,11 @@ it will assume the <code>engine</code> param is an object with a <code>compile</
         <span class="k">if</span> <span class="k">typeof</span> <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">is</span> <span class="s1">&#39;undefined&#39;</span> <span class="o">and</span> <span class="nx">k</span> <span class="o">not</span> <span class="k">in</span> <span class="nx">options</span><span class="p">.</span><span class="nx">blacklist</span>
           <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span>
       <span class="nx">template</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+
+<span class="nv">module.exports = </span><span class="nx">zappa</span><span class="p">.</span><span class="nx">run</span>
+<span class="nv">module.exports.run = </span><span class="nx">zappa</span><span class="p">.</span><span class="nx">run</span>
+<span class="nv">module.exports.app = </span><span class="nx">zappa</span><span class="p">.</span><span class="nx">app</span>
+<span class="nv">module.exports.adapter = </span><span class="nx">zappa</span><span class="p">.</span><span class="nx">adapter</span>
+<span class="nv">module.exports.version = </span><span class="nx">zappa</span><span class="p">.</span><span class="nx">version</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

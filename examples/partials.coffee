@@ -1,4 +1,4 @@
-require('../src/zappa').run ->
+require('zappa') ->
   get '/': ->
     @items = [
       {name: 'coffeescript', url: 'http://coffeescript.org'}

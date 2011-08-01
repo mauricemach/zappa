@@ -1,4 +1,4 @@
-require('../src/zappa').run ->
+require('zappa') ->
   def sleep: (secs, cb) ->
     setTimeout cb, secs * 1000
 

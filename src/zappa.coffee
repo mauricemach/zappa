@@ -2,14 +2,13 @@
 # [node.js](http://nodejs.org) runtime, integrating [express](http://expressjs.com), [socket.io](http://socket.io)
 # and other best-of-breed libraries.
 
+zappa = version: '0.2.0beta'
+
 log = console.log
 fs = require 'fs'
 path = require 'path'
-zappa = @
 express = require 'express'
 socketio = require 'socket.io'
-
-@version = '0.2.0beta'
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 # a function (see below) though, it loses access to its parent scope, and consequently to
@@ -43,11 +42,11 @@ rewrite_function = (func, locals_names) ->
   new Function('context', 'locals', 'args', code)
 
 # The stringified zappa client.
-client = require('./client').build(@version, coffeescript_helpers, rewrite_function)
+client = require('./client').build(zappa.version, coffeescript_helpers, rewrite_function)
 
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
 # The optional data object allows passing variables from the outside to the root scope.
-@app = ->
+zappa.app = ->
   data = null
   root_function = null
   
@@ -109,7 +108,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
-  app.register '.coffee', @adapter require('coffeekup').adapters.express,
+  app.register '.coffee', zappa.adapter require('coffeekup').adapters.express,
     blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
 
   # Builds the applications's root scope.    
@@ -378,10 +377,10 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 # and/or a string for hostname (any order).
 # Returns an object where `app` is the express server and `io` is the socket.io handle.
 # Ex.:
-#     require('zappa').run -> get '/': 'hi'
+#     require('zappa') -> get '/': 'hi'
 #     require('zappa').run 80, -> get '/': 'hi'
-#     require('zappa').run 'domain.com', 80, -> get '/': 'hi'
-@run = ->
+#     require('zappa') -> 'domain.com', 80, -> get '/': 'hi'
+zappa.run = ->
   host = null
   port = 3000
   root_function = null
@@ -394,7 +393,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
       when 'function' then root_function = a
       when 'object' then data = a
 
-  zapp = @app(data, root_function)
+  zapp = zappa.app(data, root_function)
   app = zapp.app
 
   if host then app.listen port, host
@@ -403,7 +402,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
   log 'Express server listening on port %d in %s mode',
     app.address().port, app.settings.env
 
-  log "Zappa #{@version} orchestrating the show"
+  log "Zappa #{zappa.version} orchestrating the show"
 
   zapp
 
@@ -422,7 +421,7 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
 #
 # If `engine` is a string, the adapter will use `require(engine)`. Otherwise,
 # it will assume the `engine` param is an object with a `compile` function.
-@adapter = (engine, options = {}) ->
+zappa.adapter = (engine, options = {}) ->
   options.blacklist ?= []
   engine = require(engine) if typeof engine is 'string'
   compile: (template, data) ->
@@ -432,3 +431,9 @@ client = require('./client').build(@version, coffeescript_helpers, rewrite_funct
         if typeof data[k] is 'undefined' and k not in options.blacklist
           data[k] = v
       template(data)
+
+module.exports = zappa.run
+module.exports.run = zappa.run
+module.exports.app = zappa.app
+module.exports.adapter = zappa.adapter
+module.exports.version = zappa.version

@@ -1,4 +1,4 @@
-require('../src/zappa').run ->
+require('zappa') ->
   #set 'view engine': 'eco'
   
   get

@@ -21,7 +21,7 @@ It is heavily influenced by [that legendary framework](http://www.sinatrarb.com)
 
 Get a `cuppa.coffee`:
 
-    require('zappa').run ->
+    require('zappa') ->
       get '/': 'hi'
 
 And give your foot a push:
@@ -252,7 +252,7 @@ In order to gain all these specialized scopes, we lose closures.
 To make things available at the root scope:
 
     foo = 'bar'
-    require('zappa').run {foo}, ->
+    require('zappa') {foo}, ->
       console.log foo   # 'bar'
 
 To make things available to handlers, use `def`:
@@ -313,9 +313,9 @@ Node.js servers don't block when calling `listen`, so you can run many apps in t
 
     zappa = require 'zappa'
     
-    zappa.run 8001, -> get '/': 'blog'
-    zappa.run 8002, -> get '/': 'chat'
-    zappa.run 8003, -> get '/': 'wiki'
+    zappa 8001, -> get '/': 'blog'
+    zappa 8002, -> get '/': 'chat'
+    zappa 8003, -> get '/': 'wiki'
   
     $ coffee apps.coffee
     
@@ -326,7 +326,7 @@ You can also take advantage of Express/Connect vhost middleware:
     chat = zappa.app -> get '/': 'chat'
     blog = zappa.app -> get '/': 'blog'
     
-    zappa.run 80, {chat, blog}, ->
+    zappa 80, {chat, blog}, ->
       use express.vhost 'chat.com', chat
       use express.vhost 'blog.com', blog
 
