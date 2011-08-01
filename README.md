@@ -305,7 +305,7 @@ Zappa makes it trivial to post-process your rendered templates by manipulating t
 
     get '/postrender': ->
       @user = plan: 'staff'
-      render 'index', postrender: plans
+      render 'index', postrender: 'plans'
 
 ### App combo
 
