@@ -9,6 +9,9 @@ fs = require 'fs'
 path = require 'path'
 express = require 'express'
 socketio = require 'socket.io'
+jsdom = require 'jsdom'
+jquery = fs.readFileSync(__dirname + '/../vendor/jquery-1.6.2.min.js').toString()
+sammy = fs.readFileSync(__dirname + '/../vendor/sammy-latest.min.js').toString()
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 # a function (see below) though, it loses access to its parent scope, and consequently to
@@ -66,13 +69,15 @@ zappa.app = ->
   # TODO: route?, error
   root_names = ['zappa', 'express', 'app', 'io', 'requiring', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
-    'enable', 'disable', 'settings']
+    'enable', 'disable', 'settings', 'postrender']
 
   # TODO: session, postrender, app data, clients list
   http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
   # TODO: app data, clients list
   ws_names = ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
+  
+  postrender_names = ['window', '$']
   
   externals_names = []
   externals_names.push k for k, v of data
@@ -86,6 +91,7 @@ zappa.app = ->
   helpers = {}
   defs = {}
   views = {}
+  postrenders = {}
   
   # Monkeypatch express to support inline templates. Such is life.
   # TODO: this doesn't work for multiple apps.
@@ -111,7 +117,7 @@ zappa.app = ->
   app.register '.coffee', zappa.adapter require('coffeekup').adapters.express,
     blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
 
-  # Builds the applications's root scope.    
+  # Builds the applications's root scope.
 
   root_context = {}
   root_locals = {zappa, express, app, io}
@@ -167,6 +173,10 @@ zappa.app = ->
     for k, v of obj
       defs_names.push k
       defs[k] = v
+
+  root_locals.postrender = (obj) ->
+    for k, v of obj
+      postrenders[k] = v
 
   root_locals.at = (obj) ->
     for k, v of obj
@@ -254,6 +264,9 @@ zappa.app = ->
   for k, v of ws_handlers
     ws_handlers[k] = rewrite_function(v, ws_names.concat(helpers_names).concat(defs_names).concat(globals_names))
 
+  for k, v of postrenders
+    postrenders[k] = rewrite_function(v, postrender_names.concat(helpers_names).concat(defs_names).concat(globals_names))
+
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->
       res.contentType 'js'
@@ -262,14 +275,12 @@ zappa.app = ->
   if app.settings['serve jquery']
     app.get '/zappa/jquery.js', (req, res) ->
       res.contentType 'js'
-      fs.readFile __dirname + '/../vendor/jquery-1.6.2.min.js', (err, data) ->
-        res.send data.toString()
+      res.send jquery
 
   if app.settings['serve sammy']
     app.get '/zappa/sammy.js', (req, res) ->
       res.contentType 'js'
-      fs.readFile __dirname + '/../vendor/sammy-latest.min.js', (err, data) ->
-        res.send data.toString()
+      ren.send sammy
 
   if app.settings['default layout']
     views.layout = ->
@@ -314,21 +325,43 @@ zappa.app = ->
             
         app[r.verb] r.path, (req, res, next) ->
           context = {}
+
           context[k] = v for k, v of req.query
           context[k] = v for k, v of req.params
           context[k] = v for k, v of req.body
+
           locals.params = context
           locals.request = req
           locals.response = res
           locals.next = next
           locals.send = -> res.send.apply res, arguments
+          locals.redirect = -> res.redirect.apply res, arguments
+
           locals.render = (args...) ->
+            # Make sure the second arg is an object.
             args[1] ?= {}
             args.splice 1, 0, {} if typeof args[1] is 'function'
+            
+            # Send request input vars to template as `params`.
             args[1].params ?= locals.params
-            res.render.apply res, args
-          locals.redirect = -> res.redirect.apply res, arguments
+
+            if args[1].postrender?
+              # Apply postrender before sending response.
+              res.render args[0], args[1], (err, str) ->
+                jsdom.env html: str, src: [jquery], done: (err, window) ->
+                  locals.window = window
+                  locals.$ = window.$
+
+                  rendered = postrenders[args[1].postrender](context, locals)
+
+                  doctype = (window.document.doctype or '') + "\n"
+                  res.send doctype + window.document.documentElement.outerHTML
+            else
+              # Just forward params to express.
+              res.render.apply res, args
+
           result = rewritten_handler(context, locals)
+          
           res.contentType(r.contentType) if r.contentType?
           if typeof result is 'string' then res.send result
           else return result

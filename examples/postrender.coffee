@@ -1,8 +1,10 @@
 require('zappa') ->
+  enable 'default layout'
+  
   get '/': ->
-    @user = plan: 'silver'
+    @user = plan: 'staff'
 
-    render 'index', apply: 'plans'
+    render 'index', postrender: 'plans'
 
   postrender plans: ->
     $('.staff').remove() if @user.plan isnt 'staff'
