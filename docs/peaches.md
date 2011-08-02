@@ -80,7 +80,7 @@ If you can do it with "raw" express/socket.io, you should be able to do it when 
 
 - You have direct access to express `app` and socket.io `io` objects at all scopes.
 
-- In addition, there are sweeter shortcuts to most of their interfaces: `use`, `set`, `enable/disable`, `configure`, etc. These are not only shorter names, but also can be used in additional ways (see reference).
+- In addition, there are sweeter shortcuts to most of their interfaces: `use`, `set`, `enable`, `disable`, `configure`, etc. These are not only shorter names, but also can be used in additional ways (see reference).
 
 - `render` uses the express implementation, zappa only making sure that defining inline templates is still possible, as well as passing variables "automatically" through `@`. Arbitrary template engines, partials, file-based templates etc are all consequently supported.
 

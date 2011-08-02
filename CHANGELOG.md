@@ -1,29 +1,24 @@
 **v0.2.0beta** (2011-07-xx):
 
-  - Complete rewrite, the main idea/api/capabilities are mostly the same, but implemented and used in a way
-    more harmonized with the node ecosystem.
+  - Complete rewrite, see `/docs/peaches.md` for a more in-depth review on changes.
   
-  - Fixed performance issues, now negligible overhead over express. Gone with the `with` keyword.
+  - Fixed performance, now negligible overhead on top of express. Gone with the `with` keyword.
 
-  - Scraped the `zappa` command. One additional `require` line and now zappa apps can be run directly with
-    standard `coffee` and `node` commands, compiled with `coffee`, reloaded with `runjs`/`nodemon` etc,
-    deployed with `forever` or to services such as [nodester](http://nodester.com) and [no.de](http://no.de)
-    with no special steps required.
+  - Scraped the `zappa` command, zappa code should go in `require('zappa') ->` blocks. All node tools and services can be used directly.
 
-  - New `app` and `io` variables at all scopes, providing direct access to express and socket.io.
+  - Changed `include`, now implemented through standard module mechanisms. Code to be included must be exported: `@include = ->`.
 
-  - Now using the rendering system from express, with all the features it supports (arbitrary engines,
-    partials, etc), while retaining the ability to define templates in-file with the `view` function and
-    pass variables to the template through `@/this`. 
-
-  - The `include` function now is implemented through the standard `require`. Files `include`'d should
-    just add a `module.exports = ->` line.
-
-  - Scraped zappa's socket "protocol", using the new socket.io 0.7.x custom events which work in the same way.
+  - Added `app` and `io` variables to all scopes, providing direct access to express and socket.io.
+  
+  - Added optimized interfaces to express features such as `use`, `set`, `enable`, `disable`, `configure`, etc.
     
-  - Optional client-side zappa with socket.io and sammy.js for routes.
+  - Changed `render`, now uses the rendering system from express, with all its features. Defining inline templates with `view` and passing variables through `@` is still possible.
+    
+  - Added an optional client-side API that can be used with `client`. To just serve code as JS, use `coffee`.
   
-  - Added `shared '/foo.js': ->`, allows sharing `helper`s and `def`s between server and client side code.
+  - Added `shared`, allows sharing code between client and server.
+  
+  - Removed most zappa's defaults, added very concise APIs to define what you need.
 
 **v0.1.5** (2011-05-06):
 
