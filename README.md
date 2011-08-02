@@ -9,6 +9,8 @@
 
 ### Not your mom's node framework
             
+This document refers to the recently released **0.2.0 beta**. You can find a review on changes from 0.1.x at `/docs/peaches.md`.
+            
 **Zappa** is a [CoffeeScript](http://coffeescript.org)-optimized, radically minimalist interface orchestrating [Express](http://expressjs.com), [Socket.IO](http://socket.io), [Sammy](http://sammyjs.org) and other top talent, with two obsessions in mind:
 
 - Providing an extremely focused interface for building web apps, delaying my carpal tunnel a few years.
