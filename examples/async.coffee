@@ -1,4 +1,6 @@
 require('zappa') ->
+  enable 'default layout'
+  
   def sleep: (secs, cb) ->
     setTimeout cb, secs * 1000
 
@@ -11,5 +13,7 @@ require('zappa') ->
       render 'index'
 
   view index: ->
+    @title = 'Async example'
+    
     h1 'Async'
     p @foo
