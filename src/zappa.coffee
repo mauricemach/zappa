@@ -71,10 +71,10 @@ zappa.app = ->
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'enable', 'disable', 'settings', 'postrender']
 
-  # TODO: session, postrender, app data, clients list
+  # TODO: session, cookies, app data, clients list
   http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
-  # TODO: app data, clients list
+  # TODO: app data, clients list, join
   ws_names = ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
   
   postrender_names = ['window', '$']
