@@ -1,16 +1,16 @@
-**v0.2.0** (2011-07-xx):
+**v0.2.0beta** (2011-07-xx):
 
   - Complete rewrite, the main idea/api/capabilities are mostly the same, but implemented and used in a way
     more harmonized with the node ecosystem.
   
-  - Performance issues worked out, now negligible overhead over express. Gone with the `with` keyword.
+  - Fixed performance issues, now negligible overhead over express. Gone with the `with` keyword.
 
   - Scraped the `zappa` command. One additional `require` line and now zappa apps can be run directly with
     standard `coffee` and `node` commands, compiled with `coffee`, reloaded with `runjs`/`nodemon` etc,
     deployed with `forever` or to services such as [nodester](http://nodester.com) and [no.de](http://no.de)
     with no special steps required.
 
-  - New `app` and `io` variables at the root scope, providing direct access to express and socket.io.
+  - New `app` and `io` variables at all scopes, providing direct access to express and socket.io.
 
   - Now using the rendering system from express, with all the features it supports (arbitrary engines,
     partials, etc), while retaining the ability to define templates in-file with the `view` function and
@@ -19,9 +19,11 @@
   - The `include` function now is implemented through the standard `require`. Files `include`'d should
     just add a `module.exports = ->` line.
 
-  - Using the new socket.io 0.7.x API which is a lot closer to how zappa works.
+  - Scraped zappa's socket "protocol", using the new socket.io 0.7.x custom events which work in the same way.
     
   - Optional client-side zappa with socket.io and sammy.js for routes.
+  
+  - Added `shared '/foo.js': ->`, allows sharing `helper`s and `def`s between server and client side code.
 
 **v0.1.5** (2011-05-06):
 
