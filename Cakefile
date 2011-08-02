@@ -1,7 +1,12 @@
 {spawn, exec} = require 'child_process'
 
-{puts} = console.log
+log = console.log
 
 task 'build', ->
   exec 'coffee -o lib -c src/*.coffee', (err) ->
-    puts err if err
+    log err if err
+    
+task 'benchmark', ->
+  exec 'cd benchmarks && ./run', (err, stdout, stderr) ->
+    if err then log stderr
+    else log stdout
