@@ -1,4 +1,4 @@
-**v0.2.0beta** (2011-07-xx):
+**v0.2.0beta** (2011-08-02):
 
   - Complete rewrite, see `/docs/peaches.md` for a more in-depth review on changes.
   
