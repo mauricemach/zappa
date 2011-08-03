@@ -121,7 +121,6 @@ zappa.app = ->
 
   root_context = {}
   root_locals = {zappa, express, app, io}
-  root_locals[k] = v for k, v of data
   root_locals[g] = eval(g) for g in globals_names
   
   # These "globals" are actually local to each module, so we get our values
@@ -198,7 +197,8 @@ zappa.app = ->
 
   root_locals.use = ->
     wrappers =
-      static: (path = root_locals.__dirname + '/public') -> express.static(path)
+      static: (path = root_locals.__dirname + '/public') ->
+        express.static(path)
 
     use = (name, arg = null) ->
       if wrappers[name]
@@ -251,6 +251,9 @@ zappa.app = ->
     # include_locals.require = ???
 
     rewritten_sub(root_context, include_locals)
+
+  # Variables passed through the object parameter.
+  root_locals[k] = v for k, v of data
 
   # Executes the (rewriten) end-user function and learns how the app should be structured.
   rewritten_root = rewrite_function(root_function, root_names.concat(globals_names).concat(externals_names))
