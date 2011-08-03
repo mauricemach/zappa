@@ -1,24 +1,17 @@
 {
   "name": "zappa",
-  "description": "Web development, cut-the-crap style.",
-  "version": "0.1.5",
+  "description": "Not your mom's node framework",
+  "version": "0.1.6",
   "author": "Maurice Machado <maurice@bitbending.com>",
-  "contributors": [ 
-    {"name": "Maurice Machado", "email": "maurice@bitbending.com"},
-    {"name": "Nicholas Kinsey", "email": "nicholas.kinsey@feistystudios.com"},
-    {"name": "Jae Kwon", "email": "jae@flywheelnetworks.com"},
-    {"name": "Vladimir Dronnikov", "email": "dronnikov@gmail.com"},
-    {"name": "Isaac Wolkerstorfer", "email": "agnoster@gmail.com"}
-  ],
   "repository": {"type": "git", "url": "http://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "express": ">= 2.3.0",
-    "coffeekup": ">= 0.2.3",
-    "coffee-script": ">= 1.0.1",
-    "socket.io": ">= 0.6.3",
-    "jquery": ">= 1.5.1"
+    "express": "2.3.0",
+    "coffeekup": "0.2.3",
+    "coffee-script": "1.0.1",
+    "socket.io": "0.6.3",
+    "jquery": "1.5.1"
   },
-  "keywords": ["framework", "websockets", "coffeescript"],
+  "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "bin": "./bin/zappa",
   "main": "./lib/zappa",
   "engines": { "node": ">= 0.4.1" }

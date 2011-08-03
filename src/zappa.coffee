@@ -202,7 +202,7 @@ class App
     pairs = if typeof arg is 'object' then arg else {default: arg}
     for k, v of pairs
       do (k, v) =>
-        code = ";(#{v})();"
+        code = ";#{coffeescript_support}(#{v}).call(this);"
         @http_server.get "/#{k}.js", (req, res) ->
           res.contentType 'bla.js'
           res.send code
@@ -395,15 +395,12 @@ coffeescript_support = """
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype;
-    return child;
-  };
+    return child; };
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
-    }
-    return -1;
-  };
-"""
+    } return -1; };
+""".replace /\n/g, ''
 
 build_msg = (title, data) ->
   obj = {}
@@ -431,6 +428,6 @@ publish_api = (from, to, methods) ->
 
 z = new Zappa()
 
-zappa.version = '0.1.5'
+zappa.version = '0.1.6'
 zappa.run = -> z.run.apply z, arguments
 zappa.run_file = -> z.run_file.apply z, arguments

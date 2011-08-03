@@ -1,3 +1,7 @@
+**v0.1.6** (2011-08-xx):
+
+  - Fixed: `client` correctly adds `coffeescript_support` to output JS.
+
 **v0.1.5** (2010-05-06):
 
   - Reworked packaging for npm 1.x.
