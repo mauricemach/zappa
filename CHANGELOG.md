@@ -1,3 +1,7 @@
+**v0.2.0beta2** (2011-08-xx):
+
+  - Changed: external vars (`zappa {foo} ->`) overwrite all others.
+
 **v0.2.0beta** (2011-08-02):
 
   - Complete rewrite, see `/docs/peaches.md` for a more in-depth review on changes.
