@@ -2,4 +2,5 @@
 material/
 node_modules/
 lib/*.js
-benchmarks/out
+benchmarks/out/*.dat
+benchmarks/out/*.out
