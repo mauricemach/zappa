@@ -343,13 +343,13 @@ Shortcut to `app.set`. Accepts an object as param. Ex.:
 
 Shortcut to `app.enable`. Accepts multiple params in one go. Ex.:
 
-    enable 'jquery', 'sammy'
+    enable 'serve jquery', 'serve sammy'
 
 ### disable
 
 Shortcut to `app.disable`. Accepts multiple params in one go. Ex.:
 
-    disable 'jquery', 'sammy'
+    disable 'serve jquery', 'serve sammy'
 
 ### global, process, console, setTimeout, clearTimeout, setInterval, clearInterval, require, __filename, __dirname, module
 
@@ -461,11 +461,11 @@ Serves `/zappa/zappa.js`, required to use the zappa client API. Automatically en
 
 ### serve jquery
 
-Serves `/zappa/jquery.js` (just standard, minified jQuery 1.6.2).
+Serves `/zappa/jquery.js` (minified jQuery 1.6.2 from npm).
 
 ### serve sammy
 
-Serves `/zappa/sammy.js` (just standard, minified Sammy 0.6.3).
+Serves `/zappa/sammy.js` (minified Sammy 0.6.3).
 
 ### default layout
 

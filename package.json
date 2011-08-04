@@ -8,6 +8,7 @@
     "express": "2.4.3",
     "socket.io": "0.7.7",
     "jsdom": "0.2.1",
+    "jquery": "1.6.2",
     "coffeekup": "0.3.0beta",
     "node-uuid": "1.2.0"
   },

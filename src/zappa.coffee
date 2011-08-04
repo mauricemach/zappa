@@ -11,7 +11,7 @@ uuid = require 'node-uuid'
 express = require 'express'
 socketio = require 'socket.io'
 jsdom = require 'jsdom'
-jquery = fs.readFileSync(__dirname + '/../vendor/jquery-1.6.2.min.js').toString()
+jquery = fs.readFileSync(__dirname + '/../node_modules/jquery/dist/node-jquery.min.js').toString()
 sammy = fs.readFileSync(__dirname + '/../vendor/sammy-latest.min.js').toString()
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
