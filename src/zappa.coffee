@@ -110,7 +110,7 @@ zappa.app = ->
   # TODO: route?, error
   root_names = ['zappa', 'express', 'app', 'io', 'requiring', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
-    'enable', 'disable', 'settings', 'postrender']
+    'stylus', 'enable', 'disable', 'settings', 'postrender']
 
   # TODO: session, cookies, app data, clients list
   http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
@@ -189,6 +189,12 @@ zappa.app = ->
     for k, v of obj
       css = String(v)
       routes.push verb: 'get', path: k, handler: css, contentType: 'css'
+
+  root_locals.stylus = (obj) ->
+    for k, v of obj
+      css = require('stylus').render v, filename: k, (err, css) ->
+        throw err if err
+        routes.push verb: 'get', path: k, handler: css, contentType: 'css'
 
   root_locals.helper = (obj) ->
     for k, v of obj

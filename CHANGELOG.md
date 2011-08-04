@@ -3,6 +3,8 @@
   - Changed: external vars (`zappa {foo} ->`) overwrite all others.
   
   - Fixed: inline templates with multiple apps.
+  
+  - Added `stylus` to the root scope.
 
 **v0.2.0beta** (2011-08-02):
 

@@ -1,4 +1,4 @@
-zappa = require 'zappa'
+zappa = require '../src/zappa'
 assert = require 'assert'
 
 class exports.Tester

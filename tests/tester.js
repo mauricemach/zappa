@@ -1,6 +1,6 @@
 (function() {
   var assert, zappa;
-  zappa = require('zappa');
+  zappa = require('../src/zappa');
   assert = require('assert');
   exports.Tester = (function() {
     function Tester(func) {

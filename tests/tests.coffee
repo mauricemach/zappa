@@ -83,3 +83,31 @@ module.exports =
     headers = 'Content-Type': 'text/css'
     body = 'font-family: sans-serif;'
     t.response {url: '/index.css'}, {headers, body}
+
+  stylus: ->
+    t = new Tester ->
+      stylus '/index.css': '''
+        border-radius()
+          -webkit-border-radius arguments  
+          -moz-border-radius arguments  
+          border-radius arguments  
+
+        body
+          font 12px Helvetica, Arial, sans-serif  
+
+        a.button
+          border-radius 5px
+      '''
+    headers = 'Content-Type': 'text/css'
+    body = '''
+      body {
+        font: 12px Helvetica, Arial, sans-serif;
+      }
+      a.button {
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+      }
+      
+    '''
+    t.response {url: '/index.css'}, {headers, body}

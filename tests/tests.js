@@ -203,6 +203,24 @@
         headers: headers,
         body: body
       });
+    },
+    stylus: function() {
+      var body, headers, t;
+      t = new Tester(function() {
+        return stylus({
+          '/index.css': 'border-radius()\n  -webkit-border-radius arguments  \n  -moz-border-radius arguments  \n  border-radius arguments  \n\nbody\n  font 12px Helvetica, Arial, sans-serif  \n\na.button\n  border-radius 5px'
+        });
+      });
+      headers = {
+        'Content-Type': 'text/css'
+      };
+      body = 'body {\n  font: 12px Helvetica, Arial, sans-serif;\n}\na.button {\n  -webkit-border-radius: 5px;\n  -moz-border-radius: 5px;\n  border-radius: 5px;\n}\n';
+      return t.response({
+        url: '/index.css'
+      }, {
+        headers: headers,
+        body: body
+      });
     }
   };
 }).call(this);
