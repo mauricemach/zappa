@@ -286,6 +286,8 @@ Serves the string as `/foo.css`, with content-type `text/css`.
 
 Compiles the string with [stylus](http://learnboost.github.com/stylus) and serves the results as `/foo.css`, with content-type `text/css`.
 
+You must have stylus installed with `npm install stylus`.
+
 ### zappa
 
 ### express
