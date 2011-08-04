@@ -1,6 +1,8 @@
 **v0.2.0beta2** (2011-08-xx):
 
   - Changed: external vars (`zappa {foo} ->`) overwrite all others.
+  
+  - Fixed: inline templates with multiple apps.
 
 **v0.2.0beta** (2011-08-02):
 

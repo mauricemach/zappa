@@ -30,7 +30,7 @@ It will also lose access to its parent scope in the process, so any variables fr
     zappa.app {foo}, ->
       console.log foo # 'bar'
 
-Returns an object with properties `app` and `io`, which are the express and socket.io applications respectively.
+Returns an object with attributes `id` (uuid generated for this app), `app` (express server) and `io` (socket.io server).
 
 ### zappa.run
 
@@ -308,39 +308,73 @@ Node.js's global variables.
 
 ### @
 
+All request input data is merged here.
+
 ### response
+
+Directly from express.
 
 ### request
 
+Directly from express.
+
 ### next
+
+Directly from express.
 
 ### params
 
+Alias to `@`.
+
 ### send
+
+Shortcut to `response.send`.
 
 ### render
 
+Shortcut to `response.render`.
+
+Two additional features:
+
+  - All data from `@`/`params` is automatically passed on to the template as `params`.
+  
+  - You can use `postrender`s: `render 'index', postrender: 'foo'`.
+
 ### redirect
+
+Shortcut to `response.redirect`.
 
 ## Sockets handlers scope
 
 ### @
 
+All input data is made accessible here.
+
 ### socket
+
+Directly from socket.io.
 
 ### id
 
+Shortcut to `socket.id`.
+
 ### params
+
+Alias to `@`.
 
 ### client
 
+You can put data pertaining to the client here. Alternative to `socket.set`.
+
 ### emit
+
+Shortcut to `socket.emit`.
 
 ### broadcast
 
-## View scope
+Shortcut to `socket.broadcast`.
 
-### @
+## View scope
 
 ## Client-side root scope
 

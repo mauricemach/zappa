@@ -7,6 +7,7 @@ zappa = version: '0.2.0beta2'
 log = console.log
 fs = require 'fs'
 path = require 'path'
+uuid = require 'node-uuid'
 express = require 'express'
 socketio = require 'socket.io'
 jsdom = require 'jsdom'
@@ -47,9 +48,49 @@ rewrite_function = (func, locals_names) ->
 # The stringified zappa client.
 client = require('./client').build(zappa.version, coffeescript_helpers, rewrite_function)
 
+# List of all apps created by this running copy of zappa.
+# Keyed by the generated app uuid.
+apps = {}
+  
+# Monkeypatch express to support lookup of inline templates. Such is life.
+express.View.prototype.__defineGetter__ 'exists', ->
+  # Zappa's `render` sends the view name as appid|viewname.
+  [appid, view] = @view.split '|'
+
+  # Try to find an inline template.
+  return true if apps[appid]?.views[view]?
+  return true if apps[appid]?.views[path.basename(view)]?
+
+  # Inline template not found, take back the app id.
+  @path = @path.replace appid + '|', ''
+
+  # Normal express behaviour.
+  try
+    fs.statSync(@path)
+    return true
+  catch err
+    return false
+    
+express.View.prototype.__defineGetter__ 'contents', ->
+  # Zappa's `render` sends the view name as appid|viewname.
+  [appid, view] = @view.split '|'
+
+  # Try to find an inline template.
+  return apps[appid]?.views[view] if apps[appid]?.views[view]?
+  return apps[appid]?.views[path.basename(view)] if apps[appid]?.views[path.basename(view)]?
+
+  # Inline template not found, take back the app id.
+  @path = @path.replace appid + '|', ''
+
+  # Normal express behaviour.
+  fs.readFileSync @path, 'utf8'
+
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
 # The optional data object allows passing variables from the outside to the root scope.
 zappa.app = ->
+  id = uuid()
+  apps[id] = {}
+  
   data = null
   root_function = null
   
@@ -90,24 +131,10 @@ zappa.app = ->
   ws_handlers = {}
   helpers = {}
   defs = {}
-  views = {}
+  # Keep inline views at the module level and namespaced by app id
+  # so that the monkeypatched express can look them up.
+  apps[id].views = {}
   postrenders = {}
-  
-  # Monkeypatch express to support inline templates. Such is life.
-  # TODO: this doesn't work for multiple apps.
-  express.View.prototype.__defineGetter__ 'exists', ->
-    return true if views[@view]?
-    return true if views[path.basename(@view)]?
-    try
-      fs.statSync(@path)
-      return true
-    catch err
-      return false
-      
-  express.View.prototype.__defineGetter__ 'contents', ->
-    return views[@view] if views[@view]?
-    return views[path.basename(@view)] if views[path.basename(@view)]?
-    fs.readFileSync @path, 'utf8'
   
   app = express.createServer()
   io = socketio.listen(app)
@@ -183,7 +210,7 @@ zappa.app = ->
 
   root_locals.view = (obj) ->
     for k, v of obj
-      views[k] = v
+      apps[id].views[k] = v
 
   root_locals.set = (obj) ->
     for k, v of obj
@@ -341,6 +368,11 @@ zappa.app = ->
           locals.redirect = -> res.redirect.apply res, arguments
 
           locals.render = (args...) ->
+            # Adds the app id to the view name so that the monkeypatched
+            # express.View.exists and express.View.contents can lookup
+            # this app's inline templates.
+            args[0] = id + '|' + args[0]
+            
             # Make sure the second arg is an object.
             args[1] ?= {}
             args.splice 1, 0, {} if typeof args[1] is 'function'
@@ -407,7 +439,7 @@ zappa.app = ->
             locals.params = context
             h(context, locals)
 
-  {app, io}
+  {id, app, io}
 
 # Takes a function and runs it as a zappa app. Optionally accepts a number for port,
 # and/or a string for hostname (any order).

@@ -8,7 +8,8 @@
     "express": "2.4.3",
     "socket.io": "0.7.7",
     "jsdom": "0.2.1",
-    "coffeekup": "0.3.0beta"
+    "coffeekup": "0.3.0beta",
+    "node-uuid": "1.2.0"
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "main": "./lib/zappa",
