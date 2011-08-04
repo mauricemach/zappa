@@ -199,41 +199,92 @@ Will `require` the file at the path specified, and run a function exported as `i
 
 ### client
 
-Client-side JavaScript code using zappa's client-side API.
+    client '/foo.js': ->
+      def sum: (a, b) -> a + b
+      
+      helper foo: (param) ->
+        console.log param                       # 'bar' or 'pong'
+        sum 1, 2                                # 3
+        console.log @zig                        # A request or event input param.
+        if render? then console.log 'route'
+        else if emit? then console.log 'event'
+    
+      get '#/': ->
+        foo 'bar'
+        console.log 'A sammy.js route.'
+        
+      at welcome: ->
+        foo 'pong'
+        console.log 'A socket.io event.'
+
+Serves `";zappa.run(#{your_function});"` as `/foo.js`, with content-type `application/javascript`.
+
+To use it, you must also include `/zappa/zappa.js` in your template, before `/foo.js`.
 
 ### shared
 
-Block of code accessible to both the client and the server.
+    shared '/index.js', ->
+      def sum: (a, b) -> a + b
+
+      helper role: (name) ->
+        unless @user.role is name
+          if request? then redirect '/login'
+          else if window? then alert "This is not the page you're looking for."
+          else if socket? then client.disconnect()
+
+    get '/admin': ->
+      role 'admin'
+      # admin stuff
+  
+    at 'delete everything': ->
+      role 'admin'
+  
+    client '/index.js': ->
+      get '#/admin': ->
+        role 'admin'
+        # admin stuff
+
+Same as `client`, but also makes the elements defined in the function available at the server-side.
 
 ### coffee
 
-`coffee path: function`
+    coffee '/foo.js': ->
+      alert 'hi!'
 
-Shortcut to:
-
-    get '/path': ->
-      response.contentType 'js'
-      COFFEESCRIPT_HELPERS + FUNCTION
+Serves `";#{coffeescript_helpers}(#{your_function})();"` as `/foo.js`, with content-type `application/javascript`.
 
 ### js
 
-`js path: string`
+    js '/foo.js': '''
+      alert('hi!');
+    '''
 
-Shortcut to:
-
-    get '/path': ->
-      response.contentType 'js'
-      STRING
+Serves the string as `/foo.js`, with content-type `application/javascript`.
 
 ### css
 
-`css path: string`
+    css '/foo.css': '''
+      font-family: sans-serif;
+    '''
 
-Shortcut to:
+Serves the string as `/foo.css`, with content-type `text/css`.
 
-    get '/path': ->
-      response.contentType 'css'
-      STRING
+### stylus
+
+    stylus '/foo.css': '''
+      border-radius()
+        -webkit-border-radius arguments  
+        -moz-border-radius arguments  
+        border-radius arguments  
+
+      body
+        font 12px Helvetica, Arial, sans-serif  
+
+      a.button
+        border-radius 5px
+    '''
+
+Compiles the string with [stylus](http://learnboost.github.com/stylus) and serves the results as `/foo.css`, with content-type `text/css`.
 
 ### zappa
 
