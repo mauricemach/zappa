@@ -4,3 +4,4 @@ node_modules/
 lib/*.js
 benchmarks/out/*.dat
 benchmarks/out/*.out
+tests/*.js
