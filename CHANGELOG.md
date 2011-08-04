@@ -1,6 +1,8 @@
-**v0.1.6** (2011-08-xx):
+**v0.1.6** (xxxx-xx-xx):
 
   - Fixed: `client` correctly adds `coffeescript_support` to output JS.
+  
+  - Fixed #41: watch included *.coffee files that may or may not be next to the main application file in the project structure. [Kris Molendyke]
 
 **v0.1.5** (2010-05-06):
 
