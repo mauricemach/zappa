@@ -48,48 +48,51 @@ rewrite_function = (func, locals_names) ->
 # The stringified zappa client.
 client = require('./client').build(zappa.version, coffeescript_helpers, rewrite_function)
 
-# List of all apps created by this running copy of zappa.
-# Keyed by the generated app uuid.
-apps = {}
+# Keep inline views at the module level and namespaced by app id
+# so that the monkeypatched express can look them up.
+views = {}
   
 # Monkeypatch express to support lookup of inline templates. Such is life.
 express.View.prototype.__defineGetter__ 'exists', ->
-  # Zappa's `render` sends the view name as appid|viewname.
-  [appid, view] = @view.split '|'
+  # Path given by zappa: /path/to/appid/foo.bar.
+  
+  # Try appid/foo.bar in memory.
+  p = @path.replace @root + '/', ''
+  id = p.split('/')[0]
+  return true if views[p]
 
-  # Try to find an inline template.
-  return true if apps[appid]?.views[view]?
-  return true if apps[appid]?.views[path.basename(view)]?
+  # Try appid/foo in memory.
+  p = p.replace(path.extname(p), '')
+  return true if views[p]
 
-  # Inline template not found, take back the app id.
-  @path = @path.replace appid + '|', ''
-
-  # Normal express behaviour.
+  # Try /path/to/foo.bar in filesystem (normal express behaviour).
+  p = @path.replace id + '/', ''
   try
-    fs.statSync(@path)
+    fs.statSync(p)
     return true
   catch err
     return false
-    
+
 express.View.prototype.__defineGetter__ 'contents', ->
-  # Zappa's `render` sends the view name as appid|viewname.
-  [appid, view] = @view.split '|'
+  # Path given by zappa: /path/to/appid/foo.bar.
 
-  # Try to find an inline template.
-  return apps[appid]?.views[view] if apps[appid]?.views[view]?
-  return apps[appid]?.views[path.basename(view)] if apps[appid]?.views[path.basename(view)]?
+  # Try appid/foo.bar in memory.
+  p = @path.replace @root + '/', ''
+  id = p.split('/')[0]
+  return views[p] if views[p]
 
-  # Inline template not found, take back the app id.
-  @path = @path.replace appid + '|', ''
+  # Try appid/foo in memory.
+  p = p.replace(path.extname(p), '')
+  return views[p] if views[p]
 
-  # Normal express behaviour.
-  fs.readFileSync @path, 'utf8'
+  # Try /path/to/foo.bar in filesystem (normal express behaviour).
+  p = @path.replace id + '/', ''
+  fs.readFileSync p, 'utf8'
 
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
 # The optional data object allows passing variables from the outside to the root scope.
 zappa.app = ->
   id = uuid()
-  apps[id] = {}
   
   data = null
   root_function = null
@@ -126,14 +129,12 @@ zappa.app = ->
   helpers_names = []
   defs_names = []
 
-  # Storage for the user-provided handlers.
+  # Storage for user-provided stuff.
+  # Views are kept at the module level.
   routes = []
   ws_handlers = {}
   helpers = {}
   defs = {}
-  # Keep inline views at the module level and namespaced by app id
-  # so that the monkeypatched express can look them up.
-  apps[id].views = {}
   postrenders = {}
   
   app = express.createServer()
@@ -216,7 +217,7 @@ zappa.app = ->
 
   root_locals.view = (obj) ->
     for k, v of obj
-      apps[id].views[k] = v
+      views["#{id}/#{k}"] = v
 
   root_locals.set = (obj) ->
     for k, v of obj
@@ -377,7 +378,7 @@ zappa.app = ->
             # Adds the app id to the view name so that the monkeypatched
             # express.View.exists and express.View.contents can lookup
             # this app's inline templates.
-            args[0] = id + '|' + args[0]
+            args[0] = id + '/' + args[0]
             
             # Make sure the second arg is an object.
             args[1] ?= {}

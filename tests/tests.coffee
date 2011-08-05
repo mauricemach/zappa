@@ -43,24 +43,57 @@ module.exports =
     
     t.get '/foo.txt', 'bar'
 
-  view: ->
+  'view (inline)': ->
     t = new Tester ->
-      get '/': -> render 'index', layout: no
-      view index: -> h1 'foo'
+      get '/': ->
+        @foo = 'bar'
+        render 'index', layout: no
+      view index: -> h2 "CoffeeKup inline template: #{@foo}"
     
-    t.get '/', '<h1>foo</h1>'
+    t.get '/', '<h2>CoffeeKup inline template: bar</h2>'
+
+  'view (inline, inline layout)': ->
+    t = new Tester ->
+      get '/': ->
+        @foo = 'bar'
+        render 'index'
+      view index: -> h2 "CoffeeKup inline template: #{@foo}"
+      view layout: ->
+        doctype 5
+        html ->
+          head ->
+            title 'CoffeeKup inline layout'
+          body @body
+    
+    t.get '/', '<!DOCTYPE html><html><head><title>CoffeeKup inline layout</title></head><body><h2>CoffeeKup inline template: bar</h2></body></html>'
 
   'view (file)': ->
     t = new Tester ->
-      get '/': -> render 'index', layout: no
+      get '/': ->
+        @foo = 'bar'
+        render 'index', layout: no
     
-    t.get '/', '<h2>CoffeeKup file template</h2>'
+    t.get '/', '<h2>CoffeeKup file template: bar</h2>'
+
+  'view (file, file layout)': ->
+    t = new Tester ->
+      get '/': ->
+        @foo = 'bar'
+        render 'index'
+    
+    t.get '/', '<!DOCTYPE html><html><head><title>CoffeeKup file layout</title></head><body><h2>CoffeeKup file template: bar</h2></body></html>'
 
   'view (response.render)': ->
     t = new Tester ->
-      get '/': -> response.render 'index', layout: no
+      get '/': -> response.render 'index', foo: 'bar', layout: no
     
-    t.get '/', '<h2>CoffeeKup file template</h2>'
+    t.get '/', '<h2>CoffeeKup file template: bar</h2>'
+
+  'view (response.render, layout)': ->
+    t = new Tester ->
+      get '/': -> response.render 'index', foo: 'bar'
+    
+    t.get '/', '<!DOCTYPE html><html><head><title>CoffeeKup file layout</title></head><body><h2>CoffeeKup file template: bar</h2></body></html>'
               
   'coffee and js': ->
     t = new Tester ->

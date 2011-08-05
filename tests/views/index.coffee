@@ -1,1 +1,1 @@
-h2 'CoffeeKup file template'
+h2 "CoffeeKup file template: #{@foo}"
