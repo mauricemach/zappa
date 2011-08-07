@@ -17,5 +17,17 @@
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "main": "./lib/zappa",
-  "engines": { "node": ">= 0.4.7" }
+  "engines": { "node": ">= 0.4.7" },
+  "contributors": [
+    "Nicholas Kinsey <nicholas.kinsey@feistystudios.com>",
+    "Jae Kwon <jae@flywheelnetworks.com>",
+    "Yuya Nishiyama <nsy@ulz.nu>",
+    "Esa-Matti Suuronen <esa-matti@suuronen.org>",
+    "Isaac Wolkerstorfer <agnoster@gmail.com>",
+    "Vladimir Dronnikov <dronnikov@gmail.com>",
+    "Aldo Bucchi <aldo.bucchi@gmail.com>",
+    "Simon Epstein <simon@simondo.com>",
+    "Kris Molendyke <kris@visibiz.com>",
+    "Rafael de Oleza Alomar <rafeca@gmail.com>"
+  ]
 }
