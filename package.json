@@ -13,7 +13,9 @@
     "node-uuid": "1.2.0"
   },
   "devDependencies": {
-    "expresso": "0.8.1"
+    "expresso": "0.8.1",
+    "eco": "1.1.0-rc-1",
+    "jade": "0.13.0"
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "main": "./lib/zappa",
