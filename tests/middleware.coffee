@@ -4,8 +4,10 @@ module.exports =
   'Middleware with vanilla express API': ->
     t = zappa {__dirname}, ->
       app.use express.static(__dirname + '/public')
+      app.use express.responseTime()
     
     t.get '/foo.txt', 'bar'
+    t.response {url: '/'}, {headers: {'X-Response-Time': /\d+ms/}}
 
   'Middleware with `use`': ->
     t = zappa {__dirname}, ->

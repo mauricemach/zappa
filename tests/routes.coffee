@@ -6,10 +6,14 @@ module.exports =
       get '/string': 'string'
       get '/return': -> 'return'
       get '/send': -> send 'send'
+      get /\/regex$/, 'regex'
+      get /\/regex_function$/, -> 'regex function'
     
     t.get '/string', 'string'
     t.get '/return', 'return'
     t.get '/send', 'send'
+    t.get '/regex', 'regex'
+    t.get '/regex_function', 'regex function'
 
   verbs: ->
     t = zappa ->
