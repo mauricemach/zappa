@@ -1,4 +1,6 @@
 require('zappa') ->
+  enable 'serve jquery'
+  
   get '/': ->
     render 'index', layout: no
   
@@ -27,7 +29,7 @@ require('zappa') ->
       head ->
         title 'PicoChat!'
         script src: '/socket.io/socket.io.js'
-        script src: 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'
+        script src: '/zappa/jquery.js'
         script src: '/zappa/zappa.js'
         script src: '/index.js'
       body ->
