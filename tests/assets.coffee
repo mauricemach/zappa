@@ -1,6 +1,14 @@
 zappa = require('./support/tester') require('../src/zappa')
 
 module.exports =
+  client: ->
+    t = zappa ->
+      client '/index.js': ->
+        get '#/': -> alert 'hi'
+    headers = 'Content-Type': 'application/javascript'
+    body = ';zappa.run(function () {\n            return get({\n              \'#/\': function() {\n                return alert(\'hi\');\n              }\n            });\n          });'
+    t.response {url: '/index.js'}, {headers, body}
+
   coffee: ->
     t = zappa ->
       coffee '/coffee.js': ->
@@ -54,3 +62,39 @@ module.exports =
       
     '''
     t.response {url: '/index.css'}, {headers, body}
+
+  jquery: ->
+    t = zappa ->
+      enable 'serve jquery'
+    status = 200
+    headers =
+      'Content-Type': 'application/javascript'
+      'Content-Length': '92334'
+    t.response {url: '/zappa/jquery.js'}, {status, headers}
+
+  sammy: ->
+    t = zappa ->
+      enable 'serve sammy'
+    status = 200
+    headers =
+      'Content-Type': 'application/javascript'
+      'Content-Length': '16854'
+    t.response {url: '/zappa/sammy.js'}, {status, headers}
+
+  zappa: ->
+    t = zappa ->
+      enable 'serve zappa'
+    status = 200
+    headers =
+      'Content-Type': 'application/javascript'
+      'Content-Length': '6864'
+    t.response {url: '/zappa/zappa.js'}, {status, headers}
+
+  'zappa (automatic)': ->
+    t = zappa ->
+      client '/index.js': ->
+    status = 200
+    headers =
+      'Content-Type': 'application/javascript'
+      'Content-Length': '6864'
+    t.response {url: '/zappa/zappa.js'}, {status, headers}
