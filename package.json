@@ -1,7 +1,7 @@
 {
   "name": "zappa",
   "description": "Not your mom's node framework",
-  "version": "0.2.0beta",
+  "version": "0.2.0beta2",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
   "dependencies": {
