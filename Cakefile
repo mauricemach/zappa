@@ -8,8 +8,7 @@ task 'bench', ->
   run 'cd benchmarks && ./run'
     
 task 'test', ->
-  run 'coffee -c tests/*.coffee', ->
-    run 'expresso tests/tests.js'
+  run 'cd tests && expresso *.coffee'
     
 task 'docs', ->
   run 'docco src/zappa.coffee'
