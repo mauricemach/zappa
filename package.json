@@ -12,6 +12,9 @@
     "coffeekup": "0.3.0beta",
     "node-uuid": "1.2.0"
   },
+  "devDependencies": {
+    "expresso": "0.8.1"
+  },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "main": "./lib/zappa",
   "engines": { "node": ">= 0.4.7" }
