@@ -4,11 +4,11 @@ log = console.log
 task 'build', ->
   run 'coffee -o lib -c src/*.coffee'
     
-task 'bench', ->
-  run 'cd benchmarks && ./run'
-    
 task 'test', ->
   run 'cd tests && expresso *.coffee'
+    
+task 'bench', ->
+  run 'cd benchmarks && ./run'
     
 task 'docs', ->
   run 'docco src/zappa.coffee'
