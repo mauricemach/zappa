@@ -1,4 +1,4 @@
-# Migration to zappa 0.2.0 beta
+# Migration to zappa 0.2.x
 
 ## TLDR; guide
 

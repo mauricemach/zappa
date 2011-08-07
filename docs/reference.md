@@ -1,4 +1,4 @@
-# Zappa 0.2.0 beta reference
+# Zappa 0.2.0beta2 reference
 
 **This reference is a work in progress. There are still many sections to be added or refined.**
 

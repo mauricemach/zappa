@@ -1,4 +1,4 @@
-**v0.2.0beta2** (2011-08-xx):
+**v0.2.0beta2** (xxxx-xx-xx):
 
   - Changed: external vars (`zappa {foo} ->`) overwrite all others.
   
