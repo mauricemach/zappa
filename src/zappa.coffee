@@ -317,7 +317,7 @@ zappa.app = ->
   if app.settings['serve sammy']
     app.get '/zappa/sammy.js', (req, res) ->
       res.contentType 'js'
-      ren.send sammy
+      res.send sammy
 
   if app.settings['default layout']
     views.layout = ->

@@ -235,7 +235,7 @@ include_locals.require = ???</p>             </td>             <td class="code">
   <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;serve sammy&#39;</span><span class="p">]</span>
     <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;/zappa/sammy.js&#39;</span><span class="p">,</span> <span class="nf">(req, res) -&gt;</span>
       <span class="nx">res</span><span class="p">.</span><span class="nx">contentType</span> <span class="s1">&#39;js&#39;</span>
-      <span class="nx">ren</span><span class="p">.</span><span class="nx">send</span> <span class="nx">sammy</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">send</span> <span class="nx">sammy</span>
 
   <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;default layout&#39;</span><span class="p">]</span>
     <span class="nv">views.layout = </span><span class="o">-&gt;</span>
