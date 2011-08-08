@@ -15,7 +15,8 @@
   "devDependencies": {
     "expresso": "0.8.1",
     "eco": "1.1.0-rc-1",
-    "jade": "0.13.0"
+    "jade": "0.13.0",
+    "stylus": "0.13.9"
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
   "main": "./lib/zappa",
