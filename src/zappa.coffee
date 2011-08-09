@@ -7,6 +7,7 @@ zappa = version: '0.2.0beta2'
 log = console.log
 fs = require 'fs'
 path = require 'path'
+_ = require 'underscore'
 uuid = require 'node-uuid'
 express = require 'express'
 socketio = require 'socket.io'
@@ -44,6 +45,11 @@ rewrite_function = (func, locals_names) ->
   for name in locals_names
     code = "var #{name} = locals.#{name};" + code
   new Function('context', 'locals', 'args', code)
+
+# Builds an array of unique names from the desired scopes.
+# Ex.: select names, 'http + defs + helpers'
+select = (names, scopes) ->
+  _.union (names[i] for i in scopes.split ' + ')
 
 # The stringified zappa client.
 client = require('./client').build(zappa.version, coffeescript_helpers, rewrite_function)
@@ -104,30 +110,27 @@ zappa.app = ->
 
   # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
   # Helpers and defs will be known after we execute the user-provided `root_function`.
-
-  # The last four (`require`, `module`, `__filename` and `__dirname`) are not actually real globals,
-  # but locals to each module.
-  globals_names = ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
+  names =
+    # The last four (`require`, `module`, `__filename` and `__dirname`) are not actually real globals,
+    # but locals to each module.
+    globals: ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
     'require', 'module', '__filename', '__dirname']
 
-  # TODO: route?, error
-  root_names = ['zappa', 'express', 'app', 'io', 'requiring', 'get', 'post', 'put', 'del', 'at',
+    # TODO: route?, error
+    root: ['zappa', 'express', 'app', 'io', 'requiring', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'stylus', 'enable', 'disable', 'settings', 'postrender']
 
-  # TODO: session, cookies, app data, clients list
-  http_names = ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
+    # TODO: session, cookies, app data, clients list
+    http: ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
 
-  # TODO: app data, clients list, join
-  ws_names = ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
+    # TODO: app data, clients list, join
+    ws: ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
   
-  postrender_names = ['window', '$']
-  
-  externals_names = []
-  externals_names.push k for k, v of data
-  
-  helpers_names = []
-  defs_names = []
+    postrender: ['window', '$']
+    externals: (k for k, v of data)
+    helpers: []
+    defs: []
 
   # Storage for user-provided stuff.
   # Views are kept at the module level.
@@ -149,7 +152,7 @@ zappa.app = ->
 
   root_context = {}
   root_locals = {zappa, express, app, io}
-  root_locals[g] = eval(g) for g in globals_names
+  root_locals[g] = eval(g) for g in names.globals
   
   # These "globals" are actually local to each module, so we get our values
   # from our parent module.
@@ -199,12 +202,12 @@ zappa.app = ->
 
   root_locals.helper = (obj) ->
     for k, v of obj
-      helpers_names.push k
+      names.helpers.push k
       helpers[k] = v
 
   root_locals.def = (obj) ->
     for k, v of obj
-      defs_names.push k
+      names.defs.push k
       defs[k] = v
 
   root_locals.postrender = (obj) ->
@@ -264,12 +267,12 @@ zappa.app = ->
       js = ";zappa.run(#{v});"
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
 
-      rewritten_shared = rewrite_function(v, root_names.concat(globals_names).concat(externals_names))
+      rewritten_shared = rewrite_function(v, select names, 'root + globals + externals')
       rewritten_shared(root_context, root_locals)
 
   root_locals.include = (name) ->
     sub = root_locals.require name
-    rewritten_sub = rewrite_function(sub.include, root_names.concat(globals_names).concat(externals_names))
+    rewritten_sub = rewrite_function(sub.include, select names, 'root + globals + externals')
 
     include_locals = {}
     include_locals[k] = v for k, v of root_locals
@@ -290,19 +293,19 @@ zappa.app = ->
   root_locals[k] = v for k, v of data
 
   # Executes the (rewriten) end-user function and learns how the app should be structured.
-  rewritten_root = rewrite_function(root_function, root_names.concat(globals_names).concat(externals_names))
+  rewritten_root = rewrite_function(root_function, select names, 'root + globals + externals')
   rewritten_root(root_context, root_locals)
 
   # Implements the application according to the specification.
 
   for k, v of helpers
-    helpers[k] = rewrite_function(v, http_names.concat(helpers_names).concat(defs_names).concat(globals_names))
+    helpers[k] = rewrite_function(v, select names, 'http + helpers + defs + globals')
 
   for k, v of ws_handlers
-    ws_handlers[k] = rewrite_function(v, ws_names.concat(helpers_names).concat(defs_names).concat(globals_names))
+    ws_handlers[k] = rewrite_function(v, select names, 'ws + helpers + defs + globals')
 
   for k, v of postrenders
-    postrenders[k] = rewrite_function(v, postrender_names.concat(helpers_names).concat(defs_names).concat(globals_names))
+    postrenders[k] = rewrite_function(v, select names, 'postrender + helpers + defs + globals')
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->
@@ -345,13 +348,13 @@ zappa.app = ->
           res.send r.handler
       else
         rewritten_handler = rewrite_function(r.handler,
-          http_names.concat(helpers_names).concat(defs_names).concat(globals_names))
+          select(names, 'http + helpers + defs + globals'))
 
         context = null
         locals = {app, settings: app.settings}
         
         # TODO: fix pseudo-globals here too.
-        locals[g] = eval(g) for g in globals_names
+        locals[g] = eval(g) for g in names.globals
 
         for name, def of defs
           locals[name] = def
@@ -422,7 +425,7 @@ zappa.app = ->
       broadcast: -> socket.broadcast.emit.apply socket.broadcast, arguments
 
     # TODO: fix pseudo-globals here too.
-    locals[g] = eval(g) for g in globals_names
+    locals[g] = eval(g) for g in names.globals
 
     for name, def of defs
       locals[name] = def

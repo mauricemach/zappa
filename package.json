@@ -5,6 +5,7 @@
   "author": "Maurice Machado <maurice@bitbending.com>",
   "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
   "dependencies": {
+    "underscore": "1.1.7",
     "express": "2.4.3",
     "socket.io": "0.7.7",
     "jsdom": "0.2.1",
