@@ -1,6 +1,6 @@
 **v0.2.0beta2** (xxxx-xx-xx):
 
-  - Changed: external vars (`zappa {foo} ->`) overwrite all others.
+  - Changed: externals (`zappa {foo} ->`) are available at all scopes, shadow globals and root scope locals.
   
   - Fixed: inline templates with multiple apps.
   

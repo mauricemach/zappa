@@ -96,17 +96,17 @@ express.View.prototype.__defineGetter__ 'contents', ->
   fs.readFileSync p, 'utf8'
 
 # Takes in a function and builds express/socket.io apps based on the rules contained in it.
-# The optional data object allows passing variables from the outside to the root scope.
+# The optional externals object allows passing variables from the outside to the root scope.
 zappa.app = ->
   id = uuid()
   
-  data = null
+  externals = null
   root_function = null
   
   for a in arguments
     switch typeof a
       when 'function' then root_function = a
-      when 'object' then data = a
+      when 'object' then externals = a
 
   # Names of local variables that we have to know beforehand, to use with `rewrite_function`.
   # Helpers and defs will be known after we execute the user-provided `root_function`.
@@ -128,7 +128,7 @@ zappa.app = ->
     ws: ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
   
     postrender: ['window', '$']
-    externals: (k for k, v of data)
+    externals: (k for k, v of externals)
     helpers: []
     defs: []
 
@@ -267,12 +267,12 @@ zappa.app = ->
       js = ";zappa.run(#{v});"
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
 
-      rewritten_shared = rewrite_function(v, select names, 'root + globals + externals')
+      rewritten_shared = rewrite_function(v, select names, 'globals + root + externals')
       rewritten_shared(root_context, root_locals)
 
   root_locals.include = (name) ->
     sub = root_locals.require name
-    rewritten_sub = rewrite_function(sub.include, select names, 'root + globals + externals')
+    rewritten_sub = rewrite_function(sub.include, select names, 'globals + root + externals')
 
     include_locals = {}
     include_locals[k] = v for k, v of root_locals
@@ -290,22 +290,22 @@ zappa.app = ->
     rewritten_sub(root_context, include_locals)
 
   # Variables passed through the object parameter.
-  root_locals[k] = v for k, v of data
+  root_locals[k] = v for k, v of externals
 
   # Executes the (rewriten) end-user function and learns how the app should be structured.
-  rewritten_root = rewrite_function(root_function, select names, 'root + globals + externals')
+  rewritten_root = rewrite_function(root_function, select names, 'globals + root + externals')
   rewritten_root(root_context, root_locals)
 
   # Implements the application according to the specification.
 
   for k, v of helpers
-    helpers[k] = rewrite_function(v, select names, 'http + helpers + defs + globals')
+    helpers[k] = rewrite_function(v, select names, 'globals + http + externals + helpers + defs')
 
   for k, v of ws_handlers
-    ws_handlers[k] = rewrite_function(v, select names, 'ws + helpers + defs + globals')
+    ws_handlers[k] = rewrite_function(v, select names, 'globals + ws + externals + helpers + defs')
 
   for k, v of postrenders
-    postrenders[k] = rewrite_function(v, select names, 'postrender + helpers + defs + globals')
+    postrenders[k] = rewrite_function(v, select names, 'globals + postrender + externals + helpers + defs')
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->
@@ -348,13 +348,16 @@ zappa.app = ->
           res.send r.handler
       else
         rewritten_handler = rewrite_function(r.handler,
-          select(names, 'http + helpers + defs + globals'))
+          select(names, 'globals + http + externals + helpers + defs'))
 
         context = null
         locals = {app, settings: app.settings}
         
         # TODO: fix pseudo-globals here too.
         locals[g] = eval(g) for g in names.globals
+        
+        # TODO: externals are also shadowing certain immutable request scope vars. Should it?
+        locals[e] = externals[e] for e in names.externals
 
         for name, def of defs
           locals[name] = def
@@ -426,6 +429,9 @@ zappa.app = ->
 
     # TODO: fix pseudo-globals here too.
     locals[g] = eval(g) for g in names.globals
+        
+    # TODO: externals are also shadowing certain immutable socket scope vars. Should it?
+    locals[e] = externals[e] for e in names.externals
 
     for name, def of defs
       locals[name] = def
@@ -462,16 +468,16 @@ zappa.run = ->
   host = null
   port = 3000
   root_function = null
-  data = null
+  externals = null
 
   for a in arguments
     switch typeof a
       when 'string' then host = a
       when 'number' then port = a
       when 'function' then root_function = a
-      when 'object' then data = a
+      when 'object' then externals = a
 
-  zapp = zappa.app(data, root_function)
+  zapp = zappa.app(externals, root_function)
   app = zapp.app
 
   if host then app.listen port, host
