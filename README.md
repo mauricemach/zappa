@@ -226,7 +226,7 @@ On a step further, you have `client`, which gives you access to a matching zappa
         
 Finally, there's also `shared`. Certain zappa "keywords" work exactly the same on the server and client side. Guess what? If you define them inside a `shared` block, they're available at both environments!
 
-    shared '/index.js', ->
+    shared '/index.js': ->
       def sum: (a, b) -> a + b
 
       helper role: (name) ->

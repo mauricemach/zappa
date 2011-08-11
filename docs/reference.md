@@ -223,7 +223,7 @@ To use it, you must also include `/zappa/zappa.js` in your template, before `/fo
 
 ### shared
 
-    shared '/index.js', ->
+    shared '/index.js': ->
       def sum: (a, b) -> a + b
 
       helper role: (name) ->
