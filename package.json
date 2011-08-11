@@ -19,7 +19,7 @@
     "jade": "0.13.0",
     "stylus": "0.13.9"
   },
-  "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra"],
+  "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra", "dsl"],
   "main": "./lib/zappa",
   "engines": { "node": ">= 0.4.7" },
   "contributors": [
