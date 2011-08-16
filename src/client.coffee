@@ -59,7 +59,7 @@ skeleton = ->
     # Implements the application according to the specification.
 
     for k, v of helpers
-      helpers[k] = rewrite_function(v, http_locals_names.concat(helpers_names).concat(defs_names))
+      helpers[k] = rewrite_function(v, sammy_locals_names.concat(helpers_names).concat(defs_names))
 
     for k, v of ws_handlers
       ws_handlers[k] = rewrite_function(v, ws_locals_names.concat(helpers_names).concat(defs_names))
