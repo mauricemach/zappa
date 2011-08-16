@@ -123,7 +123,7 @@ port = 15200
     c = t.client(zapp.app)
     c.get '/zappa/zappa.js', (err, res) ->
       t.equal 'content-type', res.headers['content-type'], 'application/javascript'
-      t.equal 'length', res.headers['content-length'], '6865'
+      t.equal 'length', res.headers['content-length'], '7037'
 
   'zappa (automatic)': (t) ->
     t.expect 'content-type', 'length'
@@ -135,4 +135,4 @@ port = 15200
     c = t.client(zapp.app)
     c.get '/zappa/zappa.js', (err, res) ->
       t.equal 'content-type', res.headers['content-type'], 'application/javascript'
-      t.equal 'length', res.headers['content-length'], '6865'
+      t.equal 'length', res.headers['content-length'], '7037'
