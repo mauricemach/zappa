@@ -20,3 +20,18 @@ port = 15100
     c.get '/', (err, res) ->
       t.equal 1, res.statusCode, 302
       t.ok 2, res.headers.location.match /\/login$/
+
+  multiple: (t) ->
+    t.expect 1, 2
+    t.wait 3000
+    
+    zapp = zappa port++, {t}, ->
+      helper sum: (a, b) -> a + b
+      helper subtract: (a, b) -> a - b
+
+      get '/': ->
+        t.equal 1, sum(1, 2), 3
+        t.equal 2, subtract(1, 2), -1
+        
+    c = t.client(zapp.app)
+    c.get '/'

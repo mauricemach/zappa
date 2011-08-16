@@ -101,15 +101,17 @@ skeleton = ->
         locals[name] = def
 
       for name, helper of helpers
-        locals[name] = ->
-          helper(context, locals, arguments)
+        do (name, helper) ->
+          locals[name] = ->
+            helper(context, locals, arguments)
 
       for name, h of ws_handlers
-        socket.on name, (data) ->
-          context = {}
-          context[k] = v for k, v of data
-          locals.params = context
-          h(context, locals)
+        do (name, h) ->
+          socket.on name, (data) ->
+            context = {}
+            context[k] = v for k, v of data
+            locals.params = context
+            h(context, locals)
 
     $(-> app.run '#/') if app?
 

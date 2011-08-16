@@ -271,8 +271,9 @@ include_locals.require = ???</p>             </td>             <td class="code">
           <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">def</span>
 
         <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">helper</span> <span class="k">of</span> <span class="nx">helpers</span>
-          <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
-            <span class="nx">helper</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
+          <span class="nx">do</span> <span class="nf">(name, helper) -&gt;</span>
+            <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
+              <span class="nx">helper</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
             
         <span class="nx">app</span><span class="p">[</span><span class="nx">r</span><span class="p">.</span><span class="nx">verb</span><span class="p">]</span> <span class="nx">r</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nf">(req, res, next) -&gt;</span>
           <span class="nv">context = </span><span class="p">{}</span>

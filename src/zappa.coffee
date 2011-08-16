@@ -363,8 +363,9 @@ zappa.app = ->
           locals[name] = def
 
         for name, helper of helpers
-          locals[name] = ->
-            helper(context, locals, arguments)
+          do (name, helper) ->
+            locals[name] = ->
+              helper(context, locals, arguments)
             
         app[r.verb] r.path, (req, res, next) ->
           context = {}
