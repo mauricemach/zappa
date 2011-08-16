@@ -55,8 +55,8 @@ class Client
   del: (args...) -> @request 'delete', args...
   
   connect: -> @socket = io.connect("http://#{@host}:#{@port}")
-    
-  on: (event, handler) -> @socket.on event, handler
+  on: -> @socket.on.apply @socket, arguments
+  emit: -> @socket.emit.apply @socket, arguments
 
 module.exports = (args...) ->
   c = new Client(args...)
