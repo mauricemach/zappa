@@ -11,7 +11,7 @@ task 'bench', ->
   run 'cd benchmarks && ./run'
     
 task 'docs', ->
-  run 'docco src/zappa.coffee'
+  run 'docco src/*.coffee'
         
 run = (args...) ->
   for a in args
