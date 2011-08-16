@@ -199,9 +199,13 @@ First there's `coffee` with which you can define a route `/file.js`, that will r
 
 On a step further, you have `client`, which gives you access to a matching zappa client-side API:
 
-    get '/': -> render 'index', layout: no
+    enable 'serve jquery', 'serve sammy'
+
+    get '/': ->
+      render 'index', layout: no
     
-    at connection: -> emit 'server time', time: new Date()
+    at connection: ->
+      emit 'server time', time: new Date()
     
     client '/index.js': ->
       def sum: (a, b) -> a + b
@@ -220,6 +224,8 @@ On a step further, you have `client`, which gives you access to a matching zappa
         head ->
           title 'Client-side zappa'
           script src: '/socket.io/socket.io.js'
+          script src: '/zappa/jquery.js'
+          script src: '/zappa/sammy.js'
           script src: '/zappa/zappa.js'
           script src: '/index.js'
         body ''
