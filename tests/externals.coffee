@@ -1,53 +1,89 @@
-zappa = require('./support/tester') require('../src/zappa')
-assert = require 'assert'
+zappa = require '../src/zappa'
+port = 15400
 
-module.exports =
-  'Externals: available at the root scope': ->
-    t = zappa {assert, foo: 'bar'}, ->
-      assert.eql foo, 'bar'
+@tests =
+  'available at the root scope': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, {t, foo: 'bar'}, ->
+      t.equal 1, foo, 'bar'
 
-  'Externals: available at the request scope': ->
-    t = zappa {foo: 'bar'}, ->
-      get '/': -> foo
-      
-    t.get '/', 'bar'
+  'available at the request scope': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, {t, foo: 'bar'}, ->
+      get '/': ->
+        t.equal 1, foo, 'bar'
+        
+    c = t.client(zapp.app)
+    c.get '/'
 
-  'Externals: shadowed by defs': ->
-    t = zappa {foo: 'bar'}, ->
+  'shadowed by defs': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, {t, foo: 'bar'}, ->
       def foo: 'zag'
-      get '/': -> foo
+      get '/': ->
+        t.equal 1, foo, 'zag'
       
-    t.get '/', 'zag'
+    c = t.client(zapp.app)
+    c.get '/'
 
-  'Externals: shadowed by helpers': ->
-    t = zappa {foo: 'bar'}, ->
+  'shadowed by helpers': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, {t, foo: 'bar'}, ->
       helper foo: -> 'pong'
-      get '/': -> foo()
+      get '/': ->
+        t.equal 1, foo(), 'pong'
       
-    t.get '/', 'pong'
+    c = t.client(zapp.app)
+    c.get '/'
 
-  'Externals: shadow globals': ->
-    t = zappa {__filename: 'shadowglobals.coffee'}, ->
-      get '/': -> __filename
-      
-    t.get '/', 'shadowglobals.coffee'
+  'shadow globals': (t) ->
+    t.expect 'root', 'http'
+    t.wait 3000
+    
+    zapp = zappa port++, {t, __filename: 'foo.coffee'}, ->
+      t.equal 'root', __filename, 'foo.coffee'
+      get '/': -> t.equal 'http', __filename, 'foo.coffee'
 
-  'Externals: shadow root scope variables': ->
-    t = zappa {assert, get: 'got'}, ->
-      assert.eql get, 'got'
+    c = t.client(zapp.app)
+    c.get '/'
 
-  'Externals: primitives are passed by value': ->
+  'shadow root scope variables': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, {t, get: 'got'}, ->
+      t.equal 1, get, 'got'
+
+  'primitives are passed by value': (t) ->
+    t.expect 1
+    t.wait 3000
+
     foo = 'bar'
-    t = zappa {foo}, ->
-      get '/': -> foo
-    foo += '!'
-      
-    t.get '/', 'bar'
+    zapp = zappa port++, {t, foo}, ->
+      t.equal 1, foo, 'bar'
+      get '/': -> t.equal 2, foo, 'bar'
 
-  'Externals: objects are passed by reference': ->
+    foo += '!'
+    c = t.client(zapp.app)
+    c.get '/'
+
+  'objects are passed by reference': (t) ->
+    t.expect 1
+    t.wait 3000
+
     foo = {zig: 'zag'}
-    t = zappa {foo}, ->
-      get '/': -> foo.zig
+    zapp = zappa port++, {t, foo}, ->
+      t.equal 1, foo.zig, 'zag'
+      get '/': -> t.equal 2, foo.zig, 'zag!'
+
     foo.zig += '!'
-      
-    t.get '/', 'zag!'
+    c = t.client(zapp.app)
+    c.get '/'

@@ -1,38 +1,72 @@
-zappa = require('./support/tester') require('../src/zappa')
+zappa = require '../src/zappa'
+port = 15500
 
-module.exports =
-  'Middleware with vanilla express API': ->
-    t = zappa {__dirname}, ->
+@tests =
+  'vanilla express API': (t) ->
+    t.expect 'static', 'response time'
+    t.wait 3000
+    
+    zapp = zappa port++, {__dirname}, ->
       app.use express.static(__dirname + '/public')
       app.use express.responseTime()
     
-    t.get '/foo.txt', 'bar'
-    t.response {url: '/'}, {headers: {'X-Response-Time': /\d+ms/}}
+    c = t.client(zapp.app)
+    c.get '/foo.txt', (err, res) ->
+      t.equal 'static', res.body, 'bar'
+    
+    c.get '/', (err, res) ->
+      t.ok 'response time', res.headers['x-response-time'].match /\d+ms/
 
-  'Middleware with `use`': ->
-    t = zappa {__dirname}, ->
+  use: (t) ->
+    t.expect 'static', 'response time'
+    t.wait 3000
+    
+    zapp = zappa port++, {__dirname}, ->
       use express.static(__dirname + '/public'), express.responseTime()
     
-    t.get '/foo.txt', 'bar'
-    t.response {url: '/'}, {headers: {'X-Response-Time': /\d+ms/}}
+    c = t.client(zapp.app)
+    c.get '/foo.txt', (err, res) ->
+      t.equal 'static', res.body, 'bar'
+    
+    c.get '/', (err, res) ->
+      t.ok 'response time', res.headers['x-response-time'].match /\d+ms/
 
-  'Middleware with `use` and shortcuts': ->
-    t = zappa {__dirname}, ->
+  'use + shortcuts': (t) ->
+    t.expect 'static', 'response time'
+    t.wait 3000
+    
+    zapp = zappa port++, {__dirname}, ->
       use static: __dirname + '/public', 'responseTime'
     
-    t.get '/foo.txt', 'bar'
-    t.response {url: '/'}, {headers: {'X-Response-Time': /\d+ms/}}
+    c = t.client(zapp.app)
+    c.get '/foo.txt', (err, res) ->
+      t.equal 'static', res.body, 'bar'
+    
+    c.get '/', (err, res) ->
+      t.ok 'response time', res.headers['x-response-time'].match /\d+ms/
 
-  'Middleware with `use`, shortcuts and zappa added defaults': ->
-    t = zappa ->
+  'use + shortcuts + zappa added defaults': (t) ->
+    t.expect 'static', 'response time'
+    t.wait 3000
+    
+    zapp = zappa port++, {__dirname}, ->
       use 'static', 'responseTime'
     
-    t.get '/foo.txt', 'bar'
-    t.response {url: '/'}, {headers: {'X-Response-Time': /\d+ms/}}
+    c = t.client(zapp.app)
+    c.get '/foo.txt', (err, res) ->
+      t.equal 'static', res.body, 'bar'
+    
+    c.get '/', (err, res) ->
+      t.ok 'response time', res.headers['x-response-time'].match /\d+ms/
 
-  'Middleware precedence': ->
-    t = zappa ->
+  precedence: (t) ->
+    t.expect 'static'
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       use app.router, 'static'
       get '/foo.txt': 'intercepted!'
     
-    t.get '/foo.txt', 'intercepted!'
+    c = t.client(zapp.app)
+    c.get '/foo.txt', (err, res) ->
+      t.equal 'static', res.body, 'intercepted!'

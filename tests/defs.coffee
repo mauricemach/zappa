@@ -1,38 +1,55 @@
-zappa = require('./support/tester') require('../src/zappa')
+zappa = require '../src/zappa'
+port = 15300
 
-module.exports =
-  foo: ->
-    t = zappa ->
+@tests =
+  string: (t) ->
+    t.expect 'body'
+    
+    zapp = zappa port++, ->
       def foo: 'bar'
       get '/': -> foo
-      
-    t.get '/', 'bar'
     
-  sum: ->
-    t = zappa ->
+    c = t.client(zapp.app)  
+    c.get '/', (err, res) ->
+      t.equal 'body', res.body, 'bar'
+
+  function: (t) ->
+    t.expect 'body'
+    
+    zapp = zappa port++, ->
       def sum: (a, b) -> a + b
       get '/': -> String(sum 1, 2)
-      
-    t.get '/', '3'
     
-  byvalue: ->
-    t = zappa ->
+    c = t.client(zapp.app)  
+    c.get '/', (err, res) ->
+      t.equal 'body', res.body, '3'
+
+  'by value': (t) ->
+    t.expect 1, 2
+    
+    zapp = zappa port++, ->
       def counter: 0
       get '/': ->
         counter++
         String(counter)
-      
-    t.get '/', '1'
-    t.get '/', '1'
-    t.get '/', '1'
     
-  byref: ->
-    t = zappa ->
+    c = t.client(zapp.app)  
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '1'
+      c.get '/', (err, res) ->
+        t.equal 2, res.body, '1'
+
+  'by reference': (t) ->
+    t.expect 1, 2
+    
+    zapp = zappa port++, ->
       def foo: {counter: 0}
       get '/': ->
         foo.counter++
         String(foo.counter)
-      
-    t.get '/', '3'
-    t.get '/', '2'
-    t.get '/', '1'
+    
+    c = t.client(zapp.app)  
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '1'
+      c.get '/', (err, res) ->
+        t.equal 2, res.body, '2'

@@ -1,65 +1,99 @@
-zappa = require('./support/tester') require('../src/zappa')
+zappa = require '../src/zappa'
+port = 15600
 
-module.exports =
-  'Views (inline)': ->
-    t = zappa ->
+@tests =
+  inline: (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       get '/': ->
         @foo = 'bar'
         render 'index', layout: no
 
       view index: -> h2 "CoffeeKup inline template: #{@foo}"
     
-    t.get '/', '<h2>CoffeeKup inline template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>CoffeeKup inline template: bar</h2>'
 
-  'Views (inline, inline layout)': ->
-    t = zappa ->
+  'inline + inline layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       get '/': ->
         @foo = 'bar'
         render 'index'
 
       view index: -> h2 "CoffeeKup inline template: #{@foo}"
-
+      
       view layout: ->
         doctype 5
         html ->
           head ->
             title 'CoffeeKup inline layout'
-          body @body
-    
-    t.get '/', '<!DOCTYPE html><html><head><title>CoffeeKup inline layout</title></head><body><h2>CoffeeKup inline template: bar</h2></body></html>'
+          body @body    
 
-  'Views (file)': ->
-    t = zappa ->
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html><html><head><title>CoffeeKup inline layout</title></head><body><h2>CoffeeKup inline template: bar</h2></body></html>'
+
+  file: (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       get '/': ->
         @foo = 'bar'
         render 'index', layout: no
     
-    t.get '/', '<h2>CoffeeKup file template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>CoffeeKup file template: bar</h2>'
 
-  'Views (file, file layout)': ->
-    t = zappa ->
+  'file + file layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       get '/': ->
         @foo = 'bar'
         render 'index'
     
-    t.get '/', '<!DOCTYPE html><html><head><title>CoffeeKup file layout</title></head><body><h2>CoffeeKup file template: bar</h2></body></html>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html><html><head><title>CoffeeKup file layout</title></head><body><h2>CoffeeKup file template: bar</h2></body></html>'
 
-  'Views (response.render)': ->
-    t = zappa ->
+  'response.render, file': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       get '/': ->
         response.render 'index', foo: 'bar', layout: no
     
-    t.get '/', '<h2>CoffeeKup file template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>CoffeeKup file template: bar</h2>'
 
-  'Views (response.render, layout)': ->
-    t = zappa ->
+  'response.render, file + file layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       get '/': ->
         response.render 'index', foo: 'bar'
     
-    t.get '/', '<!DOCTYPE html><html><head><title>CoffeeKup file layout</title></head><body><h2>CoffeeKup file template: bar</h2></body></html>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html><html><head><title>CoffeeKup file layout</title></head><body><h2>CoffeeKup file template: bar</h2></body></html>'
 
-  'Views (eco, inline)': ->
-    t = zappa ->
+  'eco, inline': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'eco'
       
       get '/': ->
@@ -68,10 +102,15 @@ module.exports =
 
       view index: "<h2>Eco inline template: <%= @params.foo %></h2>"
     
-    t.get '/', '<h2>Eco inline template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>Eco inline template: bar</h2>'
 
-  'Views (eco, inline, inline layout)': ->
-    t = zappa ->
+  'eco, inline + inline layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'eco'
       
       get '/': ->
@@ -89,32 +128,46 @@ module.exports =
           <body><%- @body %></body>
         </html>
       '''
+    
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html>\n<html>\n  <head>\n    <title>Eco inline layout</title>\n  </head>\n  <body><h2>Eco inline template: bar</h2></body>\n</html>'
 
-    t.get '/', '<!DOCTYPE html>\n<html>\n  <head>\n    <title>Eco inline layout</title>\n  </head>\n  <body><h2>Eco inline template: bar</h2></body>\n</html>'
-
-
-  'Views (eco, file)': ->
-    t = zappa ->
+  'eco, file': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'eco'
       
       get '/': ->
         @foo = 'bar'
         render 'index', layout: no
     
-    t.get '/', '<h2>Eco file template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>Eco file template: bar</h2>'
 
-  'Views (eco, file, file layout)': ->
-    t = zappa ->
+  'eco, file + file layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'eco'
       
       get '/': ->
         @foo = 'bar'
         render 'index'
     
-    t.get '/', '<!DOCTYPE html>\n<html>\n  <head>\n    <title>Eco file layout</title>\n  </head>\n  <body><h2>Eco file template: bar</h2></body>\n</html>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html>\n<html>\n  <head>\n    <title>Eco file layout</title>\n  </head>\n  <body><h2>Eco file template: bar</h2></body>\n</html>'
 
-  'Views (eco, zappa adapter, inline, inline layout)': ->
-    t = zappa ->
+  'eco, zappa adapter, inline + inline layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'eco'
       app.register '.eco', require('../src/zappa').adapter('eco')
       
@@ -133,9 +186,16 @@ module.exports =
           <body><%- @body %></body>
         </html>
       '''
+    
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html>\n<html>\n  <head>\n    <title>Eco inline layout</title>\n  </head>\n  <body><h2>Eco inline template: bar</h2></body>\n</html>'
 
-  'Views (jade, inline)': ->
-    t = zappa ->
+  'jade, inline': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'jade'
       
       get '/': ->
@@ -144,10 +204,15 @@ module.exports =
 
       view index: "h2= 'Jade inline template: ' + params.foo"
     
-    t.get '/', '<h2>Jade inline template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>Jade inline template: bar</h2>'
 
-  'Views (jade, inline, inline layout)': ->
-    t = zappa ->
+  'jade, inline + inline layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'jade'
       
       get '/': ->
@@ -163,32 +228,46 @@ module.exports =
             title Jade inline layout
           body!= body
       '''
+    
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html><html><head><title>Jade inline layout</title></head><body><h2>Jade inline template: bar</h2></body></html>'
 
-    t.get '/', '<!DOCTYPE html><html><head><title>Jade inline layout</title></head><body><h2>Jade inline template: bar</h2></body></html>'
-
-
-  'Views (jade, file)': ->
-    t = zappa ->
+  'jade, file': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'jade'
       
       get '/': ->
         @foo = 'bar'
         render 'index', layout: no
     
-    t.get '/', '<h2>Jade file template: bar</h2>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<h2>Jade file template: bar</h2>'
 
-  'Views (jade, file, file layout)': ->
-    t = zappa ->
+  'jade, file + file layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'jade'
       
       get '/': ->
         @foo = 'bar'
         render 'index'
     
-    t.get '/', '<!DOCTYPE html><html><head><title>Jade file layout</title></head><body><h2>Jade file template: bar</h2></body></html>'
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html><html><head><title>Jade file layout</title></head><body><h2>Jade file template: bar</h2></body></html>'
 
-  'Views (jade, zappa adapter, inline, inline layout)': ->
-    t = zappa ->
+  'jade, zappa adapter, inline + inline layout': (t) ->
+    t.expect 1
+    t.wait 3000
+    
+    zapp = zappa port++, ->
       set 'view engine': 'jade'
       app.register '.jade', require('../src/zappa').adapter('jade')
       
@@ -205,3 +284,7 @@ module.exports =
             title Jade inline layout
           body!= body
       '''
+    
+    c = t.client(zapp.app)
+    c.get '/', (err, res) ->
+      t.equal 1, res.body, '<!DOCTYPE html><html><head><title>Jade inline layout</title></head><body><h2>Jade inline template: bar</h2></body></html>'
