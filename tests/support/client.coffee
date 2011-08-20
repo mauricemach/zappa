@@ -7,21 +7,19 @@ jquery = fs.readFileSync(__dirname + '/../../node_modules/jquery/dist/node-jquer
 io = require 'socket.io-client'
 
 class Client
-  constructor: (arg, cb) ->
+  constructor: (arg) ->
     if typeof arg is 'string'
       @url = arg
       @parsed = url.parse arg
       @protocol = @parsed.protocol or 'http:'
       @host = @parsed.hostname
       @port = @parsed.port or 80
-      cb(@)
     else
       @app = arg
       check = =>
         try
           @host = @app.address().address
           @port = @app.address().port
-          cb(@)
         catch err
           process.nextTick check
       check()

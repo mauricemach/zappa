@@ -17,20 +17,6 @@ port = 15500
     c.get '/', (err, res) ->
       t.ok 'response time', res.headers['x-response-time'].match /\d+ms/
 
-  'port number as string': (t) ->
-    t.expect 'static', 'response time'
-    t.wait 3000
-
-    zapp = zappa ((String) port++), {__dirname}, ->
-      use express.static(__dirname + '/public'), express.responseTime()
-
-    c = t.client(zapp.app)
-    c.get '/foo.txt', (err, res) ->
-      t.equal 'static', res.body, 'bar'
-
-    c.get '/', (err, res) ->
-      t.ok 'response time', res.headers['x-response-time'].match /\d+ms/
-
   use: (t) ->
     t.expect 'static', 'response time'
     t.wait 3000
