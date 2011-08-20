@@ -385,6 +385,16 @@ You can specify your middleware through the standard `app.use`, or zappa's short
         # Syntactic sugar for:
         app.use express.static(__dirname + '/public')
 
+## Resources
+
+- [API reference](https://github.com/mauricemach/zappa/blob/master/docs/reference.md)
+
+- [Mailing list](https://groups.google.com/group/zappajs)
+
+- [Issues](https://github.com/mauricemach/zappa/issues)
+
+- **IRC**: #zappajs on irc.freenode.net
+
 ## Thanks loads
 
 To all people behind the excellent libs that made this little project possible, more specifically: 
