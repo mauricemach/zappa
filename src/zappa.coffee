@@ -458,8 +458,9 @@ zappa.app = ->
 
   {id, app, io}
 
-# Takes a function and runs it as a zappa app. Optionally accepts a number for port,
-# and/or a string for hostname (any order).
+# Takes a function and runs it as a zappa app. Optionally accepts a port number, and/or
+# a hostname (any order). The hostname must be a string, and the port number must be
+# castable as a number.
 # Returns an object where `app` is the express server and `io` is the socket.io handle.
 # Ex.:
 #     require('zappa') -> get '/': 'hi'
@@ -473,7 +474,9 @@ zappa.run = ->
 
   for a in arguments
     switch typeof a
-      when 'string' then host = a
+      when 'string'
+        if isNaN( (Number) a ) then host = a
+        else port = (Number) a
       when 'number' then port = a
       when 'function' then root_function = a
       when 'object' then externals = a
