@@ -6,6 +6,8 @@
   
   - Added `stylus` to the root scope.
   
+  - Fixed #58: multiple socket events fail. Also applied the same fix to helpers.
+  
   - Changed `zappa.run` to interpret a number-castable string param as the port, to better integrate with Heroku. Closes #61 [Tim Shadel]
 
 **v0.2.0beta** (2011-08-02):
