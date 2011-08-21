@@ -116,7 +116,7 @@ zappa.app = ->
     globals: ['global', 'process', 'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval',
     'require', 'module', '__filename', '__dirname']
 
-    # TODO: route?, error
+    # TODO: route?
     root: ['zappa', 'express', 'app', 'io', 'requiring', 'get', 'post', 'put', 'del', 'at',
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'stylus', 'enable', 'disable', 'settings', 'postrender']
