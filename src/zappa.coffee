@@ -160,7 +160,8 @@ zappa.app = ->
   root_locals.__dirname = path.dirname(module.parent.filename)
   # TODO: Find out how to pass the correct `require` (the module's, not zappa's) to the app.
   # root_locals.require = ???
-  # Meanwhile, adding the app's root dir to the front of the lookup stack.
+  # Meanwhile, adding the app's root dir and the parent's paths to the front of the lookup stack.
+  require.paths.unshift dir for dir in module.parent.paths
   require.paths.unshift root_locals.__dirname
   
   for verb in ['get', 'post', 'put', 'del']
