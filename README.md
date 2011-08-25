@@ -393,6 +393,8 @@ You can specify your middleware through the standard `app.use`, or zappa's short
 
 - [Issues](https://github.com/mauricemach/zappa/issues)
 
+- [Hosting Zappa 0.2.x on Heroku](http://blog.superbigtree.com/blog/2011/08/19/hosting-zappa-0-2-x-on-heroku/)
+
 - **IRC**: #zappajs on irc.freenode.net
 
 ## Thanks loads
