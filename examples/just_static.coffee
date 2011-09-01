@@ -1,0 +1,1 @@
+require('zappa') -> use 'static'
