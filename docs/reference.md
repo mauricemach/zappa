@@ -1,18 +1,22 @@
-# Zappa 0.2.0beta2 reference
+---
+layout: default
+title: API Reference (v0.2.0beta2)
+permalink: /reference/index.html
+---
 
-**This reference is a work in progress. There are still many sections to be added or refined.**
+# {{page.title}}
 
-**Please note that the API is subject to change while in beta.**
+**Please note this is a work in progress. There are still many sections to be added or refined.**
 
-## Zappa function
+## EXPORTS
 
-`require 'zappa'` returns a function equivalent to `zappa.run`. It also has the following attributes:
+`require 'zappa'` returns a function with the following attributes:
 
-### zappa.version
+### version
 
 Version of zappa running.
 
-### zappa.app
+### app
 
 `zappa.app [locals,] function`
 
@@ -32,19 +36,29 @@ It will also lose access to its parent scope in the process, so any variables fr
 
 Returns an object with attributes `id` (uuid generated for this app), `app` (express server) and `io` (socket.io server).
 
-### zappa.run
+### run
 
 `zappa.run [port,] [host,] [locals,] function`
 
 Same as `zappa.app`, but calls `app.listen` for you.
 
+The base export is actually a reference to this same function, so these are equivalent:
+
+    require('zappa').run ->
+      get '/': 'hi'
+      
+    require('zappa') ->
+      get '/': 'hi'
+
 You can pass the parameters in any order. Number is port, string is host, object is locals and function is your application. Port and host are optional. Omitted params will also be omitted in the `app.listen` call to express (defaulting to port 3000 and binding to INADDR_ANY).
 
-## zappa.adapter
+### adapter
 
 Creates a zappa view adapter to be used with `app.register`. See `view`.
 
-## Root scope
+## ROOT SCOPE
+
+The function you pass to `zappa.app` or `zappa.run` will be modified to include these variables:
 
 ### @/this
 
@@ -351,13 +365,13 @@ Shortcut to `app.disable`. Accepts multiple params in one go. Ex.:
 
     disable 'serve jquery', 'serve sammy'
 
-### global, process, console, setTimeout, clearTimeout, setInterval, clearInterval, require, __filename, __dirname, module
+### global, process, console, setTimeout, clearTimeout, setInterval, clearInterval, require, \__filename, \__dirname, module
 
 Node.js's global variables.
 
 `require`, `module`, `__filename` and `__dirname` are not actually globals, but local to each module.
   
-## Request handlers scope
+## REQUEST HANDLERS SCOPE
 
 ### @
 
@@ -397,7 +411,7 @@ Two additional features:
 
 Shortcut to `response.redirect`.
 
-## Sockets handlers scope
+## SOCKETS HANDLERS SCOPE
 
 ### @
 
@@ -427,9 +441,9 @@ Shortcut to `socket.emit`.
 
 Shortcut to `socket.broadcast`.
 
-## View scope
+## VIEW SCOPE
 
-## Client-side root scope
+## CLIENT-SIDE ROOT SCOPE
 
 ### get, post, put, del
 
@@ -447,11 +461,11 @@ Same as its server-side counterpart.
 
 Same as its server-side counterpart.
 
-## Client-side route scope
+## CLIENT-SIDE ROUTE HANDLERS SCOPE
 
-## Client-side socket scope
+## CLIENT-SIDE SOCKETS HANDLERS SCOPE
 
-## App settings
+## APP SETTINGS
 
 You can use the following options with `set`, `enable` and `disable`:
 

@@ -1,8 +1,10 @@
-# Migration to zappa 0.2.x
+---
+layout: default
+title: 'Migration from 0.1.x: TL;DR guide'
+permalink: /migration/index.html
+---
 
-## TLDR; guide
-
-**This may not be an exhaustive list. Contributions are welcome.**
+# {{page.title}}
 
 Commands
 

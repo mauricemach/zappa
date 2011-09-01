@@ -1,4 +1,10 @@
-# Zappa 0.2.x "Peaches en Regalia"
+---
+layout: default
+title: v0.2.x "Peaches en Regalia"
+permalink: /peaches/index.html
+---
+
+# {{page.title}}
 
 Zappa was conceived almost a year ago as a crazy experimentalist hack to explore possibilities in the then forming and rapidly changing Node.js/CoffeeScript "platform". Since then this "platform" matured a great deal, and it's high time zappa is consolidated into something really usable, and more in tune with today's node development ecosystem.
 
@@ -110,131 +116,139 @@ All work and no play makes zappa a dull module! Even though Peaches is mainly ab
 
 If you use `shared '/foo.js' ->` instead, the block of code will be both evaluated on the server and served to the client. Ex.:
 
-    shared '/shared.js': ->
-      def sum: (a, b) ->
-        a + b
-    
-      if window
-        alert 'Running on the browser!'
-      else
-        console.log 'Running on the server!'
+{% highlight coffeescript %}
+shared '/shared.js': ->
+  def sum: (a, b) ->
+    a + b
 
-    client '/index.js': ->
-      get '#/': -> console.log sum 5, 8
+  if window
+    alert 'Running on the browser!'
+  else
+    console.log 'Running on the server!'
 
-    get '/': -> console.log sum 3, 6
+client '/index.js': ->
+  get '#/': -> console.log sum 5, 8
+
+get '/': -> console.log sum 3, 6
+{% endhighlight %}
 
 ## Nice, now please show me some freaking code!
 
 With all this standardization talk you'd expect zappa apps to now look a lot different from they did in Jazz. But in practice, the basic structure remains the same:
 
-    require('zappa') ->
-      include 'sub'
-      
-      def foo: 'bar'
-      
-      helper role: (name) ->
-        redirect '/' unless @user.role is name
-      
-      get: '/': 'hi'
-      
-      get: '/': ->
-        @foo = 'bar'
-        render 'index'
-        
-      coffee '/index.js': ->
-        alert 'hi'
-        # socket.io code here.
+{% highlight coffeescript %}
+require('zappa') ->
+  include 'sub'
+  
+  def foo: 'bar'
+  
+  helper role: (name) ->
+    redirect '/' unless @user.role is name
+  
+  get: '/': 'hi'
+  
+  get: '/': ->
+    @foo = 'bar'
+    render 'index'
+    
+  coffee '/index.js': ->
+    alert 'hi'
+    # socket.io code here.
 
-      at connection: ->
-        broadcast "#{@id} connected"
+  at connection: ->
+    broadcast "#{@id} connected"
 
-      at hello: ->
-        emit 'reply', foo: 'bar'
-      
-      view index: ->
-        h1 @foo
-        
-      view layout: ->
-        doctype 5
-        html ->
-          head ->
-            title 'Foo'
-            script src: '/socket.io/socket.io.js'
-            script src: '/index.js'
-            link rel: 'stylesheet', href: '/index.css'
-          body @body
-      
-      css '/index.css': '''
-        font-family: sans-serif;
-      '''
+  at hello: ->
+    emit 'reply', foo: 'bar'
+  
+  view index: ->
+    h1 @foo
+    
+  view layout: ->
+    doctype 5
+    html ->
+      head ->
+        title 'Foo'
+        script src: '/socket.io/socket.io.js'
+        script src: '/index.js'
+        link rel: 'stylesheet', href: '/index.css'
+      body @body
+  
+  css '/index.css': '''
+    font-family: sans-serif;
+  '''
+{% endhighlight %}
           
 At sub.coffee:
-    
-    # Could also be `module.exports.include`.
-    @include = ->
-      get '/sub': -> render 'sub'
 
-      view sub: ->
-        p 'Sub module included'
+{% highlight coffeescript %}    
+# Could also be `module.exports.include`.
+@include = ->
+  get '/sub': -> render 'sub'
+
+  view sub: ->
+    p 'Sub module included'
+{% endhighlight %}
         
 The actual big difference is what you **can** do now:
+
+{% highlight coffeescript %}    
+zappa = require 'zappa'
+
+chat = zappa.app ->
+  set 'view engine': 'jade'
+  app.register '.jade', zappa.adapter 'jade'
+  
+  io.set 'log level', 1
+
+  enable 'serve jquery'
+  
+  use 'cookieParser', 'bodyParser'
+
+  configure development: ->
+    use errorHandler: {dumpExceptions: yes}
+
+  shared '/shared.js': ->
+    def sum: (a, b) -> a + b
+
+  get '/': ->
+    @foo = 'bar'
+    render 'index'
     
-    zappa = require 'zappa'
+  at connection: ->
+    broadcast 'joined', {id}
 
-    chat = zappa.app ->
-      set 'view engine': 'jade'
-      app.register '.jade', zappa.adapter 'jade'
-      
-      io.set 'log level', 1
+  client '/index.js': ->
+    connect()
+    
+    at joined: ->
+      alert "#{@id} joined us."
 
-      enable 'serve jquery'
-      
-      use 'cookieParser', 'bodyParser'
+  view index: '''
+    h1= foo
+  '''
 
-      configure development: ->
-        use errorHandler: {dumpExceptions: yes}
+  view layout: '''
+    !!! 5
+    html
+      head
+        title A Jade template!
+        script(src='/socket.io/socket.io.js')
+        script(src='/zappa/jquery.js')
+        script(src='/zappa/zappa.js')
+        script(src='/shared.js')
+        script(src='/index.js')
+      body!= body
+  '''
 
-      shared '/shared.js': ->
-        def sum: (a, b) -> a + b
+wiki = zappa.app ->
+  get '/': 'wiki'
+  # wiki code here...
 
-      get '/': ->
-        @foo = 'bar'
-        render 'index'
-        
-      at connection: ->
-        broadcast 'joined', {id}
-
-      client '/index.js': ->
-        connect()
-        
-        at joined: ->
-          alert "#{@id} joined us."
-
-      view index: '''
-        h1= foo
-      '''
-
-      view layout: '''
-        !!! 5
-        html
-          head
-            title A Jade template!
-            script(src='/socket.io/socket.io.js')
-            script(src='/zappa/jquery.js')
-            script(src='/zappa/zappa.js')
-            script(src='/shared.js')
-            script(src='/index.js')
-          body!= body
-      '''
-
-    wiki = zappa.app ->
-      get '/': 'wiki'
-      # wiki code here...
-
-    zappa 80, {chat, wiki}, ->
-      use express.vhost 'chat.com', chat.app
-      use express.vhost 'wiki.com', wiki.app
+zappa 80, {chat, wiki}, ->
+  use express.vhost 'chat.com', chat.app
+  use express.vhost 'wiki.com', wiki.app
+{% endhighlight %}
   
 ## What's next?
 
