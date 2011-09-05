@@ -11,6 +11,8 @@
   - Changed `zappa.run` to interpret a number-castable string param as the port, to better integrate with Heroku. Closes #61 [Tim Shadel]
   
   - Fixed #64: require does not pick up node_modules in app dir. [Jason King]
+  
+  - Added: setting views dir to `__dirname + '/views'` by default. Closes #71. [rachel-carvalho]
 
 **v0.2.0beta** (2011-08-02):
 

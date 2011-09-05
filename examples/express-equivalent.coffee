@@ -3,7 +3,7 @@
 
 @app = require('zappa') ->
   configure ->
-    set views: "#{__dirname}/views", 'view engine': 'jade'
+    set 'view engine': 'jade'
     app.register '.jade', zappa.adapter 'jade'
     use 'bodyParser', 'methodOverride', app.router, 'static'
 
