@@ -74,6 +74,10 @@ uncaught = []
           if actual isnt expected then @fail key, {type: 'equal', actual, expected}
           else @pass key
 
+        matches: (key, actual, regex) ->
+          if not actual.match(regex) then @fail key, {type: 'matches', actual, regex}
+          else @pass key
+
         ok: (key, value) ->
           if !!!value then @fail key, {type: 'ok'}
           else @pass key
@@ -135,6 +139,10 @@ finish_him = ->
           if v.type is 'equal'
             log "Expected vs #{red}actual#{reset}:"
             log v.expected
+            log red + v.actual + reset
+          else if v.type is 'matches'
+            log "Regex vs #{red}actual#{reset}:"
+            log v.regex
             log red + v.actual + reset
         for k, v of t.expected
           timedout++
