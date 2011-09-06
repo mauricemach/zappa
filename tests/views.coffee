@@ -169,7 +169,7 @@ port = 15600
     
     zapp = zappa port++, ->
       set 'view engine': 'eco'
-      app.register '.eco', require('../src/zappa').adapter('eco')
+      app.register '.eco', zappa.adapter('eco')
       
       get '/': ->
         @foo = 'bar'
@@ -269,7 +269,7 @@ port = 15600
     
     zapp = zappa port++, ->
       set 'view engine': 'jade'
-      app.register '.jade', require('../src/zappa').adapter('jade')
+      app.register '.jade', zappa.adapter('jade')
       
       get '/': ->
         @foo = 'bar'
