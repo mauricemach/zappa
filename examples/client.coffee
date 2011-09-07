@@ -1,17 +1,17 @@
 require('zappa') ->
-  enable 'default layout'
+  @enable 'default layout'
   
-  get '/': ->
-    render 'index'
+  @get '/': ->
+    @render 'index'
 
-  client '/index.js': ->
+  @client '/index.js': ->
     $(document).ready -> $('body').append "<p>default client</p>"
 
-  css '/index.css': ''''
+  @css '/index.css': ''''
     #default.css {border: 1px solid #00f}
   '''
 
-  view index: ->
+  @view index: ->
     @title = 'Client'
     @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'default', 'named', 'admin/namespaced']
     @stylesheets = ['default', 'named', 'admin/namespaced']

@@ -1,2 +1,2 @@
 @include = ->
-  get '/': 'included!'
+  @get '/': 'included!'

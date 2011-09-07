@@ -1,2 +1,2 @@
 require('zappa') ->
-  include 'included'
+  @include 'included'

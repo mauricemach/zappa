@@ -1,2 +1,2 @@
 require('zappa') ->
-  get '/': 'hi'
+  @get '/': 'hi'

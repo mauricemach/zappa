@@ -1,10 +1,10 @@
 zappa = require 'zappa'
 
 zappa 8000, ->
-  get '/': 'blog'
+  @get '/': 'blog'
 
 zappa 8001, ->
-  get '/': 'chat'
+  @get '/': 'chat'
 
 zappa 8002, ->
-  get '/': 'wiki'
+  @get '/': 'wiki'

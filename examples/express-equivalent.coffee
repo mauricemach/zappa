@@ -2,15 +2,15 @@
 # See `express.coffee` for comparison.
 
 @app = require('zappa') ->
-  configure ->
-    set 'view engine': 'jade'
-    app.register '.jade', zappa.adapter 'jade'
-    use 'bodyParser', 'methodOverride', app.router, 'static'
+  @configure ->
+    @set 'view engine': 'jade'
+    @register '.jade', @zappa.adapter 'jade'
+    @use 'bodyParser', 'methodOverride', @app.router, 'static'
 
-  configure
-    development: -> use errorHandler: {dumpExceptions: on, showStack: on}
-    production: -> use 'errorHandler'
+  @configure
+    development: => @use errorHandler: {dumpExceptions: on, showStack: on}
+    production: => @use 'errorHandler'
 
-  get '/': ->
-    @title = 'zappa'
-    render 'index'
+  @get '/': ->
+    @data.title = 'zappa'
+    @render 'index'
