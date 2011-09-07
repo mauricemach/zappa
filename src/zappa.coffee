@@ -14,6 +14,7 @@ socketio = require 'socket.io'
 jsdom = require 'jsdom'
 jquery = fs.readFileSync(__dirname + '/../node_modules/jquery/dist/node-jquery.min.js').toString()
 sammy = fs.readFileSync(__dirname + '/../vendor/sammy-latest.min.js').toString()
+uglify = require 'uglify-js'
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 # a function (see below) though, it loses access to its parent scope, and consequently to
@@ -45,6 +46,12 @@ rewrite_function = (func, locals_names) ->
   for name in locals_names
     code = "var #{name} = locals.#{name};" + code
   new Function('context', 'locals', 'args', code)
+
+minify = (js) ->
+  ast = uglify.parser.parse(js)
+  ast = uglify.uglify.ast_mangle(ast)
+  ast = uglify.uglify.ast_squeeze(ast)
+  uglify.uglify.gen_code(ast)
 
 # Builds an array of unique names from the desired scopes.
 # Ex.: select names, 'http + defs + helpers'
@@ -180,16 +187,19 @@ zappa.app = ->
     app.enable 'serve zappa'
     for k, v of obj
       js = ";zappa.run(#{v});"
+      js = minify(js) if app.settings['minify']
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
 
   root_locals.coffee = (obj) ->
     for k, v of obj
       js = ";#{coffeescript_helpers}(#{v})();"
+      js = minify(js) if app.settings['minify']
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
 
   root_locals.js = (obj) ->
     for k, v of obj
       js = String(v)
+      js = minify(js) if app.settings['minify']
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
 
   root_locals.css = (obj) ->
@@ -268,6 +278,7 @@ zappa.app = ->
     app.enable 'serve zappa'
     for k, v of obj
       js = ";zappa.run(#{v});"
+      js = minify(js) if app.settings['minify']
       routes.push verb: 'get', path: k, handler: js, contentType: 'js'
 
       rewritten_shared = rewrite_function(v, select names, 'globals + root + externals')
@@ -311,9 +322,12 @@ zappa.app = ->
     postrenders[k] = rewrite_function(v, select names, 'globals + postrender + externals + helpers + defs')
 
   if app.settings['serve zappa']
+    js = ";#{coffeescript_helpers}(#{client})();"
+    js = minify(js) if app.settings['minify']
+    
     app.get '/zappa/zappa.js', (req, res) ->
       res.contentType 'js'
-      res.send ";#{coffeescript_helpers}(#{client})();"
+      res.send js
 
   if app.settings['serve jquery']
     app.get '/zappa/jquery.js', (req, res) ->

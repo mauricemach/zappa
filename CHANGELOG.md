@@ -4,7 +4,7 @@
   
   - Fixed: inline templates with multiple apps.
   
-  - Added `stylus` to the root scope.
+  - Added `stylus` to the root scope (compiles string with stylus and serves it as css).
   
   - Fixed #58: multiple socket events fail. Also applied the same fix to helpers.
   
@@ -13,6 +13,8 @@
   - Fixed #64: require does not pick up node_modules in app dir. [Jason King]
   
   - Added: setting views dir to `__dirname + '/views'` by default. Closes #71. [rachel-carvalho]
+  
+  - Added the `minify` setting, which uses uglify-js to minify the outputs of `serve zappa`, `client`, `shared`, `coffee` and `js`. Closes #70 (thanks @jacobrask).
 
 **v0.2.0beta** (2011-08-02):
 
