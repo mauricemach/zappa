@@ -136,3 +136,26 @@ port = 15200
     c.get '/zappa/zappa.js', (err, res) ->
       t.equal 'content-type', res.headers['content-type'], 'application/javascript'
       t.equal 'length', res.headers['content-length'], '7037'
+
+  minify: (t) ->
+    t.expect 'zappa', 'client', 'shared', 'coffee', 'js'
+    t.wait 3000
+    
+    zapp = zappa port++, ->
+      enable 'serve zappa', 'minify'
+      client '/client.js': -> alert 'foo'
+      shared '/shared.js': -> alert 'foo' if window?
+      coffee '/coffee.js': -> alert 'foo'
+      js '/js.js': "alert('foo');"
+
+    c = t.client(zapp.app)
+    c.get '/zappa/zappa.js', (err, res) ->
+      t.equal 'zappa', res.headers['content-length'], '3258'
+    c.get '/client.js', (err, res) ->
+      t.equal 'client', res.headers['content-length'], '42'
+    c.get '/shared.js', (err, res) ->
+      t.equal 'shared', res.headers['content-length'], '87'
+    c.get '/coffee.js', (err, res) ->
+      t.equal 'coffee', res.headers['content-length'], '475'
+    c.get '/js.js', (err, res) ->
+      t.equal 'js', res.headers['content-length'], '12'
