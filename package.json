@@ -1,12 +1,11 @@
 {
   "name": "zappa",
   "description": "CoffeeScript minimalist interface to express, socket.io and others",
-  "version": "0.2.0beta2",
+  "version": "0.3.0",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "homepage": "http://zappajs.org",
   "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "underscore": "1.1.7",
     "express": "2.4.6",
     "socket.io": "0.8.4",
     "jsdom": "0.2.4",
