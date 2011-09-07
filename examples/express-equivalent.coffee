@@ -2,9 +2,9 @@
 # See `express.coffee` for comparison.
 
 @app = require('zappa') ->
-  @configure ->
+  @configure =>
     @set 'view engine': 'jade'
-    @register '.jade', @zappa.adapter 'jade'
+    @register jade: @zappa.adapter('jade')
     @use 'bodyParser', 'methodOverride', @app.router, 'static'
 
   @configure

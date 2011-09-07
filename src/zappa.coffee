@@ -154,6 +154,10 @@ zappa.app = (func) ->
     for k, v of obj
       views["#{context.id}/#{k}"] = v
 
+  context.register = (obj) ->
+    for k, v of obj
+      app.register '.' + k, v
+
   context.set = (obj) ->
     for k, v of obj
       app.set k, v
