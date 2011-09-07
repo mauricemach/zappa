@@ -196,11 +196,11 @@ zappa.app = (func) ->
     for k, v of obj
       js = ";zappa.run(#{v});"
       route verb: 'get', path: k, handler: js, contentType: 'js'
-      v.apply(context)
+      v.apply(context, [context])
 
   context.include = (p) ->
     sub = require path.join(context.root, p)
-    sub.include.apply(context)
+    sub.include.apply(context, [context])
 
   # Register a route with express.
   route = (r) ->
@@ -277,11 +277,11 @@ zappa.app = (func) ->
         ctx[name] = ->
           helper.apply(ctx, arguments)
     
-    ws_handlers.connection.apply(ctx) if ws_handlers.connection?
+    ws_handlers.connection.apply(ctx, [ctx]) if ws_handlers.connection?
 
     socket.on 'disconnect', ->
       context = {}
-      ws_handlers.disconnect.apply(ctx) if ws_handlers.disconnect?
+      ws_handlers.disconnect.apply(ctx, [ctx]) if ws_handlers.disconnect?
 
     for name, h of ws_handlers
       do (name, h) ->
@@ -289,7 +289,7 @@ zappa.app = (func) ->
           socket.on name, (data) ->
             ctx.data = {}
             ctx.data[k] = v for k, v of data
-            h.apply(ctx)
+            h.apply(ctx, [ctx])
 
   # GO!!!
   func.apply(context, [context])
