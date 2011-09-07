@@ -7,12 +7,12 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      client '/index.js': ->
-        get '#/': -> alert 'hi'
+      @client '/index.js': ->
+        @get '#/': -> alert 'hi'
 
     c = t.client(zapp.app)
     c.get '/index.js', (err, res) ->
-      t.equal 1, res.body, ';zappa.run(function () {\n            return get({\n              \'#/\': function() {\n                return alert(\'hi\');\n              }\n            });\n          });'
+      t.equal 1, res.body, ';zappa.run(function () {\n            return this.get({\n              \'#/\': function() {\n                return alert(\'hi\');\n              }\n            });\n          });'
       t.equal 2, res.headers['content-type'], 'application/javascript'
 
   coffee: (t) ->
@@ -20,7 +20,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      coffee '/coffee.js': ->
+      @coffee '/coffee.js': ->
         alert 'hi'
 
     c = t.client(zapp.app)
@@ -33,7 +33,7 @@ port = 15200
     t.wait 3000
 
     zapp = zappa port++, ->
-      js '/js.js': '''
+      @js '/js.js': '''
         alert('hi');
       '''
 
@@ -47,7 +47,7 @@ port = 15200
     t.wait 3000
 
     zapp = zappa port++, ->
-      css '/index.css': '''
+      @css '/index.css': '''
         font-family: sans-serif;
       '''
 
@@ -61,7 +61,7 @@ port = 15200
     t.wait 3000
 
     zapp = zappa port++, ->
-      stylus '/index.css': '''
+      @stylus '/index.css': '''
         border-radius()
           -webkit-border-radius arguments  
           -moz-border-radius arguments  
@@ -94,7 +94,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      enable 'serve jquery'
+      @enable 'serve jquery'
 
     c = t.client(zapp.app)
     c.get '/zappa/jquery.js', (err, res) ->
@@ -106,7 +106,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      enable 'serve sammy'
+      @enable 'serve sammy'
 
     c = t.client(zapp.app)
     c.get '/zappa/sammy.js', (err, res) ->
@@ -118,21 +118,21 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      enable 'serve zappa'
+      @enable 'serve zappa'
 
     c = t.client(zapp.app)
     c.get '/zappa/zappa.js', (err, res) ->
       t.equal 'content-type', res.headers['content-type'], 'application/javascript'
-      t.equal 'length', res.headers['content-length'], '7037'
+      t.equal 'length', res.headers['content-length'], '4685'
 
   'zappa (automatic)': (t) ->
     t.expect 'content-type', 'length'
     t.wait 3000
     
     zapp = zappa port++, ->
-      client '/index.js': ->
+      @client '/index.js': ->
 
     c = t.client(zapp.app)
     c.get '/zappa/zappa.js', (err, res) ->
       t.equal 'content-type', res.headers['content-type'], 'application/javascript'
-      t.equal 'length', res.headers['content-length'], '7037'
+      t.equal 'length', res.headers['content-length'], '4685'
