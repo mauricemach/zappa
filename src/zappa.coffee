@@ -34,7 +34,7 @@ coffeescript_helpers = """
 """.replace /\n/g, ''
 
 # The stringified zappa client.
-client = require('./client').build(zappa.version, coffeescript_helpers, rewrite_function)
+client = require('./client').build(zappa.version, coffeescript_helpers)
 
 # Keep inline views at the module level and namespaced by app id
 # so that the monkeypatched express can look them up.
@@ -236,7 +236,7 @@ zappa.app = (func) ->
           args.splice 1, 0, {} if typeof args[1] is 'function'
           
           # Send request input vars to template as `params`.
-          args[1].params ?= ctx.params
+          args[1].data ?= ctx.data
 
           if args[1].postrender?
             # Apply postrender before sending response.
@@ -379,7 +379,7 @@ zappa.adapter = (engine, options = {}) ->
   compile: (template, data) ->
     template = engine.compile(template, data)
     (data) ->
-      for k, v of data.params
+      for k, v of data.data
         if typeof data[k] is 'undefined' and k not in options.blacklist
           data[k] = v
       template(data)

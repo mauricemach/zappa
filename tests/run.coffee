@@ -7,7 +7,7 @@ port = 15800
     t.wait 3000
 
     zapp = zappa ->
-      get '/': 'default'
+      @get '/': 'default'
 
     c = t.client 'http://localhost:3000'
     c.get '/', (err, res) -> t.equal 'localhost', res.body, 'default'
@@ -23,7 +23,7 @@ port = 15800
     t.wait 3000
 
     zapp = zappa 15801, ->
-      get '/': 'number port'
+      @get '/': 'number port'
 
     c = t.client 'http://localhost:15801'
     c.get '/', (err, res) -> t.equal 'localhost', res.body, 'number port'
@@ -35,7 +35,7 @@ port = 15800
     t.wait 3000
 
     zapp = zappa '15802', ->
-      get '/': 'string port'
+      @get '/': 'string port'
 
     c = t.client 'http://localhost:15802'
     c.get '/', (err, res) -> t.equal 'localhost', res.body, 'string port'
@@ -47,7 +47,7 @@ port = 15800
     t.wait 3000
 
     zapp = zappa 'localhost', '15803', ->
-      get '/': 'host + string port'
+      @get '/': 'host + string port'
 
     c = t.client 'http://localhost:15803'
     c.get '/', (err, res) -> t.equal 'localhost', res.body, 'host + string port'

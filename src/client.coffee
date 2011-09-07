@@ -119,5 +119,4 @@ skeleton = ->
   String(skeleton)
     .replace('version = null;', "version = '#{version}';")
     .replace('coffeescript_helpers = null;', "var coffeescript_helpers = '#{coffeescript_helpers}';")
-    .replace('rewrite_function = null;', "var rewrite_function = #{rewrite_function};")
     .replace /(\n)/g, ''

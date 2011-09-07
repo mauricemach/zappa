@@ -6,8 +6,8 @@ port = 15700
     t.expect 1
     t.wait 3000
     
-    zapp = zappa port++, {t}, ->
-      at connection: ->
+    zapp = zappa port++, ->
+      @on connection: ->
         t.reached 1
 
     c = t.client(zapp.app)
@@ -18,8 +18,8 @@ port = 15700
     t.wait 3000
     
     zapp = zappa port++, ->
-      at connection: ->
-        emit 'welcome'
+      @on connection: ->
+        @emit 'welcome'
 
     c = t.client(zapp.app)
     c.connect()
@@ -32,8 +32,8 @@ port = 15700
     t.wait 3000
     
     zapp = zappa port++, {t}, ->
-      at shout: ->
-        io.sockets.emit 'shout', {@foo}
+      @on shout: ->
+        @io.sockets.emit 'shout', {foo: @data.foo}
 
     c = t.client(zapp.app)
     c.connect()
