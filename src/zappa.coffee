@@ -246,7 +246,7 @@ zappa.app = (func) ->
             # Apply postrender before sending response.
             res.render args[0], args[1], (err, str) ->
               jsdom.env html: str, src: [jquery], done: (err, window) ->
-                rendered = postrenders[args[1].postrender].apply({}, [$, window])
+                rendered = postrenders[args[1].postrender].apply({data: ctx.data}, [$, window])
 
                 doctype = (window.document.doctype or '') + "\n"
                 res.send doctype + window.document.documentElement.outerHTML
