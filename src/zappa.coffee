@@ -292,7 +292,7 @@ zappa.app = (func) ->
             h.apply(ctx)
 
   # GO!!!
-  func.apply(context)
+  func.apply(context, [context])
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->
