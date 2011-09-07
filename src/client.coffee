@@ -76,7 +76,7 @@ skeleton = ->
 
     $(-> app.run '#/') if app?
 
-@build = (version, coffeescript_helpers, rewrite_function) ->
+@build = (version, coffeescript_helpers) ->
   String(skeleton)
     .replace('version = null;', "version = '#{version}';")
     .replace('coffeescript_helpers = null;', "var coffeescript_helpers = '#{coffeescript_helpers}';")
