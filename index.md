@@ -42,21 +42,21 @@ Into this:
 
 {% highlight coffeescript %}
 require('zappa') ->
-  use 'bodyParser', 'methodOverride', app.router, 'static'
+  @use 'bodyParser', 'methodOverride', app.router, 'static'
 
-  configure
-    development: -> use errorHandler: {dumpExceptions: on}
-    production: -> use 'errorHandler'
+  @configure
+    development: => @use errorHandler: {dumpExceptions: on}
+    production: => @use 'errorHandler'
 
-  get '/:foo': ->
-    @foo += 'bar'
-    render 'index'
+  @get '/:foo': ->
+    @data.foo += 'bar'
+    @render 'index'
   
-  at connection: ->
-    emit 'welcome', time: new Date()
+  @on connection: ->
+    @emit 'welcome', time: new Date()
     
-  at shout: ->
-    broadcast 'shout', {id, @text}
+  @on shout: ->
+    @broadcast 'shout', {id, @text}
 {% endhighlight %}
 
 ## Learn More
