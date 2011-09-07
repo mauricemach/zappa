@@ -164,6 +164,9 @@ zappa.app = ->
   require.paths.unshift dir for dir in module.parent.paths
   require.paths.unshift root_locals.__dirname
   
+  # Sets default view dir to root_local's dir name.
+  app.set 'views', root_locals.__dirname + '/views'
+  
   for verb in ['get', 'post', 'put', 'del']
     do (verb) ->
       root_locals[verb] = ->

@@ -5,7 +5,7 @@ task 'build', ->
   run 'coffee -o lib -c src/*.coffee'
     
 task 'test', ->
-  run 'cd tests && coffee index.coffee'
+  run 'coffee tests/index.coffee'
     
 task 'bench', ->
   run 'cd benchmarks && ./run'
