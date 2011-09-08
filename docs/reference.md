@@ -411,6 +411,10 @@ Two additional features:
 
 Shortcut to `response.redirect`.
 
+### session
+
+Shortcut to `request.session`.
+
 ## SOCKETS HANDLERS SCOPE
 
 ### @

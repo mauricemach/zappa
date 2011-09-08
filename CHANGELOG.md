@@ -15,6 +15,8 @@
   - Added: setting views dir to `__dirname + '/views'` by default. Closes #71. [rachel-carvalho]
   
   - Added the `minify` setting, which uses uglify-js to minify the outputs of `serve zappa`, `client`, `shared`, `coffee` and `js`. Closes #70 (thanks @jacobrask).
+  
+  - Added back `session` to the request handlers scope. [shimaore]
 
 **v0.2.0beta** (2011-08-02):
 
