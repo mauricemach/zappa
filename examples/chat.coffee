@@ -5,10 +5,10 @@ require('../src/zappa') ->
     @render 'index', layout: no
   
   @on 'set nickname': ->
-    @client.nickname = @data.nickname
+    @client.nickname = @nickname
   
   @on said: ->
-    @io.sockets.emit 'said', nickname: @client.nickname, text: @data.text
+    @io.sockets.emit 'said', {nickname: @client.nickname, @text}
   
   @client '/index.js': ->
     @connect()

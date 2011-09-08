@@ -1,1 +1,1 @@
-<h2>Eco file template: <%= @data.foo %></h2>
+<h2>Eco file template: <%= @params.foo %></h2>

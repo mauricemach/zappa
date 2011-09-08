@@ -8,7 +8,7 @@ port = 15600
     
     zapp = zappa port++, ->
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index', layout: no
 
       @view index: -> h2 "CoffeeKup inline template: #{@foo}"
@@ -23,7 +23,7 @@ port = 15600
     
     zapp = zappa port++, ->
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
 
       @view index: -> h2 "CoffeeKup inline template: #{@foo}"
@@ -45,7 +45,7 @@ port = 15600
     
     zapp = zappa port++, ->
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index', layout: no
     
     c = t.client(zapp.app)
@@ -58,7 +58,7 @@ port = 15600
     
     zapp = zappa port++, ->
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
     
     c = t.client(zapp.app)
@@ -97,10 +97,10 @@ port = 15600
       @set 'view engine': 'eco'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index', layout: no
 
-      @view index: "<h2>Eco inline template: <%= @data.foo %></h2>"
+      @view index: "<h2>Eco inline template: <%= @params.foo %></h2>"
     
     c = t.client(zapp.app)
     c.get '/', (err, res) ->
@@ -114,10 +114,10 @@ port = 15600
       @set 'view engine': 'eco'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
 
-      @view index: "<h2>Eco inline template: <%= @data.foo %></h2>"
+      @view index: "<h2>Eco inline template: <%= @params.foo %></h2>"
 
       @view layout: '''
         <!DOCTYPE html>
@@ -141,7 +141,7 @@ port = 15600
       @set 'view engine': 'eco'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index', layout: no
     
     c = t.client(zapp.app)
@@ -156,7 +156,7 @@ port = 15600
       @set 'view engine': 'eco'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
     
     c = t.client(zapp.app)
@@ -169,10 +169,10 @@ port = 15600
     
     zapp = zappa port++, ->
       @set 'view engine': 'eco'
-      @app.register '.eco', @zappa.adapter('eco')
+      @register eco: @zappa.adapter('eco')
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
 
       @view index: "<h2>Eco inline template: <%= @foo %></h2>"
@@ -199,10 +199,10 @@ port = 15600
       @set 'view engine': 'jade'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index', layout: no
 
-      @view index: "h2= 'Jade inline template: ' + data.foo"
+      @view index: "h2= 'Jade inline template: ' + params.foo"
     
     c = t.client(zapp.app)
     c.get '/', (err, res) ->
@@ -216,10 +216,10 @@ port = 15600
       @set 'view engine': 'jade'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
 
-      @view index: "h2= 'Jade inline template: ' + data.foo"
+      @view index: "h2= 'Jade inline template: ' + params.foo"
 
       @view layout: '''
         !!! 5
@@ -241,7 +241,7 @@ port = 15600
       @set 'view engine': 'jade'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index', layout: no
     
     c = t.client(zapp.app)
@@ -256,7 +256,7 @@ port = 15600
       @set 'view engine': 'jade'
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
     
     c = t.client(zapp.app)
@@ -269,10 +269,10 @@ port = 15600
     
     zapp = zappa port++, ->
       @set 'view engine': 'jade'
-      @app.register '.jade', @zappa.adapter('jade')
+      @register jade: @zappa.adapter('jade')
       
       @get '/': ->
-        @data.foo = 'bar'
+        @foo = 'bar'
         @render 'index'
 
       @view index: "h2= 'Jade inline template: ' + foo"

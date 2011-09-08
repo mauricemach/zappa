@@ -235,8 +235,10 @@ zappa.app = (func) ->
             args[1] ?= {}
             args.splice 1, 0, {} if typeof args[1] is 'function'
           
-            # Send request input vars to template as `params`.
-            args[1].data ?= ctx.data
+            # Automatically send request input vars to template.
+            args[1].params = {}
+            for k, v of ctx
+              args[1].params[k] = v unless k in names
 
             if args[1].postrender?
               # Apply postrender before sending response.
@@ -255,7 +257,11 @@ zappa.app = (func) ->
             ctx[name] = ->
               helper.apply ctx, arguments
 
-        # Puts input vars in ctx.data, and in ctx if the name is not taken.
+        # Names of non-input context vars.
+        names = []
+        names.push k for k, v of ctx
+
+        # Imports input vars to ctx.data, and in ctx if the name is not taken.
         import_data ctx, [req.query, req.params, req.body]
 
         # Go!
@@ -267,6 +273,8 @@ zappa.app = (func) ->
   
   # Register socket.io handlers.
   io.sockets.on 'connection', (socket) ->
+    c = {}
+    
     build_ctx = ->
       ctx =
         app: app
@@ -274,7 +282,7 @@ zappa.app = (func) ->
         settings: app.settings
         socket: socket
         id: socket.id
-        client: {}
+        client: c
         emit: -> socket.emit.apply socket, arguments
         broadcast: -> socket.broadcast.emit.apply socket.broadcast, arguments
 
@@ -391,7 +399,7 @@ zappa.adapter = (engine, options = {}) ->
   compile: (template, data) ->
     template = engine.compile(template, data)
     (data) ->
-      for k, v of data.data
+      for k, v of data.params
         if typeof data[k] is 'undefined' and k not in options.blacklist
           data[k] = v
       template(data)
