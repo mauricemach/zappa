@@ -7,9 +7,7 @@
      d88P        d8888888888 888        888     d8888888888           @@@@@@@@    
     d8888888888 d88P     888 888        888    d88P     888            @@@@@@     
 
-### Not your mom's node framework
-            
-This document refers to the recently released **0.2.0 beta**. You can find a review on changes from 0.1.x at `/docs/peaches.md`.
+### Node development for the lazy
             
 **Zappa** is a [CoffeeScript](http://coffeescript.org)-optimized, radically minimalist interface orchestrating [Express](http://expressjs.com), [Socket.IO](http://socket.io), [Sammy](http://sammyjs.org) and other top talent, with two obsessions in mind:
 
@@ -32,7 +30,7 @@ And give your foot a push:
     $ coffee cuppa.coffee    
        info  - socket.io started
     Express server listening on port 3000 in development mode
-    Zappa 0.2.0beta orchestrating the show
+    Zappa 0.2.0 orchestrating the show
 
 ### Nice, but one-line string responses are mostly useless. Can you show me something closer to a real web app?
 

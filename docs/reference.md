@@ -1,6 +1,6 @@
 ---
 layout: default
-title: API Reference (v0.2.0beta2)
+title: API Reference (v0.2.0)
 permalink: /reference/index.html
 ---
 
@@ -410,6 +410,10 @@ Two additional features:
 ### redirect
 
 Shortcut to `response.redirect`.
+
+### session
+
+Shortcut to `request.session`.
 
 ## SOCKETS HANDLERS SCOPE
 
