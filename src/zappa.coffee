@@ -127,8 +127,8 @@ zappa.app = ->
     'helper', 'def', 'view', 'set', 'use', 'configure', 'include', 'shared', 'client', 'coffee', 'js', 'css',
     'stylus', 'enable', 'disable', 'settings', 'postrender']
 
-    # TODO: session, cookies, app data, clients list
-    http: ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect']
+    # TODO: cookies, app data, clients list
+    http: ['app', 'settings', 'response', 'request', 'next', 'params', 'send', 'render', 'redirect', 'session']
 
     # TODO: app data, clients list, join
     ws: ['app', 'io', 'settings', 'socket', 'id', 'params', 'client', 'emit', 'broadcast']
@@ -393,6 +393,7 @@ zappa.app = ->
 
           locals.params = context
           locals.request = req
+          locals.session = req.session
           locals.response = res
           locals.next = next
           locals.send = -> res.send.apply res, arguments
