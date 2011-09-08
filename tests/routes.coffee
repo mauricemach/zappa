@@ -52,8 +52,8 @@ port = 15000
     
     zapp = zappa port++, ->
       @use 'bodyParser'
-      @get '/:foo': -> @data.foo + @data.ping
-      @post '/:foo': -> @data.foo + @data.ping + @data.zig
+      @get '/:foo': -> @foo + @ping
+      @post '/:foo': -> @foo + @ping + @zig
     
     c = t.client(zapp.app)
 

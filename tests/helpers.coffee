@@ -9,10 +9,10 @@ port = 15100
     zapp = zappa port++, ->
       @helper role: (name) ->
         if @request?
-          @redirect '/login' unless @data.user.role is name
+          @redirect '/login' unless @user.role is name
 
       @get '/': ->
-        @data.user = role: 'comonner'
+        @user = role: 'commoner'
         @role 'lord'
         
     c = t.client(zapp.app)

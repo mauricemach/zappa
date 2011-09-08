@@ -33,7 +33,7 @@ port = 15700
     
     zapp = zappa port++, {t}, ->
       @on shout: ->
-        @io.sockets.emit 'shout', {foo: @data.foo}
+        @io.sockets.emit 'shout', {@foo}
 
     c = t.client(zapp.app)
     c.connect()

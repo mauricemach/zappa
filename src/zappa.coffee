@@ -33,6 +33,13 @@ coffeescript_helpers = """
     } return -1; };
 """.replace /\n/g, ''
 
+import_data = (c, objs) ->
+  c.data ?= {}
+  for obj in objs
+    for k, v of obj
+      c.data[k] = v
+      c[k] = v unless c[k]
+
 # The stringified zappa client.
 client = require('./client').build(zappa.version, coffeescript_helpers)
 
@@ -209,51 +216,49 @@ zappa.app = (func) ->
         res.contentType r.contentType if r.contentType?
         res.send r.handler
     else
-      ctx = {app, settings: app.settings}
-
-      for name, helper of helpers
-        do (name, helper) ->
-          ctx[name] = ->
-            helper.apply ctx, arguments
-          
       app[r.verb] r.path, (req, res, next) ->
-        ctx.data = {}
-
-        ctx.data[k] = v for k, v of req.query
-        ctx.data[k] = v for k, v of req.params
-        ctx.data[k] = v for k, v of req.body
-
-        ctx.request = req
-        ctx.response = res
-        ctx.next = next
-        ctx.send = -> res.send.apply res, arguments
-        ctx.redirect = -> res.redirect.apply res, arguments
-
-        ctx.render = (args...) ->
-          # Adds the app id to the view name so that the monkeypatched
-          # express.View.exists and express.View.contents can lookup
-          # this app's inline templates.
-          args[0] = context.id + '/' + args[0]
+        ctx =
+          app: app
+          settings: app.settings
+          request: req
+          response: res
+          next: next
+          send: -> res.send.apply res, arguments
+          redirect: -> res.redirect.apply res, arguments
+          render: (args...) ->
+            # Adds the app id to the view name so that the monkeypatched
+            # express.View.exists and express.View.contents can lookup
+            # this app's inline templates.
+            args[0] = context.id + '/' + args[0]
           
-          # Make sure the second arg is an object.
-          args[1] ?= {}
-          args.splice 1, 0, {} if typeof args[1] is 'function'
+            # Make sure the second arg is an object.
+            args[1] ?= {}
+            args.splice 1, 0, {} if typeof args[1] is 'function'
           
-          # Send request input vars to template as `params`.
-          args[1].data ?= ctx.data
+            # Send request input vars to template as `params`.
+            args[1].data ?= ctx.data
 
-          if args[1].postrender?
-            # Apply postrender before sending response.
-            res.render args[0], args[1], (err, str) ->
-              jsdom.env html: str, src: [jquery], done: (err, window) ->
-                rendered = postrenders[args[1].postrender].apply({data: ctx.data}, [$, window])
+            if args[1].postrender?
+              # Apply postrender before sending response.
+              res.render args[0], args[1], (err, str) ->
+                jsdom.env html: str, src: [jquery], done: (err, window) ->
+                  rendered = postrenders[args[1].postrender].apply({data: ctx.data}, [$, window])
 
-                doctype = (window.document.doctype or '') + "\n"
-                res.send doctype + window.document.documentElement.outerHTML
-          else
-            # Just forward params to express.
-            res.render.apply res, args
+                  doctype = (window.document.doctype or '') + "\n"
+                  res.send doctype + window.document.documentElement.outerHTML
+            else
+              # Just forward params to express.
+              res.render.apply res, args
 
+        for name, helper of helpers
+          do (name, helper) ->
+            ctx[name] = ->
+              helper.apply ctx, arguments
+
+        # Puts input vars in ctx.data, and in ctx if the name is not taken.
+        import_data ctx, [req.query, req.params, req.body]
+
+        # Go!
         result = r.handler.apply(ctx, [ctx])
         
         res.contentType(r.contentType) if r.contentType?
@@ -262,36 +267,39 @@ zappa.app = (func) ->
   
   # Register socket.io handlers.
   io.sockets.on 'connection', (socket) ->
-    ctx =
-      app: app
-      io: io
-      settings: app.settings
-      socket: socket
-      id: socket.id
-      client: {}
-      emit: -> socket.emit.apply socket, arguments
-      broadcast: -> socket.broadcast.emit.apply socket.broadcast, arguments
+    build_ctx = ->
+      ctx =
+        app: app
+        io: io
+        settings: app.settings
+        socket: socket
+        id: socket.id
+        client: {}
+        emit: -> socket.emit.apply socket, arguments
+        broadcast: -> socket.broadcast.emit.apply socket.broadcast, arguments
 
-    for name, helper of helpers
-      do (name, helper) ->
-        ctx[name] = ->
-          helper.apply(ctx, arguments)
-    
+      for name, helper of helpers
+        do (name, helper) ->
+          ctx[name] = ->
+            helper.apply(ctx, arguments)
+      ctx
+
+    ctx = build_ctx()
     ws_handlers.connection.apply(ctx, [ctx]) if ws_handlers.connection?
 
     socket.on 'disconnect', ->
-      context = {}
+      ctx = build_ctx()
       ws_handlers.disconnect.apply(ctx, [ctx]) if ws_handlers.disconnect?
 
     for name, h of ws_handlers
       do (name, h) ->
         if name isnt 'connection' and name isnt 'disconnect'
           socket.on name, (data) ->
-            ctx.data = {}
-            ctx.data[k] = v for k, v of data
+            ctx = build_ctx()
+            import_data ctx, [data]
             h.apply(ctx, [ctx])
 
-  # GO!!!
+  # Go!
   func.apply(context, [context])
 
   if app.settings['serve zappa']
