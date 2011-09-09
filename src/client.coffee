@@ -35,11 +35,6 @@ skeleton = ->
     context.emit = ->
       context.socket.emit.apply context.socket, arguments
 
-    # GO!!!
-    func.apply(context, [context])
-
-    # Implements the application according to the specification.
-
     route = (r) ->
       ctx = {app}
 
@@ -54,6 +49,9 @@ skeleton = ->
         ctx.render = -> sammy_context.render.apply sammy_context, arguments
         ctx.redirect = -> sammy_context.redirect.apply sammy_context, arguments
         r.handler.apply(ctx, [ctx])
+
+    # GO!!!
+    func.apply(context, [context])
 
     # Implements the websockets client with socket.io.
     if context.socket?
