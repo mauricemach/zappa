@@ -13,6 +13,7 @@ socketio = require 'socket.io'
 jsdom = require 'jsdom'
 jquery = fs.readFileSync(__dirname + '/../node_modules/jquery/dist/node-jquery.min.js').toString()
 sammy = fs.readFileSync(__dirname + '/../vendor/sammy-latest.min.js').toString()
+uglify = require 'uglify-js'
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 # a function (see below) though, it loses access to its parent scope, and consequently to
@@ -32,6 +33,12 @@ coffeescript_helpers = """
       if (this[i] === item) return i;
     } return -1; };
 """.replace /\n/g, ''
+
+minify = (js) ->
+  ast = uglify.parser.parse(js)
+  ast = uglify.uglify.ast_mangle(ast)
+  ast = uglify.uglify.ast_squeeze(ast)
+  uglify.uglify.gen_code(ast)
 
 import_data = (c, objs) ->
   c.data ?= {}
@@ -122,16 +129,19 @@ zappa.app = (func) ->
     app.enable 'serve zappa'
     for k, v of obj
       js = ";zappa.run(#{v});"
+      js = minify(js) if app.settings['minify']
       route verb: 'get', path: k, handler: js, contentType: 'js'
 
   context.coffee = (obj) ->
     for k, v of obj
       js = ";#{coffeescript_helpers}(#{v})();"
+      js = minify(js) if app.settings['minify']
       route verb: 'get', path: k, handler: js, contentType: 'js'
 
   context.js = (obj) ->
     for k, v of obj
       js = String(v)
+      js = minify(js) if app.settings['minify']
       route verb: 'get', path: k, handler: js, contentType: 'js'
 
   context.css = (obj) ->
@@ -202,6 +212,7 @@ zappa.app = (func) ->
     app.enable 'serve zappa'
     for k, v of obj
       js = ";zappa.run(#{v});"
+      js = minify(js) if app.settings['minify']
       route verb: 'get', path: k, handler: js, contentType: 'js'
       v.apply(context, [context])
 
@@ -312,8 +323,10 @@ zappa.app = (func) ->
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->
+      js = ";#{coffeescript_helpers}(#{client})();"
+      js = minify(js) if app.settings['minify']
       res.contentType 'js'
-      res.send ";#{coffeescript_helpers}(#{client})();"
+      res.send js
 
   if app.settings['serve jquery']
     app.get '/zappa/jquery.js', (req, res) ->

@@ -3,109 +3,70 @@
   <span class="nv">zappa.version = </span><span class="kc">null</span>
 
   <span class="nv">coffeescript_helpers = </span><span class="kc">null</span>
-  <span class="nv">rewrite_function = </span><span class="kc">null</span>
 
-  <span class="nv">zappa.run = </span><span class="nf">(root_function) -&gt;</span>
-    <span class="nv">root_locals_names = </span><span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;socket&#39;</span><span class="p">,</span> <span class="s1">&#39;def&#39;</span><span class="p">,</span> <span class="s1">&#39;helper&#39;</span><span class="p">,</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="s1">&#39;at&#39;</span><span class="p">,</span> <span class="s1">&#39;emit&#39;</span><span class="p">]</span>
-    <span class="nv">sammy_locals_names = </span><span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;render&#39;</span><span class="p">,</span> <span class="s1">&#39;redirect&#39;</span><span class="p">]</span>
-    <span class="nv">ws_locals_names = </span><span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">,</span> <span class="s1">&#39;socket&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;emit&#39;</span><span class="p">]</span>
-    <span class="nv">helpers_names = </span><span class="p">[]</span>
-    <span class="nv">defs_names = </span><span class="p">[]</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Storage for the functions provided by the user.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">routes = </span><span class="p">[]</span>
-    <span class="nv">ws_handlers = </span><span class="p">{}</span>
+  <span class="nv">zappa.run = </span><span class="nf">(func) -&gt;</span>
+    <span class="nv">context = </span><span class="p">{}</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Storage for the functions provided by the user.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">ws_handlers = </span><span class="p">{}</span>
     <span class="nv">helpers = </span><span class="p">{}</span>
-    <span class="nv">defs = </span><span class="p">{}</span>
 
-    <span class="nv">app = </span><span class="nx">Sammy</span><span class="p">()</span> <span class="k">if</span> <span class="nx">Sammy</span><span class="o">?</span>
-    <span class="nv">socket = </span><span class="kc">null</span>
+    <span class="nv">app = context.app = </span><span class="nx">Sammy</span><span class="p">()</span> <span class="k">if</span> <span class="nx">Sammy</span><span class="o">?</span>
 
-    <span class="nv">root_context = </span><span class="p">{}</span>
-    <span class="nv">root_locals = </span><span class="p">{</span><span class="nx">app</span><span class="p">,</span> <span class="nx">socket</span><span class="p">}</span>
-
-    <span class="nv">root_locals.get = </span><span class="o">-&gt;</span>
+    <span class="nv">context.get = </span><span class="o">-&gt;</span>
       <span class="k">if</span> <span class="k">typeof</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">isnt</span> <span class="s1">&#39;object&#39;</span>
-        <span class="nx">routes</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="nv">path: </span><span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nv">handler: </span><span class="nx">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
+        <span class="nx">route</span> <span class="nv">path: </span><span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nv">handler: </span><span class="nx">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
       <span class="k">else</span>
         <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-          <span class="nx">routes</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="nv">path: </span><span class="nx">k</span><span class="p">,</span> <span class="nv">handler: </span><span class="nx">v</span><span class="p">})</span>
+          <span class="nx">route</span> <span class="nv">path: </span><span class="nx">k</span><span class="p">,</span> <span class="nv">handler: </span><span class="nx">v</span>
 
-    <span class="nv">root_locals.helper = </span><span class="nf">(obj) -&gt;</span>
+    <span class="nv">context.helper = </span><span class="nf">(obj) -&gt;</span>
       <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">obj</span>
-        <span class="nx">helpers_names</span><span class="p">.</span><span class="nx">push</span> <span class="nx">k</span>
         <span class="nx">helpers</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span>
 
-    <span class="nv">root_locals.def = </span><span class="nf">(obj) -&gt;</span>
-      <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">obj</span>
-        <span class="nx">defs_names</span><span class="p">.</span><span class="nx">push</span> <span class="nx">k</span>
-        <span class="nx">defs</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span>
-
-    <span class="nv">root_locals.at = </span><span class="nf">(obj) -&gt;</span>
+    <span class="nv">context.on = </span><span class="nf">(obj) -&gt;</span>
       <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">obj</span>
         <span class="nx">ws_handlers</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span>
 
-    <span class="nv">root_locals.connect = </span><span class="o">-&gt;</span>
-      <span class="nv">socket = </span><span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">io</span><span class="p">,</span> <span class="nx">arguments</span>
+    <span class="nv">context.connect = </span><span class="o">-&gt;</span>
+      <span class="nv">context.socket = </span><span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">io</span><span class="p">,</span> <span class="nx">arguments</span>
       
-    <span class="nv">root_locals.emit = </span><span class="o">-&gt;</span>
-      <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">socket</span><span class="p">,</span> <span class="nx">arguments</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Executes the (rewriten) end-user function and learns how the app should be structured.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">rewritten_root = </span><span class="nx">rewrite_function</span><span class="p">(</span><span class="nx">root_function</span><span class="p">,</span> <span class="nx">root_locals_names</span><span class="p">)</span>
-    <span class="nx">rewritten_root</span><span class="p">(</span><span class="nx">root_context</span><span class="p">,</span> <span class="nx">root_locals</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Implements the application according to the specification.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">helpers</span>
-      <span class="nx">helpers</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rewrite_function</span><span class="p">(</span><span class="nx">v</span><span class="p">,</span> <span class="nx">sammy_locals_names</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">helpers_names</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="nx">defs_names</span><span class="p">))</span>
-
-    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">ws_handlers</span>
-      <span class="nx">ws_handlers</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rewrite_function</span><span class="p">(</span><span class="nx">v</span><span class="p">,</span> <span class="nx">ws_locals_names</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">helpers_names</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="nx">defs_names</span><span class="p">))</span>
-
-    <span class="k">for</span> <span class="nx">r</span> <span class="k">in</span> <span class="nx">routes</span>
-      <span class="nx">do</span> <span class="nf">(r) -&gt;</span>
-        <span class="nv">rewritten_handler = </span><span class="nx">rewrite_function</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">handler</span><span class="p">,</span>
-          <span class="nx">sammy_locals_names</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">helpers_names</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="nx">defs_names</span><span class="p">))</span>
-
-        <span class="nv">context = </span><span class="kc">null</span>
-        <span class="nv">locals = </span><span class="p">{</span><span class="nx">app</span><span class="p">}</span>
-
-        <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">def</span> <span class="k">of</span> <span class="nx">defs</span>
-          <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">def</span>
-
-        <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">helper</span> <span class="k">of</span> <span class="nx">helpers</span>
-          <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
-            <span class="nx">helper</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
-
-        <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="nx">r</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nf">(sammy_context) -&gt;</span>
-          <span class="nv">context = </span><span class="p">{}</span>
-          <span class="nx">context</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span> <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">params</span>
-          <span class="nv">locals.params = </span><span class="nx">context</span>
-          <span class="nv">locals.context = </span><span class="nx">sammy_context</span>
-          <span class="nv">locals.render = </span><span class="o">-&gt;</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">render</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">arguments</span>
-          <span class="nv">locals.redirect = </span><span class="o">-&gt;</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">redirect</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">arguments</span>
-          <span class="nx">rewritten_handler</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Implements the websockets client with socket.io.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">socket</span><span class="o">?</span>
-      <span class="nv">context = </span><span class="p">{}</span>
-      <span class="nv">locals =</span>
-        <span class="nv">app: </span><span class="nx">app</span>
-        <span class="nv">socket: </span><span class="nx">socket</span>
-        <span class="nv">id: </span><span class="nx">socket</span><span class="p">.</span><span class="nx">id</span>
-        <span class="nv">emit: </span><span class="o">-&gt;</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">socket</span><span class="p">,</span> <span class="nx">arguments</span>
-      
-      <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">def</span> <span class="k">of</span> <span class="nx">defs</span>
-        <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">def</span>
+    <span class="nv">context.emit = </span><span class="o">-&gt;</span>
+      <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">,</span> <span class="nx">arguments</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>GO!!!</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">func</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="p">[</span><span class="nx">context</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Implements the application according to the specification.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">route = </span><span class="nf">(r) -&gt;</span>
+      <span class="nv">ctx = </span><span class="p">{</span><span class="nx">app</span><span class="p">}</span>
 
       <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">helper</span> <span class="k">of</span> <span class="nx">helpers</span>
-        <span class="nx">do</span> <span class="nf">(name, helper) -&gt;</span>
-          <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
-            <span class="nx">helper</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
+        <span class="nx">ctx</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
+          <span class="nx">helper</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
 
+      <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="nx">r</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nf">(sammy_context) -&gt;</span>
+        <span class="nv">ctx.data = </span><span class="p">{}</span>
+        <span class="nx">ctx</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span> <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">params</span>
+        <span class="nv">ctx.sammy_context = </span><span class="nx">sammy_context</span>
+        <span class="nv">ctx.render = </span><span class="o">-&gt;</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">render</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">sammy_context</span><span class="p">,</span> <span class="nx">arguments</span>
+        <span class="nv">ctx.redirect = </span><span class="o">-&gt;</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">redirect</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">sammy_context</span><span class="p">,</span> <span class="nx">arguments</span>
+        <span class="nx">r</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">ctx</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Implements the websockets client with socket.io.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="o">?</span>
       <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">h</span> <span class="k">of</span> <span class="nx">ws_handlers</span>
         <span class="nx">do</span> <span class="nf">(name, h) -&gt;</span>
-          <span class="nx">socket</span><span class="p">.</span><span class="kc">on</span> <span class="nx">name</span><span class="p">,</span> <span class="nf">(data) -&gt;</span>
-            <span class="nv">context = </span><span class="p">{}</span>
-            <span class="nx">context</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span> <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">data</span>
-            <span class="nv">locals.params = </span><span class="nx">context</span>
-            <span class="nx">h</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span>
+          <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="kc">on</span> <span class="nx">name</span><span class="p">,</span> <span class="nf">(data) -&gt;</span>
+            <span class="nv">ctx =</span>
+              <span class="nv">app: </span><span class="nx">app</span>
+              <span class="nv">socket: </span><span class="nx">context</span><span class="p">.</span><span class="nx">socket</span>
+              <span class="nv">id: </span><span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">id</span>
+              <span class="nv">emit: </span><span class="o">-&gt;</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">,</span> <span class="nx">arguments</span>
+              <span class="nv">data: </span><span class="nx">data</span>
+
+            <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">helper</span> <span class="k">of</span> <span class="nx">helpers</span>
+              <span class="nx">do</span> <span class="nf">(name, helper) -&gt;</span>
+                <span class="nx">ctx</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
+                  <span class="nx">helper</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
+
+            <span class="nx">h</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">ctx</span><span class="p">])</span>
 
     <span class="nx">$</span><span class="p">(</span><span class="o">-&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nx">run</span> <span class="s1">&#39;#/&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">app</span><span class="o">?</span>
 
-<span class="vi">@build = </span><span class="nf">(version, coffeescript_helpers, rewrite_function) -&gt;</span>
+<span class="vi">@build = </span><span class="nf">(version, coffeescript_helpers) -&gt;</span>
   <span class="nb">String</span><span class="p">(</span><span class="nx">skeleton</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;version = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;version = &#39;#{version}&#39;;&quot;</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;coffeescript_helpers = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var coffeescript_helpers = &#39;#{coffeescript_helpers}&#39;;&quot;</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;rewrite_function = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var rewrite_function = #{rewrite_function};&quot;</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span> <span class="sr">/(\n)/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
