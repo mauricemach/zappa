@@ -232,6 +232,7 @@ zappa.app = (func) ->
           app: app
           settings: app.settings
           request: req
+          session: req.session
           response: res
           next: next
           send: -> res.send.apply res, arguments
