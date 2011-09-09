@@ -1,6 +1,6 @@
 ---
 layout: default
-title: API Reference (v0.2.0beta2)
+title: API Reference (v0.2.0)
 permalink: /reference/index.html
 ---
 
@@ -411,6 +411,10 @@ Two additional features:
 
 Shortcut to `response.redirect`.
 
+### session
+
+Shortcut to `request.session`.
+
 ## SOCKETS HANDLERS SCOPE
 
 ### @
@@ -480,6 +484,10 @@ Serves `/zappa/jquery.js` (minified jQuery 1.6.2 from npm).
 ### serve sammy
 
 Serves `/zappa/sammy.js` (minified Sammy 0.6.3).
+
+### minify
+
+Uses uglify-js to minify the outputs of `serve zappa`, `client`, `shared`, `coffee` and `js`.
 
 ### default layout
 
