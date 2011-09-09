@@ -15,6 +15,7 @@
     "uglify-js": "1.0.7"
   },
   "devDependencies": {
+    "underscore": "1.1.7",
     "request": "2.1.1",
     "socket.io-client": "0.8.4",
     "eco": "1.1.0-rc-1",
