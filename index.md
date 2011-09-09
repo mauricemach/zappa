@@ -42,14 +42,14 @@ Into this:
 
 {% highlight coffeescript %}
 require('zappa') ->
-  @use 'bodyParser', 'methodOverride', app.router, 'static'
+  @use 'bodyParser', 'methodOverride', @app.router, 'static'
 
   @configure
     development: => @use errorHandler: {dumpExceptions: on}
     production: => @use 'errorHandler'
 
   @get '/:foo': ->
-    @data.foo += 'bar'
+    @foo += 'bar'
     @render 'index'
   
   @on connection: ->
