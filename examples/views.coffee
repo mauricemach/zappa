@@ -1,16 +1,22 @@
 require('zappa') ->
-  #set 'view engine': 'eco'
-  
-  get
-    '/': -> render 'index'
-    '/eco': -> render 'index.eco'
-    '/jade': -> render 'index.jade'
+  @get
+    '/': ->
+      @foo = 'bar'
+      @render 'index'
+      
+    '/eco': ->
+      @foo = 'bar'
+      @render 'index.eco'
+      
+    '/jade': ->
+      @foo = 'bar'
+      @render 'index.jade'
 
-  ###
-  view index: ->
+  @view index: ->
     h2 'CoffeeKup inline template'
+    p @foo
   
-  view layout: ->
+  @view layout: ->
     doctype 5
     html ->
       head ->
@@ -18,13 +24,13 @@ require('zappa') ->
       body ->
         h1 'CoffeeKup inline layout'
         @body
-  ###
   
-  view 'index.eco': '''
+  @view 'index.eco': '''
     <h2>Eco inline template</h2>
+    <p><%= @params.foo %></p>
   '''
   
-  view 'layout.eco': '''
+  @view 'layout.eco': '''
     <!DOCTYPE html>
     <html>
       <head>
@@ -36,11 +42,12 @@ require('zappa') ->
     </html>
   '''
   
-  view 'index.jade': '''
+  @view 'index.jade': '''
     h2 Jade inline template
+    p= params.foo
   '''
   
-  view 'layout.jade': '''
+  @view 'layout.jade': '''
     !!! 5
     html
       head
