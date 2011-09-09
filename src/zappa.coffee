@@ -40,15 +40,17 @@ minify = (js) ->
   ast = uglify.uglify.ast_squeeze(ast)
   uglify.uglify.gen_code(ast)
 
-import_data = (c, objs) ->
-  c.data ?= {}
-  for obj in objs
+# Shallow copy attributes from `sources` (array of objects) to `recipient` and `recipient.data`.
+# Only copies to `recipient` when the name isn't already taken.
+copy_data_to = (recipient, sources) ->
+  recipient.data ?= {}
+  for obj in sources
     for k, v of obj
-      c.data[k] = v
-      c[k] = v unless c[k]
+      recipient.data[k] = v
+      recipient[k] = v unless recipient[k]
 
 # The stringified zappa client.
-client = require('./client').build(zappa.version, coffeescript_helpers, import_data)
+client = require('./client').build(zappa.version, coffeescript_helpers, copy_data_to)
 
 # Keep inline views at the module level and namespaced by app id
 # so that the monkeypatched express can look them up.
@@ -274,7 +276,7 @@ zappa.app = (func) ->
         names.push k for k, v of ctx
 
         # Imports input vars to ctx.data, and in ctx if the name is not taken.
-        import_data ctx, [req.query, req.params, req.body]
+        copy_data_to ctx, [req.query, req.params, req.body]
 
         # Go!
         result = r.handler.apply(ctx, [ctx])
@@ -316,7 +318,7 @@ zappa.app = (func) ->
         if name isnt 'connection' and name isnt 'disconnect'
           socket.on name, (data) ->
             ctx = build_ctx()
-            import_data ctx, [data]
+            copy_data_to ctx, [data]
             h.apply(ctx, [ctx])
 
   # Go!

@@ -4,7 +4,7 @@ skeleton = ->
   zappa.version = null
 
   coffeescript_helpers = null
-  import_data = null
+  copy_data_to = null
 
   zappa.run = (func) ->
     context = {}
@@ -47,7 +47,7 @@ skeleton = ->
         ctx.sammy_context = sammy_context
         ctx.render = -> sammy_context.render.apply sammy_context, arguments
         ctx.redirect = -> sammy_context.redirect.apply sammy_context, arguments
-        import_data ctx, [sammy_context.params]
+        copy_data_to ctx, [sammy_context.params]
         r.handler.apply(ctx, [ctx])
 
     # GO!!!
@@ -64,7 +64,7 @@ skeleton = ->
               id: context.socket.id
               emit: -> context.socket.emit.apply context.socket, arguments
             
-            import_data ctx, [data]
+            copy_data_to ctx, [data]
 
             for name, helper of helpers
               do (name, helper) ->
@@ -75,9 +75,9 @@ skeleton = ->
 
     $(-> app.run '#/') if app?
 
-@build = (version, coffeescript_helpers, import_data) ->
+@build = (version, coffeescript_helpers, copy_data_to) ->
   String(skeleton)
     .replace('version = null;', "version = '#{version}';")
     .replace('coffeescript_helpers = null;', "var coffeescript_helpers = '#{coffeescript_helpers}';")
-    .replace('import_data = null;', "var import_data = #{import_data};")
+    .replace('copy_data_to = null;', "var copy_data_to = #{copy_data_to};")
     .replace /(\n)/g, ''
