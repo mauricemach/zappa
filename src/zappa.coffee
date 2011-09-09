@@ -48,7 +48,7 @@ import_data = (c, objs) ->
       c[k] = v unless c[k]
 
 # The stringified zappa client.
-client = require('./client').build(zappa.version, coffeescript_helpers)
+client = require('./client').build(zappa.version, coffeescript_helpers, import_data)
 
 # Keep inline views at the module level and namespaced by app id
 # so that the monkeypatched express can look them up.

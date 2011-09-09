@@ -14,7 +14,7 @@ require('../src/zappa') ->
     @connect()
 
     @on said: ->
-      $('#panel').append "<p>#{@data.nickname} said: #{@data.text}</p>"
+      $('#panel').append "<p>#{@nickname} said: #{@text}</p>"
     
     $().ready =>
       @emit 'set nickname', nickname: prompt('Pick a nickname')
