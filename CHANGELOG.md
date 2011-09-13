@@ -1,3 +1,5 @@
+**v0.2.0edge** (unreleased):
+
 **v0.2.0** (2011-09-08):
 
   - Changed: externals (`zappa {foo} ->`) are available at all scopes, shadow globals and root scope locals.

@@ -2,7 +2,7 @@
 # [node.js](http://nodejs.org) runtime, integrating [express](http://expressjs.com), [socket.io](http://socket.io)
 # and other best-of-breed libraries.
 
-zappa = version: '0.2.0'
+zappa = version: '0.2.0edge'
 
 log = console.log
 fs = require 'fs'
