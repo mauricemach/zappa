@@ -252,6 +252,7 @@ zappa.app = (func) ->
             # Automatically send request input vars to template.
             args[1].params = {}
             for k, v of ctx
+              # TODO: What if I *want* to pass, say, @request to the view?
               args[1].params[k] = v unless k in names
 
             if args[1].postrender?
