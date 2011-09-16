@@ -47,9 +47,6 @@ copy_data_to = (recipient, sources) ->
     for k, v of obj
       recipient[k] = v unless recipient[k]
 
-# The stringified zappa client.
-client = require('./client').build(zappa.version, coffeescript_helpers, copy_data_to)
-
 # Keep inline views at the module level and namespaced by app id
 # so that the monkeypatched express can look them up.
 views = {}
@@ -105,6 +102,9 @@ zappa.app = (func) ->
   
   app = context.app = express.createServer()
   io = context.io = socketio.listen(app)
+
+  # Reference to the zappa client, the value will be set later.
+  client = null
 
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
@@ -329,6 +329,9 @@ zappa.app = (func) ->
 
   # Go!
   func.apply(context, [context])
+
+  # The stringified zappa client.
+  client = require('./client').build(zappa.version, coffeescript_helpers, copy_data_to, app.settings)
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->

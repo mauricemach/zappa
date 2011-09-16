@@ -5,6 +5,7 @@ skeleton = ->
 
   coffeescript_helpers = null
   copy_data_to = null
+  settings = null
 
   zappa.run = (func) ->
     context = {}
@@ -44,10 +45,13 @@ skeleton = ->
           helper.apply(ctx, arguments)
 
       app.get r.path, (sammy_context) ->
+        ctx.params = sammy_context.params
         ctx.sammy_context = sammy_context
         ctx.render = -> sammy_context.render.apply sammy_context, arguments
         ctx.redirect = -> sammy_context.redirect.apply sammy_context, arguments
-        copy_data_to ctx, [sammy_context.params]
+        if settings['autoimport']
+          # Imports input vars to ctx. Does NOT overwrite existing variables.
+          copy_data_to ctx, [sammy_context.params]
         r.handler.apply(ctx, [ctx])
 
     # GO!!!
@@ -62,9 +66,11 @@ skeleton = ->
               app: app
               socket: context.socket
               id: context.socket.id
+              data: data
               emit: -> context.socket.emit.apply context.socket, arguments
             
-            copy_data_to ctx, [data]
+            if settings['autoimport']
+              copy_data_to ctx, [data]
 
             for name, helper of helpers
               do (name, helper) ->
@@ -75,9 +81,9 @@ skeleton = ->
 
     $(-> app.run '#/') if app?
 
-@build = (version, coffeescript_helpers, copy_data_to) ->
+@build = (version, coffeescript_helpers, copy_data_to, settings) ->
   String(skeleton)
     .replace('version = null;', "version = '#{version}';")
     .replace('coffeescript_helpers = null;', "var coffeescript_helpers = '#{coffeescript_helpers}';")
     .replace('copy_data_to = null;', "var copy_data_to = #{copy_data_to};")
-    .replace /(\n)/g, ''
+    .replace('settings = null;', "var settings = #{JSON.stringify settings};")
