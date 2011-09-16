@@ -256,7 +256,7 @@ include_locals.require = ???</p>             </td>             <td class="code">
       <span class="nx">res</span><span class="p">.</span><span class="nx">send</span> <span class="nx">sammy</span>
 
   <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;default layout&#39;</span><span class="p">]</span>
-    <span class="nv">views.layout = </span><span class="o">-&gt;</span>
+    <span class="nx">root_locals</span><span class="p">.</span><span class="nx">view</span> <span class="nv">layout: </span><span class="o">-&gt;</span>
       <span class="nx">doctype</span> <span class="mi">5</span>
       <span class="nx">html</span> <span class="o">-&gt;</span>
         <span class="nx">head</span> <span class="o">-&gt;</span>

@@ -340,7 +340,7 @@ zappa.app = ->
       res.send sammy
 
   if app.settings['default layout']
-    views.layout = ->
+    root_locals.view layout: ->
       doctype 5
       html ->
         head ->
