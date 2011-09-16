@@ -1,40 +1,19 @@
 require('./src/zappa') ->
-  @helper sum: (a, b) ->
-    (a + b + @ble).toString()
-    
-  subtract = (a, b) ->
-    (a - b).toString()
-  
-  @get '/': ->
-    @redirect '/ohai'
-    
-  @get '/context_as_param': (c) ->
-    c.send 'context_as_param'
-    
-  @get '/ohai': ->
-    #@ble = 5
-    #subtract 17, 5
-    @render 'index'
-  
-  @on connection: ->
-    @emit 'welcome'
-    
-  @on shout: ->
-    @broadcast 'shouted'
-    
+  @enable 'default layout', 'autoimport', 'autoexport'
+
+  sleep = (secs, cb) ->
+    setTimeout cb, secs * 1000
+
+  @get '/': -> @redirect '/bar'
+
+  @get '/:foo': ->
+    @foo += 'a'
+    sleep 3, =>
+      @foo += 'b'
+      @render 'index'
+
   @view index: ->
-    h1 'fooa'
-  
-  @view layout: ->
-    doctype 5
-    html ->
-      head ->
-        title 'foo'
-      script src: '/socket.io/socket.io.js'
-      coffeescript ->
-        window.onload = ->
-          socket = io.connect 'http://localhost'
-          
-          socket.on 'welcome', ->
-            console.log 'welcome'
-      body @body
+    @title = 'Async example'
+    
+    h1 'Async'
+    p @foo

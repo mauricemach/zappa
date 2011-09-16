@@ -1,17 +1,17 @@
 require('zappa') ->
   @get '/': ->
-    @items = [
+    items = [
       {name: 'coffeescript', url: 'http://coffeescript.org'}
       {name: 'ruby', url: 'http://ruby-lang.org'}
       {name: 'python', url: 'http://python.org'}
     ]
 
-    @render 'index', format: yes
+    @render 'index', {items, format: yes}
 
   @view index: ->
     ul ->
       for i in @items
-        partial 'item', i: i
+        partial 'item', {i}
 
   @view item: ->
     li -> a href: @i.url, -> @i.name

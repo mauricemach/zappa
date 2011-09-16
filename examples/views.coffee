@@ -1,16 +1,13 @@
 require('zappa') ->
   @get
     '/': ->
-      @foo = 'bar'
-      @render 'index'
+      @render 'index', foo: 'bar'
       
     '/eco': ->
-      @foo = 'bar'
-      @render 'index.eco'
+      @render 'index.eco', foo: 'bar'
       
     '/jade': ->
-      @foo = 'bar'
-      @render 'index.jade'
+      @render 'index.jade', foo: 'bar'
 
   @view index: ->
     h2 'CoffeeKup inline template'
@@ -27,7 +24,7 @@ require('zappa') ->
   
   @view 'index.eco': '''
     <h2>Eco inline template</h2>
-    <p><%= @params.foo %></p>
+    <p><%= @foo %></p>
   '''
   
   @view 'layout.eco': '''
@@ -44,7 +41,7 @@ require('zappa') ->
   
   @view 'index.jade': '''
     h2 Jade inline template
-    p= params.foo
+    p= foo
   '''
   
   @view 'layout.jade': '''

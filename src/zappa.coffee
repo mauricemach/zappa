@@ -40,13 +40,11 @@ minify = (js) ->
   ast = uglify.uglify.ast_squeeze(ast)
   uglify.uglify.gen_code(ast)
 
-# Shallow copy attributes from `sources` (array of objects) to `recipient` and `recipient.data`.
-# Only copies to `recipient` when the name isn't already taken.
+# Shallow copy attributes from `sources` (array of objects) to `recipient`.
+# Does NOT overwrite attributes already present in `recipient`.
 copy_data_to = (recipient, sources) ->
-  recipient.data ?= {}
   for obj in sources
     for k, v of obj
-      recipient.data[k] = v
       recipient[k] = v unless recipient[k]
 
 # The stringified zappa client.
@@ -234,6 +232,9 @@ zappa.app = (func) ->
           app: app
           settings: app.settings
           request: req
+          query: req.query
+          params: req.params
+          body: req.body
           session: req.session
           response: res
           next: next
@@ -249,17 +250,18 @@ zappa.app = (func) ->
             args[1] ?= {}
             args.splice 1, 0, {} if typeof args[1] is 'function'
           
-            # Automatically send request input vars to template.
-            args[1].params = {}
-            for k, v of ctx
-              # TODO: What if I *want* to pass, say, @request to the view?
-              args[1].params[k] = v unless k in names
+            if app.settings['autoexport']
+              # Automatically send request input vars to template.
+              args[1].params = {}
+              for k, v of ctx
+                # TODO: What if I *want* to pass, say, @request to the view?
+                args[1].params[k] = v unless k in names
 
             if args[1].postrender?
               # Apply postrender before sending response.
               res.render args[0], args[1], (err, str) ->
                 jsdom.env html: str, src: [jquery], done: (err, window) ->
-                  rendered = postrenders[args[1].postrender].apply({data: ctx.data}, [$, window])
+                  rendered = postrenders[args[1].postrender].apply(ctx, [window.$, window])
 
                   doctype = (window.document.doctype or '') + "\n"
                   res.send doctype + window.document.documentElement.outerHTML
@@ -276,8 +278,9 @@ zappa.app = (func) ->
         names = []
         names.push k for k, v of ctx
 
-        # Imports input vars to ctx.data, and in ctx if the name is not taken.
-        copy_data_to ctx, [req.query, req.params, req.body]
+        if app.settings['autoimport']
+          # Imports input vars to ctx. Does NOT overwrite existing variables.
+          copy_data_to ctx, [req.query, req.params, req.body]
 
         # Go!
         result = r.handler.apply(ctx, [ctx])
@@ -319,7 +322,9 @@ zappa.app = (func) ->
         if name isnt 'connection' and name isnt 'disconnect'
           socket.on name, (data) ->
             ctx = build_ctx()
-            copy_data_to ctx, [data]
+            ctx.data = data
+            if app.settings['autoimport']
+              copy_data_to ctx, [data]
             h.apply(ctx, [ctx])
 
   # Go!

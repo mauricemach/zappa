@@ -7,10 +7,10 @@ require('../src/zappa') ->
   @get '/': -> @redirect '/bar'
 
   @get '/:foo': ->
-    @foo += '!'
+    @params.foo += '!'
     sleep 3, =>
-      @foo += '?'
-      @render 'index'
+      @params.foo += '?'
+      @render 'index', @params
 
   @view index: ->
     @title = 'Async example'

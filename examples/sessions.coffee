@@ -1,9 +1,8 @@
-require('zappa') ->
+require('../src/zappa') ->
   @use 'cookieParser', session: {secret: 'foo'}
 
   @get '/': ->
-    @user = @session.user
-    @render 'index'
+    @render 'index', {user: @session.user}
     
   @get '/login': ->
     @session.user = 'foo'

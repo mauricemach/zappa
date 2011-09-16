@@ -1,10 +1,10 @@
-require('zappa') ->
+require('../src/zappa') ->
   @enable 'default layout'
   
   @get '/': ->
     @user = plan: 'staff'
 
-    @render 'index', postrender: 'plans'
+    @render 'index', {@user, postrender: 'plans'}
 
   @postrender plans: ($) ->
     $('.staff').remove() if @user.plan isnt 'staff'
