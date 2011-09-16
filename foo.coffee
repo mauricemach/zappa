@@ -1,19 +1,18 @@
 require('./src/zappa') ->
-  @enable 'default layout', 'autoimport', 'autoexport'
+  @enable 'default layout'
+  
+  @set views: __dirname + '/tests/views'
 
-  sleep = (secs, cb) ->
-    setTimeout cb, secs * 1000
-
-  @get '/': -> @redirect '/bar'
-
-  @get '/:foo': ->
-    @foo += 'a'
-    sleep 3, =>
-      @foo += 'b'
-      @render 'index'
-
+  @get '/': ->
+    @render 'index'
+  
   @view index: ->
-    @title = 'Async example'
+    @title = 'shaboo'
+    p 'inline view'
     
-    h1 'Async'
-    p @foo
+  @view layoute: ->
+    doctype 5
+    html ->
+      head ->
+        title 'inline layout'
+      body @body
