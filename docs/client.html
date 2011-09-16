@@ -4,6 +4,7 @@
 
   <span class="nv">coffeescript_helpers = </span><span class="kc">null</span>
   <span class="nv">copy_data_to = </span><span class="kc">null</span>
+  <span class="nv">settings = </span><span class="kc">null</span>
 
   <span class="nv">zappa.run = </span><span class="nf">(func) -&gt;</span>
     <span class="nv">context = </span><span class="p">{}</span>
@@ -41,11 +42,12 @@
           <span class="nx">helper</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span>
 
       <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="nx">r</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span> <span class="nf">(sammy_context) -&gt;</span>
+        <span class="nv">ctx.params = </span><span class="nx">sammy_context</span><span class="p">.</span><span class="nx">params</span>
         <span class="nv">ctx.sammy_context = </span><span class="nx">sammy_context</span>
         <span class="nv">ctx.render = </span><span class="o">-&gt;</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">render</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">sammy_context</span><span class="p">,</span> <span class="nx">arguments</span>
         <span class="nv">ctx.redirect = </span><span class="o">-&gt;</span> <span class="nx">sammy_context</span><span class="p">.</span><span class="nx">redirect</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">sammy_context</span><span class="p">,</span> <span class="nx">arguments</span>
-        <span class="nx">copy_data_to</span> <span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">sammy_context</span><span class="p">.</span><span class="nx">params</span><span class="p">]</span>
-        <span class="nx">r</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">ctx</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>GO!!!</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">func</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="p">[</span><span class="nx">context</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Implements the websockets client with socket.io.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="o">?</span>
+        <span class="k">if</span> <span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;autoimport&#39;</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Imports input vars to ctx. Does NOT overwrite existing variables.</p>             </td>             <td class="code">               <div class="highlight"><pre>          <span class="nx">copy_data_to</span> <span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">sammy_context</span><span class="p">.</span><span class="nx">params</span><span class="p">]</span>
+        <span class="nx">r</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">ctx</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>GO!!!</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">func</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="p">[</span><span class="nx">context</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Implements the websockets client with socket.io.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="o">?</span>
       <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">h</span> <span class="k">of</span> <span class="nx">ws_handlers</span>
         <span class="nx">do</span> <span class="nf">(name, h) -&gt;</span>
           <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="kc">on</span> <span class="nx">name</span><span class="p">,</span> <span class="nf">(data) -&gt;</span>
@@ -53,9 +55,11 @@
               <span class="nv">app: </span><span class="nx">app</span>
               <span class="nv">socket: </span><span class="nx">context</span><span class="p">.</span><span class="nx">socket</span>
               <span class="nv">id: </span><span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">id</span>
+              <span class="nv">data: </span><span class="nx">data</span>
               <span class="nv">emit: </span><span class="o">-&gt;</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">context</span><span class="p">.</span><span class="nx">socket</span><span class="p">,</span> <span class="nx">arguments</span>
             
-            <span class="nx">copy_data_to</span> <span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">data</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;autoimport&#39;</span><span class="p">]</span>
+              <span class="nx">copy_data_to</span> <span class="nx">ctx</span><span class="p">,</span> <span class="p">[</span><span class="nx">data</span><span class="p">]</span>
 
             <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">helper</span> <span class="k">of</span> <span class="nx">helpers</span>
               <span class="nx">do</span> <span class="nf">(name, helper) -&gt;</span>
@@ -66,11 +70,11 @@
 
     <span class="nx">$</span><span class="p">(</span><span class="o">-&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nx">run</span> <span class="s1">&#39;#/&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">app</span><span class="o">?</span>
 
-<span class="vi">@build = </span><span class="nf">(version, coffeescript_helpers, copy_data_to) -&gt;</span>
+<span class="vi">@build = </span><span class="nf">(version, coffeescript_helpers, copy_data_to, settings) -&gt;</span>
   <span class="nb">String</span><span class="p">(</span><span class="nx">skeleton</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;version = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;version = &#39;#{version}&#39;;&quot;</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;coffeescript_helpers = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var coffeescript_helpers = &#39;#{coffeescript_helpers}&#39;;&quot;</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;copy_data_to = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var copy_data_to = #{copy_data_to};&quot;</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">replace</span> <span class="sr">/(\n)/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;settings = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var settings = #{JSON.stringify settings};&quot;</span><span class="p">)</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
