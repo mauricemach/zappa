@@ -367,7 +367,7 @@ zappa.app = (func) ->
           style @style if @style
         body @body
 
-  {id: context.id, app, io}
+  context
 
 # Takes a function and runs it as a zappa app. Optionally accepts a port number, and/or
 # a hostname (any order). The hostname must be a string, and the port number must be
