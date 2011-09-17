@@ -1,25 +1,19 @@
-require('zappa') ->
-  @enable 'default layout'
+require('../src/zappa') ->
+  @enable 'default layout', 'serve jquery'
   
-  @get '/': ->
-    @render 'index'
+  @get '/': -> @render 'index'
 
-  @client '/index.js': ->
-    $(document).ready -> $('body').append "<p>default client</p>"
+  @coffee '/index.js': ->
+    $(document).ready -> $('body').append "<p>@coffee</p>"
 
-  @css '/index.css': ''''
-    #default.css {border: 1px solid #00f}
+  @css '/index.css': '''
+    #css {display: block !important;}
   '''
 
   @view index: ->
     @title = 'Client'
-    @scripts = ['http://code.jquery.com/jquery-1.4.3.min', 'default', 'named', 'admin/namespaced']
-    @stylesheets = ['default', 'named', 'admin/namespaced']
-    @style = '''
-      .css {font-family: monospace}
-    '''
+    @scripts = ['/zappa/jquery', '/index']
+    @stylesheets = ['/index']
 
     h1 @title
-    p id: 'default', class: 'css', -> 'default stylesheet'
-    p id: 'named', class: 'css', -> 'named stylesheet'
-    p id: 'namespaced', class: 'css', -> 'namespaced stylesheet'
+    p '#css', style: 'display: none', '@css'
