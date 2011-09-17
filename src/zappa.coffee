@@ -279,8 +279,9 @@ zappa.app = (func) ->
 
         for name, helper of helpers
           do (name, helper) ->
-            ctx[name] = ->
-              helper.apply ctx, arguments
+            ctx[name] = (args...) ->
+              args.push ctx
+              helper.apply ctx, args
 
         # Names of non-input context vars.
         names = []
