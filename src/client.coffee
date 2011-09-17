@@ -35,7 +35,11 @@ skeleton = ->
       context.socket = io.connect.apply io, arguments
       
     context.emit = ->
-      context.socket.emit.apply context.socket, arguments
+      if typeof arguments[0] isnt 'object'
+        context.socket.emit.apply context.socket, arguments
+      else
+        for k, v of arguments[0]
+          context.socket.emit.apply context.socket, [k, v]
 
     route = (r) ->
       ctx = {app}
@@ -67,7 +71,7 @@ skeleton = ->
               socket: context.socket
               id: context.socket.id
               data: data
-              emit: -> context.socket.emit.apply context.socket, arguments
+              emit: context.emit
             
             if settings['autoimport']
               copy_data_to ctx, [data]

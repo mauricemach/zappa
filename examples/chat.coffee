@@ -18,10 +18,10 @@ require('../src/zappa') ->
       $('#panel').append "<p>#{@data.nickname} said: #{@data.text}</p>"
     
     $().ready =>
-      @emit 'set nickname', nickname: prompt('Pick a nickname')
+      @emit 'set nickname': {nickname: prompt 'Pick a nickname!'}
       
       $('button').click =>
-        @emit 'said', text: $('#box').val()
+        @emit said: {text: $('#box').val()}
         $('#box').val('').focus()
     
   @view index: ->
