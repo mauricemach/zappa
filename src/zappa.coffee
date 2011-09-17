@@ -113,7 +113,7 @@ zappa.app = (func) ->
 
   # Builds the applications's root scope.
   
-  # Sets default view dir to root_local's dir name.
+  # Sets default view dir to @root (`path.dirname(module.parent.filename)`).
   app.set 'views', path.join(context.root, '/views')
   
   for verb in ['get', 'post', 'put', 'del']
