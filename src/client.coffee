@@ -95,7 +95,7 @@ skeleton = ->
         app: app
         socket: socket
         id: socket.id
-        emit: -> socket.emit.apply socket, arguments
+        emit: root_locals.emit
       
       for name, def of defs
         locals[name] = def
