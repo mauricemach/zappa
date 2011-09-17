@@ -4,15 +4,9 @@ require('./src/zappa') ->
   @set views: __dirname + '/tests/views'
 
   @get '/': ->
-    @render 'index'
+    @render index: {foo: 'bong'}
   
   @view index: ->
     @title = 'shaboo'
     p 'inline view'
-    
-  @view layoute: ->
-    doctype 5
-    html ->
-      head ->
-        title 'inline layout'
-      body @body
+    p @foo

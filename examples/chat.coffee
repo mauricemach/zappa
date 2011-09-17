@@ -2,13 +2,14 @@ require('../src/zappa') ->
   @enable 'serve jquery'
   
   @get '/': ->
-    @render 'index', layout: no
+    @render index: {layout: no}
   
   @on 'set nickname': ->
     @client.nickname = @data.nickname
   
   @on said: ->
-    @io.sockets.emit 'said', {nickname: @client.nickname, text: @data.text}
+    @broadcast said: {nickname: @client.nickname, text: @data.text}
+    @emit said: {nickname: @client.nickname, text: @data.text}
   
   @client '/index.js': ->
     @connect()

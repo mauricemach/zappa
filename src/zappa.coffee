@@ -240,34 +240,41 @@ zappa.app = (func) ->
           next: next
           send: -> res.send.apply res, arguments
           redirect: -> res.redirect.apply res, arguments
-          render: (args...) ->
-            # Adds the app id to the view name so that the monkeypatched
-            # express.View.exists and express.View.contents can lookup
-            # this app's inline templates.
-            args[0] = context.id + '/' + args[0]
-          
-            # Make sure the second arg is an object.
-            args[1] ?= {}
-            args.splice 1, 0, {} if typeof args[1] is 'function'
-          
-            if app.settings['autoexport']
-              # Automatically send request input vars to template.
-              args[1].params = {}
-              for k, v of ctx
-                # TODO: What if I *want* to pass, say, @request to the view?
-                args[1].params[k] = v unless k in names
-
-            if args[1].postrender?
-              # Apply postrender before sending response.
-              res.render args[0], args[1], (err, str) ->
-                jsdom.env html: str, src: [jquery], done: (err, window) ->
-                  rendered = postrenders[args[1].postrender].apply(ctx, [window.$, window])
-
-                  doctype = (window.document.doctype or '') + "\n"
-                  res.send doctype + window.document.documentElement.outerHTML
+          render: ->
+            if typeof arguments[0] isnt 'object'
+              render.apply @, arguments
             else
-              # Just forward params to express.
-              res.render.apply res, args
+              for k, v of arguments[0]
+                render.apply @, [k, v]
+
+        render = (args...) ->
+          # Adds the app id to the view name so that the monkeypatched
+          # express.View.exists and express.View.contents can lookup
+          # this app's inline templates.
+          args[0] = context.id + '/' + args[0]
+        
+          # Make sure the second arg is an object.
+          args[1] ?= {}
+          args.splice 1, 0, {} if typeof args[1] is 'function'
+        
+          if app.settings['autoexport']
+            # Automatically send request input vars to template.
+            args[1].params = {}
+            for k, v of ctx
+              # TODO: What if I *want* to pass, say, @request to the view?
+              args[1].params[k] = v unless k in names
+
+          if args[1].postrender?
+            # Apply postrender before sending response.
+            res.render args[0], args[1], (err, str) ->
+              jsdom.env html: str, src: [jquery], done: (err, window) ->
+                rendered = postrenders[args[1].postrender].apply(ctx, [window.$, window])
+
+                doctype = (window.document.doctype or '') + "\n"
+                res.send doctype + window.document.documentElement.outerHTML
+          else
+            # Just forward params to express.
+            res.render.apply res, args
 
         for name, helper of helpers
           do (name, helper) ->
@@ -301,8 +308,18 @@ zappa.app = (func) ->
         socket: socket
         id: socket.id
         client: c
-        emit: -> socket.emit.apply socket, arguments
-        broadcast: -> socket.broadcast.emit.apply socket.broadcast, arguments
+        emit: ->
+          if typeof arguments[0] isnt 'object'
+            socket.emit.apply socket, arguments
+          else
+            for k, v of arguments[0]
+              socket.emit.apply socket, [k, v]
+        broadcast: ->
+          if typeof arguments[0] isnt 'object'
+            socket.broadcast.emit.apply socket.broadcast, arguments
+          else
+            for k, v of arguments[0]
+              socket.broadcast.emit.apply socket.broadcast, [k, v]
 
       for name, helper of helpers
         do (name, helper) ->
@@ -351,7 +368,7 @@ zappa.app = (func) ->
       res.send sammy
 
   if app.settings['default layout']
-    root_locals.view layout: ->
+    context.view layout: ->
       doctype 5
       html ->
         head ->

@@ -10,7 +10,7 @@ require('../src/zappa') ->
     @params.foo += '!'
     sleep 3, =>
       @params.foo += '?'
-      @render 'index', @params
+      @render index: @params
 
   @view index: ->
     @title = 'Async example'
