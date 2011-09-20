@@ -257,12 +257,8 @@ zappa.app = (func) ->
           args[1] ?= {}
           args.splice 1, 0, {} if typeof args[1] is 'function'
         
-          if app.settings['autoexport']
-            # Automatically send request input vars to template.
-            args[1].params = {}
-            for k, v of ctx
-              # TODO: What if I *want* to pass, say, @request to the view?
-              args[1].params[k] = v unless k in names
+          if app.settings['databag']
+            args[1].params = data
 
           if args[1].postrender?
             # Apply postrender before sending response.
@@ -283,16 +279,15 @@ zappa.app = (func) ->
               args.push ctx
               helper.apply ctx, args
 
-        # Names of non-input context vars.
-        names = []
-        names.push k for k, v of ctx
-
-        if app.settings['autoimport']
-          # Imports input vars to ctx. Does NOT overwrite existing variables.
-          copy_data_to ctx, [req.query, req.params, req.body]
+        if app.settings['databag']
+          data = {}
+          copy_data_to data, [req.query, req.params, req.body]
 
         # Go!
-        result = r.handler.apply(ctx, [ctx])
+        switch app.settings['databag']
+          when 'context' then result = r.handler.apply(data, [ctx])
+          when 'param' then result = r.handler.apply(ctx, [data])
+          else result = r.handler.apply(ctx, [ctx])
         
         res.contentType(r.contentType) if r.contentType?
         if typeof result is 'string' then res.send result
@@ -342,15 +337,16 @@ zappa.app = (func) ->
           socket.on name, (data) ->
             ctx = build_ctx()
             ctx.data = data
-            if app.settings['autoimport']
-              copy_data_to ctx, [data]
-            h.apply(ctx, [ctx])
+            switch app.settings['databag']
+              when 'context' then h.apply(data, [ctx])
+              when 'param' then h.apply(ctx, [data])
+              else h.apply(ctx, [ctx])
 
   # Go!
   func.apply(context, [context])
 
   # The stringified zappa client.
-  client = require('./client').build(zappa.version, coffeescript_helpers, copy_data_to, app.settings)
+  client = require('./client').build(zappa.version, coffeescript_helpers, app.settings)
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->
