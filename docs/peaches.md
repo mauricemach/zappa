@@ -18,6 +18,7 @@ Or to follow the bleeding edge:
 
     git clone git@github.com:mauricemach/zappa.git && cd zappa
     cake build
+    cake vendor
     npm link
 
 Then in your project:
