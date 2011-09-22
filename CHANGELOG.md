@@ -1,4 +1,4 @@
-**v0.2.0edge** (unreleased):
+**v0.2.1** (2011-09-22):
 
   - Changed: using standard jquery from code.jquery.com instead of node-jquery. Updated to 1.6.4.
   - Changed: updated sammy to 0.7.0.
