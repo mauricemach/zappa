@@ -1,4 +1,4 @@
-require('../src/zappa') ->
+require('./zappa') ->
   @enable 'default layout'
   
   @get '/': ->

@@ -1,4 +1,4 @@
-require('../src/zappa') ->
+require('./zappa') ->
   @enable 'serve jquery'
   
   @get '/': ->
@@ -17,12 +17,15 @@ require('../src/zappa') ->
     @on said: ->
       $('#panel').append "<p>#{@data.nickname} said: #{@data.text}</p>"
     
-    $().ready =>
+    $ =>
       @emit 'set nickname': {nickname: prompt 'Pick a nickname!'}
       
-      $('button').click =>
+      $('#box').focus()
+      
+      $('button').click (e) =>
         @emit said: {text: $('#box').val()}
         $('#box').val('').focus()
+        e.preventDefault()
     
   @view index: ->
     doctype 5
@@ -35,5 +38,6 @@ require('../src/zappa') ->
         script src: '/index.js'
       body ->
         div id: 'panel'
-        input id: 'box'
-        button 'Send'
+        form ->
+          input id: 'box'
+          button 'Send'
