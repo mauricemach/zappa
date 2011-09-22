@@ -3,7 +3,6 @@ fs = require 'fs'
 url = require 'url'
 request = require 'request'
 jsdom = require 'jsdom'
-jquery = fs.readFileSync(__dirname + '/../../node_modules/jquery/dist/node-jquery.min.js').toString()
 io = require 'socket.io-client'
 
 class Client
@@ -41,9 +40,9 @@ class Client
       if err and cb? then cb(err)
       else
         if opts.dom?
-          jsdom.env html: res.body, src: [jquery], done: (err, window) ->
+          jsdom.env html: res.body, done: (err, window) ->
             if err and cb? then cb(err)
-            else cb(null, res, window, window.$)
+            else cb(null, res, window)
         else
           cb(null, res) if cb?
   
