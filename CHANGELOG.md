@@ -1,3 +1,9 @@
+**v0.2.0edge** (unreleased):
+
+  - Changed: using standard jquery from code.jquery.com instead of node-jquery. Updated to 1.6.4.
+  - Changed: updated sammy to 0.7.0.
+  - Fixed #80: Default layout is not being added correctly.
+
 **v0.2.0** (2011-09-08):
 
   - Changed: externals (`zappa {foo} ->`) are available at all scopes, shadow globals and root scope locals.

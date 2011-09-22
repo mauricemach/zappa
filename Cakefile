@@ -15,7 +15,7 @@ task 'docs', ->
   
 task 'vendor', ->
   run 'mkdir -p vendor && cd vendor && curl -OL http://code.jquery.com/jquery-1.6.4.min.js', ->
-    run 'cd vendor && curl -OL http://raw.github.com/quirkey/sammy/v0.7.0/lib/min/sammy-0.7.0.min.js', ->
+    run 'cd vendor && curl -OL https://raw.github.com/quirkey/sammy/v0.7.0/lib/min/sammy-0.7.0.min.js', ->
       run 'head -n 1 vendor/jquery*', ->
         run 'head -n 3 vendor/sammy*'
         
