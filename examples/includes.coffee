@@ -1,2 +1,2 @@
-require('zappa') ->
+require('../src/zappa') ->
   @include 'included'

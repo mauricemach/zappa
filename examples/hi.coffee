@@ -1,2 +1,2 @@
-require('zappa') ->
+require('../src/zappa') ->
   @get '/': 'hi'

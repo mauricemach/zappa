@@ -1,1 +1,1 @@
-require('zappa') -> @use 'static'
+require('../src/zappa') -> @use 'static'

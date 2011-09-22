@@ -1,4 +1,4 @@
-require('zappa') ->
+require('../src/zappa') ->
   @get
     '/': ->
       @render 'index', foo: 'bar'
