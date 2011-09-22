@@ -479,11 +479,11 @@ Serves `/zappa/zappa.js`, required to use the zappa client API. Automatically en
 
 ### serve jquery
 
-Serves `/zappa/jquery.js` (minified jQuery 1.6.2 from npm).
+Serves `/zappa/jquery.js` (just standard, minified jQuery).
 
 ### serve sammy
 
-Serves `/zappa/sammy.js` (minified Sammy 0.6.3).
+Serves `/zappa/sammy.js` (just standard, minified Sammy).
 
 ### minify
 

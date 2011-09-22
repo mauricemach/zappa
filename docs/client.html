@@ -81,7 +81,7 @@
         <span class="nv">app: </span><span class="nx">app</span>
         <span class="nv">socket: </span><span class="nx">socket</span>
         <span class="nv">id: </span><span class="nx">socket</span><span class="p">.</span><span class="nx">id</span>
-        <span class="nv">emit: </span><span class="o">-&gt;</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">socket</span><span class="p">,</span> <span class="nx">arguments</span>
+        <span class="nv">emit: </span><span class="nx">root_locals</span><span class="p">.</span><span class="nx">emit</span>
       
       <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">def</span> <span class="k">of</span> <span class="nx">defs</span>
         <span class="nx">locals</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">def</span>

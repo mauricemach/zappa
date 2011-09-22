@@ -1,7 +1,7 @@
 {
   "name": "zappa",
   "description": "CoffeeScript minimalist interface to express, socket.io and others",
-  "version": "0.2.0",
+  "version": "0.2.0edge",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "homepage": "http://zappajs.org",
   "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
@@ -10,7 +10,6 @@
     "express": "2.4.6",
     "socket.io": "0.8.4",
     "jsdom": "0.2.4",
-    "jquery": "1.6.2",
     "coffeekup": "0.3.0",
     "node-uuid": "1.2.0",
     "uglify-js": "1.0.7"
@@ -30,8 +29,9 @@
     "Jae Kwon <jae@flywheelnetworks.com>",
     "Yuya Nishiyama <nsy@ulz.nu>",
     "Esa-Matti Suuronen <esa-matti@suuronen.org>",
+    "Ian Young <ian.greenleaf@gmail.com>",
     "Isaac Wolkerstorfer <agnoster@gmail.com>",
-    "Jason King <jasonk@amcoonline.net>",
+    "Jason King <jk@handle.it>",
     "Stéphane Alnet <stephane@shimaore.net>",
     "Rachel Carvalho <rachel.carvalho@gmail.com>",
     "Tim Shadel <github@timshadel.com>",

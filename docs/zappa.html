@@ -1,6 +1,6 @@
 <!DOCTYPE html>  <html> <head>   <title>zappa.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="client.html">                 client.coffee               </a>                                           <a class="source" href="zappa.html">                 zappa.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               zappa.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p><strong>Zappa</strong> is a <a href="http://coffeescript.org">CoffeeScript</a> DSL-ish interface for building web apps on the
 <a href="http://nodejs.org">node.js</a> runtime, integrating <a href="http://expressjs.com">express</a>, <a href="http://socket.io">socket.io</a>
-and other best-of-breed libraries.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa = version: </span><span class="s1">&#39;0.2.0&#39;</span>
+and other best-of-breed libraries.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">zappa = version: </span><span class="s1">&#39;0.2.0edge&#39;</span>
 
 <span class="nv">log = </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span>
 <span class="nv">fs = </span><span class="nx">require</span> <span class="s1">&#39;fs&#39;</span>
@@ -10,8 +10,8 @@ and other best-of-breed libraries.</p>             </td>             <td class="
 <span class="nv">express = </span><span class="nx">require</span> <span class="s1">&#39;express&#39;</span>
 <span class="nv">socketio = </span><span class="nx">require</span> <span class="s1">&#39;socket.io&#39;</span>
 <span class="nv">jsdom = </span><span class="nx">require</span> <span class="s1">&#39;jsdom&#39;</span>
-<span class="nv">jquery = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/../node_modules/jquery/dist/node-jquery.min.js&#39;</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
-<span class="nv">sammy = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/../vendor/sammy-latest.min.js&#39;</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
+<span class="nv">jquery = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/../vendor/jquery-1.6.4.min.js&#39;</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
+<span class="nv">sammy = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/../vendor/sammy-0.7.0.min.js&#39;</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
 <span class="nv">uglify = </span><span class="nx">require</span> <span class="s1">&#39;uglify-js&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 a function (see below) though, it loses access to its parent scope, and consequently to
 any helpers it might need. So we need to reintroduce these helpers manually inside any
@@ -256,7 +256,7 @@ include_locals.require = ???</p>             </td>             <td class="code">
       <span class="nx">res</span><span class="p">.</span><span class="nx">send</span> <span class="nx">sammy</span>
 
   <span class="k">if</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">[</span><span class="s1">&#39;default layout&#39;</span><span class="p">]</span>
-    <span class="nv">views.layout = </span><span class="o">-&gt;</span>
+    <span class="nx">root_locals</span><span class="p">.</span><span class="nx">view</span> <span class="nv">layout: </span><span class="o">-&gt;</span>
       <span class="nx">doctype</span> <span class="mi">5</span>
       <span class="nx">html</span> <span class="o">-&gt;</span>
         <span class="nx">head</span> <span class="o">-&gt;</span>
