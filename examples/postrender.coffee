@@ -1,16 +1,16 @@
-require('zappa') ->
-  enable 'default layout'
+require('../src/zappa') ->
+  @enable 'default layout'
   
-  get '/': ->
+  @get '/': ->
     @user = plan: 'staff'
 
-    render 'index', postrender: 'plans'
+    @render 'index', {@user, postrender: 'plans'}
 
-  postrender plans: ->
+  @postrender plans: ($) ->
     $('.staff').remove() if @user.plan isnt 'staff'
     $('div.' + @user.plan).addClass 'highlighted'
 
-  view index: ->
+  @view index: ->
     @title = 'Post-rendering'
     @style = '''
       #quotas div {border: 1px solid #999; background: #eee; padding: 10px; margin: 10px}

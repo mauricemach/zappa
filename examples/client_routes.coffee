@@ -1,20 +1,20 @@
-require('zappa') ->
-  enable 'serve sammy', 'serve jquery'
+require('../src/zappa') ->
+  @enable 'serve sammy', 'serve jquery'
 
-  get '/': ->
-    render 'index'
+  @get '/': ->
+    @render 'index'
 
-  client '/index.js': ->
-    get '#/': ->
+  @client '/index.js': ->
+    @get '#/': ->
       console.log 'home'
     
-    get '#/foo': ->
+    @get '#/foo': ->
       console.log 'bar'
   
-  view index: ->
+  @view index: ->
     h1 'client test'
     
-  view layout: ->
+  @view layout: ->
     doctype 5
     html ->
       head ->

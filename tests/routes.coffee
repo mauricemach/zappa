@@ -7,11 +7,11 @@ port = 15000
     t.wait 3000
     
     zapp = zappa port++, ->
-      get '/string': 'string'
-      get '/return': -> 'return'
-      get '/send': -> send 'send'
-      get /\/regex$/, 'regex'
-      get /\/regex_function$/, -> 'regex function'
+      @get '/string': 'string'
+      @get '/return': -> 'return'
+      @get '/send': -> @send 'send'
+      @get /\/regex$/, 'regex'
+      @get /\/regex_function$/, -> 'regex function'
     
     c = t.client(zapp.app)
     c.get '/string', (err, res) -> t.equal 1, res.body, 'string'
@@ -25,9 +25,9 @@ port = 15000
     t.wait 3000
     
     zapp = zappa port++, ->
-      post '/': -> 'post'
-      put '/': -> 'put'
-      del '/': -> 'del'
+      @post '/': -> 'post'
+      @put '/': -> 'put'
+      @del '/': -> 'del'
     
     c = t.client(zapp.app)
     c.post '/', (err, res) -> t.equal 1, res.body, 'post'
@@ -39,7 +39,7 @@ port = 15000
     t.wait 3000
     
     zapp = zappa port++, ->
-      get '/': -> redirect '/foo'
+      @get '/': -> @redirect '/foo'
     
     c = t.client(zapp.app)
     c.get '/', (err, res) ->
@@ -51,9 +51,9 @@ port = 15000
     t.wait 3000
     
     zapp = zappa port++, ->
-      use 'bodyParser'
-      get '/:foo': -> @foo + @ping
-      post '/:foo': -> @foo + @ping + @zig
+      @use 'bodyParser'
+      @get '/:foo': -> @params.foo + @query.ping
+      @post '/:foo': -> @params.foo + @query.ping + @body.zig
     
     c = t.client(zapp.app)
 

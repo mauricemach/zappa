@@ -1,18 +1,18 @@
-require('zappa') ->
-  enable 'default layout'
-  
-  def sleep: (secs, cb) ->
+require('../src/zappa') ->
+  @enable 'default layout'
+
+  sleep = (secs, cb) ->
     setTimeout cb, secs * 1000
 
-  get '/': -> redirect '/bar'
+  @get '/': -> @redirect '/bar'
 
-  get '/:foo': ->
-    @foo += '!'
+  @get '/:foo': ->
+    @params.foo += '!'
     sleep 3, =>
-      @foo += '?'
-      render 'index'
+      @params.foo += '?'
+      @render index: @params
 
-  view index: ->
+  @view index: ->
     @title = 'Async example'
     
     h1 'Async'

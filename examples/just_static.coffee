@@ -1,1 +1,1 @@
-require('zappa') -> use 'static'
+require('zappa') -> @use 'static'
