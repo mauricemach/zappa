@@ -8,14 +8,77 @@
     d8888888888 d88P     888 888        888    d88P     888            @@@@@@     
 
 ### Node development for the lazy
-            
-**Zappa** is a [CoffeeScript](http://coffeescript.org)-optimized, radically minimalist interface orchestrating [Express](http://expressjs.com), [Socket.IO](http://socket.io), [Sammy](http://sammyjs.org) and other top talent, with two obsessions in mind:
 
-- Providing an extremely focused interface for building web apps, delaying my carpal tunnel a few years.
+Zappa is a [coffeescript](http://coffeescript.org)-optimized interface to [express](http://expressjs.com) and [socket.io](http://socket.io) that makes this:
 
-- Taking advantage of possibilities brought by new web technologies and the node runtime: trivialization of websockets/comet, client-server smoother integration and code sharing, server-side DOM manipulation, etc.
+```coffeescript
+require('zappa') ->
+  Gizmo = require './model/gizmo'
+  
+  @use 'bodyParser', 'methodOverride', @app.router, 'static'
 
-It is heavily influenced by [that legendary framework](http://www.sinatrarb.com) named after another rockstar Frank, with also a hint of [Camping](http://camping.rubyforge.org/).
+  @configure
+    development: => @use errorHandler: {dumpExceptions: on}
+    production: => @use 'errorHandler'
+
+  @get '/': -> @render 'index'
+  
+  @get '/gizmos/:id': ->
+    Gizmo.findById @query.id, (err, gizmo) =>
+      @render index: {err, gizmo}
+
+  @on connection: ->
+    @emit welcome: {time: new Date()}
+
+  @on shout: ->
+    @broadcast shout: {@id, text: @data.text}
+```
+
+Equivalent to this:
+
+```coffeescript
+app = require('express').createServer()
+io = require('socket.io').listen(app)
+
+Gizmo = require './model/gizmo'
+
+app.use express.bodyParser()
+app.use express.methodOverride()
+app.use app.router
+app.use express.static __dirname + '/public'
+
+app.configure 'development', ->
+  app.use express.errorHandler dumpExceptions: on
+
+app.configure 'production', ->
+  app.use express.errorHandler()
+
+app.get '/', (req, res) -> res.render 'index'
+
+app.get '/gizmos/:id', (req, res) ->
+  Gizmo.findOne req.params.id, (err, gizmo) ->
+    res.render 'index', {err, gizmo}
+
+io.sockets.on 'connection', (socket) ->
+  socket.emit 'welcome', time: new Date()
+
+  socket.on 'shout', (data) ->
+    socket.broadcast.emit 'shout',
+      id: socket.id, text: data.text
+
+app.listen 3000
+```
+
+### Overview
+
+  - DRYer shortcuts for everything. Direct access to the underlying APIs to fallback to when needed.
+  - Socket.io integration, out of the box.
+  - Matching client-side API.
+  - Client-server code sharing.
+  - Inline views, css/stylus, js/coffee.
+  - Postrender.
+  - Default layout.
+  - Serve jQuery.
 
 ### Hi, World
 
@@ -30,230 +93,15 @@ And give your foot a push:
     $ coffee cuppa.coffee    
        info  - socket.io started
     Express server listening on port 3000 in development mode
-    Zappa 0.2.1 orchestrating the show
+    Zappa 0.3.0 orchestrating the show
 
-### Nice, but one-line string responses are mostly useless. Can you show me something closer to a real web app?
+### ...
 
-    @get '*': '''
-      <!DOCTYPE html>
-      <html>
-        <head><title>Sorry, we'll be back soon!</title></head>
-        <body><h1>Sorry, we'll be back soon!</h1></body>
-      </html>
-    '''
-
-### Seriously.
-
-Right. This is what a basic route with a handler function looks like:
-
-    @get '/:name': ->
-      "Hi, #{@name}"
-
-If you return a string, it will automatically be sent as the response.
-
-Now for a more typical scenario:
-
-    @get '/users/:id': ->
-      User.findById @id, (@err, @user) =>
-        @render 'user'
-
-    @view user: ->
-      if @err
-        @title = 'Error'
-        p "Something terrible happened: #{@err}."
-      else
-        @title = "#{@user.name}'s Home"
-        p "Hullo, #{@user.name}!"
-
-    @view layout: ->
-      html ->
-        head -> title @title
-        body ->
-          h1 @title
-          @body
-
-Handler functions are executed within a specially crafted scope that is optimized for the typical scenario of taking the input, processing it, rendering a view with this data and sending a response, all with *minimal wiring*.
-
-You have certain local variables automatically available such as `request`, `response` and `next` (straight from Express). You also have shortcuts such as `send`, `redirect` and `render`.
-
-Besides being able to read your input through the standard API (ex.: `request.query.foo` and friends), you also have access to a merged collection of them, as `@foo` and the alias `params.foo`.
-
-All variables at `@`/`params` (from input or put there by you) are automatically made available to templates as `params.foo` (in CoffeeKup, `@params.foo`).
-
-In addition, if you're using the *zappa view adapter* (as is the case by default, with CoffeeKup), they're also made available at the template's "root namespace" (`foo` or CoffeeKup's `@foo`).
-
-Since in express templating data is usually mixed up with framework locals and template options, the adapter will only put variables in the template root if there isn't a variable there with the same name already, *and* the name is not blacklisted.
-
-To use this feature with other templating engines:
-
-    blacklist = 'scope|self|locals|filename|debug|compiler|compileDebug|inline'.split '|'
-    @register jade: zappa.adapter('jade', blacklist)
-
-To disable it on default zappa:
-
-    @register coffee: require('coffeekup').adapters.express
-
-### Fine. But this is node! What about some async?
-
-Both examples below will produce `bar?!` if you request `/bar`:
-
-    @get '/:foo': ->
-      @foo += '?'
-      
-      sleep 3, =>
-        @foo += '!'
-        @render 'index'
-
-Or if you can't / don't want to use the fat arrow to bind `@`:
-
-    @get '/:foo': (c) ->
-      c.foo += '?'
-      
-      sleep 3, ->
-        c.foo += '!'
-        c.render 'index'
-
-### Let me guess. You can also post/put/del, use regexes, routes are matched first to last, all like any self-respecting sinatra clone.
-
-Exactly. Actually, when it comes to HTTP zappa hands over all the serious work to Express, so there are no big surprises here:
-
-    @get '/': 'got'
-    @post '/': 'posted'
-    @put '/': 'put'
-    @del '/': 'deleted'
-    @get '*': 'any url'
-
-### Route combo
-
-The routing functions accept an object where each key is a route path, and each values the response. This means we can define multiple routes in one go:
-
-    @get '/foo': 'bar', '/ping': 'pong', '/zig': 'zag'
-
-Better yet:
-
-    @get
-      '/foo': 'bar'
-      '/ping': 'pong'
-      '/zig': 'zag'
-
-You can also use the default syntax where the first param is the path, and the second the response. This is mostly to allow for regexes:
-
-    @get '/foo', 'bar'
-    @get /^\/ws-(.*)/, ->
-      'bloatware-' + params[0]
-
-### Bi-directional events (WebSockets/Comet)
-
-But the web is not just about HTTP requests anymore. WebSockets are soon to become available on all major browsers but IE. For this sucker and legacy browsers, there's a collection of ugly hacks that work (comet), and thanks to Socket.IO, we don't even have to care.
-
-Zappa pushes this trivialization a bit further by removing some of the boilerplate, and providing some integration. The goal is to make event handling feel more like a first-class citizen along with request handling, readily available, instead of an exotic feature you bolt on your app.
-
-All you have to do to handle bi-directional events in your apps is declare the handlers, side by side with your HTTP ones:
-
-    @get '/chat': ->
-      @render 'chat'
-
-    @get '/counter': ->
-      "Total messages so far: #{@app.counter}"
-
-    @on connection: ->
-      @app.counter ?= 0
-      @emit 'welcome', time: new Date()
-      @broadcast "#{@id} connected"
-
-    @on disconnect: ->
-      @broadcast "#{@id} is gone!"
-
-    @on said: ->
-      @app.counter++
-      @broadcast 'said', {@id, @text}
-
-    @on afk: ->
-      @broadcast 'afk', {@id}
-
-When your app starts, if you defined one of those handlers, zappa will automatically require Socket.IO and fire it up. It will not take up a dedicated port, since Socket.IO can attach itself to the HTTP server and intercept WebSockets/comet traffic.
-
-Event and request handlers are designed to behave as similarly as possible. There are locals for the standard API (`io`, `socket`), shortcuts (`emit`, `broadcast`) and input variables are also available at `@`.
-
-### But what about the client-side?
-
-That's an interesting question! Let's start with the basics.
-
-First there's `coffee` with which you can define a route `/file.js`, that will respond with your CoffeeScript code in JS form, and the correct content-type set. No compilation involved, since we already have you function's string representation from the runtime.
-
-    @get '/': -> @render 'index'
-
-    @coffee '/index.js': ->
-      alert 'hullo'
-
-    @view index: ->
-      h1 'Client embedding example'
-
-    @view layout: ->
-      html ->
-        head -> title 'bla'
-        script src: '/index.js'
-      body @body
-
-On a step further, you have `client`, which gives you access to a matching zappa client-side API:
-
-    @enable 'serve jquery', 'serve sammy'
-
-    @get '/': ->
-      @render 'index', layout: no
-    
-    @on connection: ->
-      @emit 'server time', time: new Date()
-    
-    @client '/index.js': ->
-      sum: (a, b) -> a + b
-    
-      @get '#/': ->
-        alert 'index'
-      
-      @on 'server time': ->
-        alert "Server time: #{@time}"
-        
-      @connect()
-        
-    @view index: ->
-      doctype 5
-      html ->
-        head ->
-          title 'Client-side zappa'
-          script src: '/socket.io/socket.io.js'
-          script src: '/zappa/jquery.js'
-          script src: '/zappa/sammy.js'
-          script src: '/zappa/zappa.js'
-          script src: '/index.js'
-        body ''
-        
-Finally, there's also `shared`. Certain zappa "keywords" work exactly the same on the server and client side. Guess what? If you define them inside a `shared` block, they're available at both environments!
-
-    @shared '/index.js': ->
-      @def sum: (a, b) -> a + b
-
-      @helper role: (name) ->
-        unless @user.role is name
-          if @request? then @redirect '/login'
-          else if @socket? then @client.disconnect()
-          else if window? then alert "This is not the page you're looking for."
-    
-    @get '/admin': ->
-      @role 'admin'
-      # admin stuff
-      
-    @on 'delete everything': ->
-      @role 'admin'
-      
-    @client '/index.js': ->
-      @get '#/admin': ->
-        @role 'admin'
-        # admin stuff
+...
 
 ### Santa's little `helper`s
 
-Helpers are functions with automatic access to the same context (@/this) as whatever called them (request or event handlers).
+Helpers are functions with automatic access to the same context (`this`/`@`) as whatever called them (request or event handlers, client or server-side).
 
     @helper role: (name) ->
       if @request?
@@ -283,29 +131,6 @@ Zappa makes it trivial to post-process your rendered templates by manipulating t
       @user = plan: 'staff'
       @render 'index', postrender: 'plans'
 
-### App combo
-
-Node.js servers don't block when calling `listen`, so you can run many apps in the same process:
-
-    zappa = require 'zappa'
-    
-    zappa 8001, -> @get '/': 'blog'
-    zappa 8002, -> @get '/': 'chat'
-    zappa 8003, -> @get '/': 'wiki'
-  
-    $ coffee apps.coffee
-    
-You can also take advantage of Express/Connect vhost middleware:
-
-    zappa = require 'zappa'
-    
-    chat = zappa.app -> @get '/': 'chat'
-    blog = zappa.app -> @get '/': 'blog'
-    
-    zappa 80, ->
-      @use @express.vhost 'chat.com', chat
-      @use @express.vhost 'blog.com', blog
-
 ### Splitting it up
 
 If your single file of doom is becoming unwieldy, you can split it up based on whatever organization suits you better:
@@ -333,24 +158,24 @@ The files to be included just have to export an `include` function:
 
 You can specify your middleware through the standard `app.use`, or zappa's shortcut `use`. The latter can be used in a number of additional ways:
 
-- It accepts many params in a row. Ex.:
+It accepts many params in a row. Ex.:
 
-        @use @express.bodyParser(), @app.router, @express.cookies()
+    @use @express.bodyParser(), @app.router, @express.cookies()
 
-- It accepts strings as parameters. This is syntactic sugar to the equivalent express middleware with no arguments. Ex.:
+It accepts strings as parameters. This is syntactic sugar to the equivalent express middleware with no arguments. Ex.:
 
-        @use 'bodyParser', @app.router, 'cookies'
+    @use 'bodyParser', @app.router, 'cookies'
 
-- You can also specify parameters by using objects. Ex.:
+You can also specify parameters by using objects. Ex.:
 
-        @use 'bodyParser', static: __dirname + '/public', session: {secret: 'fnord'}, 'cookies'
+    @use 'bodyParser', static: __dirname + '/public', session: {secret: 'fnord'}, 'cookies'
 
-- Finally, when using strings and objects, zappa will intercept some specific middleware and add behaviour, usually default parameters. Ex.:
+Finally, when using strings and objects, zappa will intercept some specific middleware and add behaviour, usually default parameters. Ex.:
 
-        @use 'static'
-        
-        # Syntactic sugar for:
-        @app.use @express.static(__dirname + '/public')
+    @use 'static'
+    
+    # Syntactic sugar for:
+    @app.use @express.static(__dirname + '/public')
 
 ## Resources
 
