@@ -285,7 +285,7 @@ zappa.app = (func) ->
 
         # Go!
         switch app.settings['databag']
-          when 'context' then result = r.handler.apply(data, [ctx])
+          when 'this' then result = r.handler.apply(data, [ctx])
           when 'param' then result = r.handler.apply(ctx, [data])
           else result = r.handler.apply(ctx, [ctx])
         
@@ -338,7 +338,7 @@ zappa.app = (func) ->
             ctx = build_ctx()
             ctx.data = data
             switch app.settings['databag']
-              when 'context' then h.apply(data, [ctx])
+              when 'this' then h.apply(data, [ctx])
               when 'param' then h.apply(ctx, [data])
               else h.apply(ctx, [ctx])
 

@@ -53,7 +53,7 @@ skeleton = ->
         ctx.render = -> sammy_context.render.apply sammy_context, arguments
         ctx.redirect = -> sammy_context.redirect.apply sammy_context, arguments
         switch settings['databag']
-          when 'context' then r.handler.apply(sammy_context.params, [ctx])
+          when 'this' then r.handler.apply(sammy_context.params, [ctx])
           when 'param' then r.handler.apply(ctx, [sammy_context.params])
           else r.handler.apply(ctx, [ctx])
 
@@ -78,7 +78,7 @@ skeleton = ->
                   helper.apply(ctx, arguments)
 
             switch settings['databag']
-              when 'context' then h.apply(data, [ctx])
+              when 'this' then h.apply(data, [ctx])
               when 'param' then h.apply(ctx, [data])
               else h.apply(ctx, [ctx])
 
