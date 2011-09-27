@@ -9,9 +9,9 @@
 
 ### Node development for the lazy
 
-Zappa is a [coffeescript](http://coffeescript.org)-optimized interface to [express](http://expressjs.com) and [socket.io](http://socket.io) that makes this:
+Zappa is a [CoffeeScript](http://coffeescript.org)-optimized interface to [Express](http://expressjs.com) and [Socket.IO](http://socket.io) that makes this:
 
-```coffeescript
+{% highlight coffeescript %}
 require('zappa') ->
   Gizmo = require './model/gizmo'
   
@@ -32,12 +32,13 @@ require('zappa') ->
 
   @on shout: ->
     @broadcast shout: {@id, text: @data.text}
-```
+{% endhighlight %}
 
 Equivalent to this:
 
-```coffeescript
-app = require('express').createServer()
+{% highlight coffeescript %}
+express = require 'express'
+app = express.createServer()
 io = require('socket.io').listen(app)
 
 Gizmo = require './model/gizmo'
@@ -67,7 +68,10 @@ io.sockets.on 'connection', (socket) ->
       id: socket.id, text: data.text
 
 app.listen 3000
-```
+
+console.log "Express server listening on port %d in %s mode",
+  app.address().port, app.settings.env
+{% endhighlight %}
 
 ### Overview
 
@@ -94,6 +98,17 @@ And give your foot a push:
        info  - socket.io started
     Express server listening on port 3000 in development mode
     Zappa 0.3.0 orchestrating the show
+
+Or to follow the bleeding edge:
+
+    git clone git@github.com:mauricemach/zappa.git && cd zappa
+    cake build
+    cake vendor
+    npm link
+
+Then in your project:
+
+    npm link zappa
 
 ### ...
 

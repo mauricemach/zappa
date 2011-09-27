@@ -59,9 +59,7 @@ The function you pass to `zappa.app` or `zappa.run` will be called with `this`/`
 
 ### @get, @post, @put, @del
 
-```coffeescript
-@get '/path': handler`
-```
+`@get '/path': handler`
 
 Define handlers for HTTP requests.
 
@@ -103,19 +101,16 @@ The handler functions will have access to all variables described in the **Socke
 A function that will be available to both the HTTP and sockets scopes. It will have access to the same variables as whatever called it. Ex.:
 
     @get '/': ->
-      @foo = 'bar'
       @sum 5, 7
       
     @on connection: ->
-      @foo = 'f7u12'
       @sum 26, 18
 
     @helper sum: (a, b) ->
                             # Values when called from `@get` vs `@on`
       console.log a         # 5 vs 26
-      console.log @foo      # 'bar' vs 'f7u12'
-      console.log @request  # available vs error
-      console.log @emit     # error vs available
+      console.log @request  # available vs undefined
+      console.log @emit     # undefined vs available
       
 Since the parameter is actually an object, you can define any number of helpers in one go:
 
@@ -341,6 +336,14 @@ Shortcut to `@app.enable`. Accepts multiple params in one go. Ex.:
 Shortcut to `@app.disable`. Accepts multiple params in one go. Ex.:
 
     @disable 'serve jquery', 'serve sammy'
+
+### @register
+
+Shortcut to `@app.register`. Accepts an object as param. Ex.:
+
+    @register eco: require 'eco'
+    
+Note that while `@app.register '.eco'` uses a dot, `@register eco` doesn't.
 
 ## REQUEST HANDLERS SCOPE
 

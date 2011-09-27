@@ -1,17 +1,43 @@
 ---
 layout: default
-title: Radically focused, CoffeeScript-oriented interface for building web apps on Node.js with Express and Socket.IO.
+title: CoffeeScript-optimized interface for building web apps on Node.js with Express and Socket.IO.
 ---
 
 # Node development for the lazy
 
-Zappa is a radically focused, [CoffeeScript](http://coffeescript.org)-oriented interface for building web apps on [Node.js](http://nodejs.org) with [Express](http://expressjs.com) and [Socket.IO](http://socket.io).
-
-It turns this:
+Zappa is a [CoffeeScript](http://coffeescript.org)-optimized interface to [Express](http://expressjs.com) and [Socket.IO](http://socket.io) that makes this:
 
 {% highlight coffeescript %}
-app = require('express').createServer()
+require('zappa') ->
+  Gizmo = require './model/gizmo'
+  
+  @use 'bodyParser', 'methodOverride', @app.router, 'static'
+
+  @configure
+    development: => @use errorHandler: {dumpExceptions: on}
+    production: => @use 'errorHandler'
+
+  @get '/': -> @render 'index'
+  
+  @get '/gizmos/:id': ->
+    Gizmo.findById @query.id, (err, gizmo) =>
+      @render index: {err, gizmo}
+
+  @on connection: ->
+    @emit welcome: {time: new Date()}
+
+  @on shout: ->
+    @broadcast shout: {@id, text: @data.text}
+{% endhighlight %}
+
+Equivalent to this:
+
+{% highlight coffeescript %}
+express = require 'express'
+app = express.createServer()
 io = require('socket.io').listen(app)
+
+Gizmo = require './model/gizmo'
 
 app.use express.bodyParser()
 app.use express.methodOverride()
@@ -24,46 +50,30 @@ app.configure 'development', ->
 app.configure 'production', ->
   app.use express.errorHandler()
 
-app.get '/:foo', (req, res) ->
-  req.params.foo += 'bar'
-  res.render 'index', foo: req.params.foo
-  
+app.get '/', (req, res) -> res.render 'index'
+
+app.get '/gizmos/:id', (req, res) ->
+  Gizmo.findOne req.params.id, (err, gizmo) ->
+    res.render 'index', {err, gizmo}
+
 io.sockets.on 'connection', (socket) ->
   socket.emit 'welcome', time: new Date()
-  
+
   socket.on 'shout', (data) ->
     socket.broadcast.emit 'shout',
       id: socket.id, text: data.text
 
 app.listen 3000
-{% endhighlight %}
 
-Into this:
-
-{% highlight coffeescript %}
-require('zappa') ->
-  @use 'bodyParser', 'methodOverride', @app.router, 'static'
-
-  @configure
-    development: => @use errorHandler: {dumpExceptions: on}
-    production: => @use 'errorHandler'
-
-  @get '/:foo': ->
-    @foo += 'bar'
-    @render 'index'
-  
-  @on connection: ->
-    @emit 'welcome', time: new Date()
-    
-  @on shout: ->
-    @broadcast 'shout', {id, @text}
+console.log "Express server listening on port %d in %s mode",
+  app.address().port, app.settings.env
 {% endhighlight %}
 
 ## Learn More
 
 - Get the gist with the [crash course](/docs/crashcourse)
 
-- Check the [API reference](/docs/reference)
+- Check the [API reference](/docs/0.3-gumbo/reference)
 
 - See the [examples](https://github.com/mauricemach/zappa/tree/master/examples) included with the source
 
@@ -81,6 +91,6 @@ require('zappa') ->
 
 - Check the project's history at the [change log](https://github.com/mauricemach/zappa/blob/master/CHANGELOG.md)
 
-- Migrating from 0.1.x? See what changed in [v0.2.x](/docs/peaches), and follow the [quick guide](/docs/migration)
+- Migrating from an earlier version? Read the announcements ([0.2.x](/docs/0.2-peaches/announcement)/[0.3.x](/docs/0.3-gumbo/announcement)) for an overview on changes, and follow the TL;DR migration guides ([0.2.x](/docs/0.2-peaches/migration)/[0.3.x](/docs/0.3-gumbo/migration))
 
 - Deploying to heroku? Check [this blog post](http://blog.superbigtree.com/blog/2011/08/19/hosting-zappa-0-2-x-on-heroku/)
