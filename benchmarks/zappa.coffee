@@ -1,10 +1,8 @@
 require('../src/zappa') ->
-  @register '.jade', @zappa.adapter 'jade'
+  @register jade: @zappa.adapter 'jade'
   
   @get '/': ->
-    @data.foo = 'Zappa + Jade'
-    @render 'index.jade'
+    @render 'index.jade': {foo: 'Zappa + Jade'}
     
   @get '/coffeekup': ->
-    @data.foo = 'Zappa + CoffeeKup'
-    @render 'index.coffee'
+    @render 'index.coffee': {foo: 'Zappa + CoffeeKup'}
