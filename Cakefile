@@ -18,7 +18,11 @@ task 'vendor', ->
     run 'cd vendor && curl -OL https://raw.github.com/quirkey/sammy/v0.7.0/lib/min/sammy-0.7.0.min.js', ->
       run 'head -n 1 vendor/jquery*', ->
         run 'head -n 3 vendor/sammy*'
-        
+
+task 'setup', ->
+  invoke 'build'
+  invoke 'vendor'
+
 run = (args...) ->
   for a in args
     switch typeof a
