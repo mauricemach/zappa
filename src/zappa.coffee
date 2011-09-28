@@ -4,6 +4,8 @@
 
 zappa = version: '0.3.0edge'
 
+codename = 'The Gumbo Variations'
+
 log = console.log
 fs = require 'fs'
 path = require 'path'
@@ -414,7 +416,7 @@ zappa.run = ->
   log 'Express server listening on port %d in %s mode',
     app.address().port, app.settings.env
 
-  log "Zappa #{zappa.version} orchestrating the show"
+  log "Zappa #{zappa.version} \"#{codename}\" orchestrating the show"
 
   zapp
 
