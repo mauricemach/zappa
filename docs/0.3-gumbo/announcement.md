@@ -6,7 +6,7 @@ permalink: /announcement/index.html
 
 # {{page.title}}
 
-Moving further with smoothing out the rough edges, 0.3.0 restores **normal JS scope** and **meaningful stack traces** by [doing away with function rewriting](https://github.com/mauricemach/zappa/issues/74), replacing the "magic locals" of 0.2.x with attributes appended to `this` (and its CoffeeScript alias `@`).
+Moving further with smoothing out the rough edges, 0.3.0 restores **normal JS scope** and **meaningful stack traces** by [doing away with function rewriting](https://github.com/mauricemach/zappa/issues/74), replacing the "magic locals" of 0.2.x with properties of `this` (and its CoffeeScript alias `@`).
 
 So, the following 0.2.x snippet:
 

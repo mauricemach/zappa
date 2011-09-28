@@ -490,9 +490,9 @@ If enabled, zappa adds the following template with the name `layout`:
       
 ### 'databag'
 
-Values: `context` or `param`.
+Values: `this` or `param`.
 
-When `context`:
+When `this`:
 
     @get '/:foo': (c) ->
       @foo += '!'

@@ -1,6 +1,6 @@
 **v0.3.0 "The Gumbo Variations"** (unreleased):
 
-  - Changed: "magic locals" replaced by attributes of `this`/param (`get` becomes `@get` or `(foo) -> foo.get`). See #74 and `/docs/0.3-gumbo/announcement.md`.
+  - Changed: "magic locals" replaced by properties of `this` (`get` becomes `@get`). See #74 and `/docs/0.3-gumbo/announcement.md`.
   - Backtraces show the relevant file and (js) file number.
   - Normal JS scope restored: `def`, `zappa {foo}, ->` etc not needed anymore.
   - Added the `'databag'` setting. Automatic input importing and exporting to templates now optional.
