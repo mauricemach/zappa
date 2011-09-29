@@ -13,7 +13,7 @@ If you can describe it in 494 characters, why on earth should it take 879?
 
 Zappa is a [CoffeeScript](http://coffeescript.org)-optimized interface to [Express](http://expressjs.com) and [Socket.IO](http://socket.io) that makes this:
 
-{% highlight coffeescript %}
+```coffee
 require('zappa') ->
   Gizmo = require './model/gizmo'
   
@@ -26,7 +26,7 @@ require('zappa') ->
   @get '/': -> @render 'index'
   
   @get '/gizmos/:id': ->
-    Gizmo.findById @query.id, (err, gizmo) =>
+    Gizmo.findById @params.id, (err, gizmo) =>
       @render index: {err, gizmo}
 
   @on connection: ->
@@ -34,11 +34,11 @@ require('zappa') ->
 
   @on shout: ->
     @broadcast shout: {@id, text: @data.text}
-{% endhighlight %}
+```
 
 Equivalent to this:
 
-{% highlight coffeescript %}
+```coffee
 express = require 'express'
 app = express.createServer()
 io = require('socket.io').listen(app)
@@ -73,11 +73,11 @@ app.listen 3000
 
 console.log "Express server listening on port %d in %s mode",
   app.address().port, app.settings.env
-{% endhighlight %}
+```
 
-And throws in some features while at it:
+And throws in some additional features while at it:
 
-{% highlight coffeescript %}
+```coffee
 require('zappa') ->
   @enable 'default layout', 'serve jquery',
     'serve sammy', 'minify'
@@ -107,7 +107,7 @@ require('zappa') ->
       '/zappa/sammy', '/zappa/zappa', '/shared', '/index']
   
     h1 @title
-{% endhighlight %}
+```
 
 ## Learn More
 

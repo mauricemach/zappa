@@ -22,7 +22,7 @@ require('zappa') ->
   @get '/': -> @render 'index'
   
   @get '/gizmos/:id': ->
-    Gizmo.findById @query.id, (err, gizmo) =>
+    Gizmo.findById @params.id, (err, gizmo) =>
       @render index: {err, gizmo}
 
   @on connection: ->
@@ -71,7 +71,7 @@ console.log "Express server listening on port %d in %s mode",
   app.address().port, app.settings.env
 {% endhighlight %}
 
-And throws in some features while at it:
+And throws in some additional features while at it:
 
 {% highlight coffeescript %}
 require('zappa') ->

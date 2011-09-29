@@ -23,7 +23,7 @@ And give your foot a push:
     $ coffee cuppa.coffee    
        info  - socket.io started
     Express server listening on port 3000 in development mode
-    Zappa 0.3.0 orchestrating the show
+    Zappa 0.3.0 "The Gumbo Variations" orchestrating the show
 
 (hat tip to [sinatra](http://sinatrarb.com))
 
@@ -36,7 +36,7 @@ If your thing is the bleeding edge, replace `npm install zappa` with:
 
 ## OK, so WTF did just happen?
 
-CoffeeScript is relatively new on the scene, so it might be worth it to compare this first example with the equivalent JavaScript:
+CoffeeScript is relatively new on the scene, so it might be worth it to compare that first example with the equivalent JavaScript:
 
 {% highlight javascript %}
 require('zappa')(function(){
@@ -46,7 +46,7 @@ require('zappa')(function(){
 
 `require 'zappa'` returns a function you can use to run your apps. We're calling it right away and passing an anonymous function as the parameter.
 
-The zappa function sets up all the boring express and socket.io boilerplate, then calls your function with the relevant stuff exposed at `this` (and its CoffeeScript alias `@`).
+The zappa function does the initial express and socket.io setup, then calls your function with the relevant stuff exposed at `this` (and its CoffeeScript alias `@`).
 
 You have direct access to the low-level APIs at `@app` and `@io`:
 
@@ -137,7 +137,7 @@ If you return a string, it will automatically be sent as the response. But most 
 
 Note that we're using a fat arrow (`=>`) here, to preserve the value of `this`. We could be just as well using the alternative reference (`foo.send`) and a normal arrow.
 
-## Unorthodox views
+## Radical views
 
 Generally `@render` works just as `@response.render`:
 
