@@ -7,6 +7,8 @@
   - Normal JS scope restored: `def`, `zappa {foo}, ->` etc gone.
   
   - Changed: automatic input "importing" and "exporting" to templates now optional through the `databag` setting. See #84.
+  
+  - Changed: removed hard dependency on `jsdom`. To use `@postrender`, `npm install jsdom` first.
 
 **v0.2.1** (2011-09-22):
 

@@ -12,10 +12,12 @@ path = require 'path'
 uuid = require 'node-uuid'
 express = require 'express'
 socketio = require 'socket.io'
-jsdom = require 'jsdom'
 jquery = fs.readFileSync(__dirname + '/../vendor/jquery-1.6.4.min.js').toString()
 sammy = fs.readFileSync(__dirname + '/../vendor/sammy-0.7.0.min.js').toString()
 uglify = require 'uglify-js'
+
+# Soft dependencies:
+jsdom = null
 
 # CoffeeScript-generated JavaScript may contain anyone of these; when we "rewrite"
 # a function (see below) though, it loses access to its parent scope, and consequently to
@@ -162,6 +164,7 @@ zappa.app = (func) ->
       helpers[k] = v
 
   context.postrender = (obj) ->
+    jsdom = require 'jsdom'
     for k, v of obj
       postrenders[k] = v
 

@@ -158,9 +158,24 @@ To disable it on default zappa:
 
 ### @postrender
 
-`@postrender name: contents`
+`@postrender name: function`
 
-DOM rendering with server-side jQuery.
+DOM rendering with server-side jQuery. Defines a function that can be applied after `@render`.
+
+To use this feature, `npm install jsdom` first.
+
+    @postrender plans: ($) ->
+      $('.staff').remove() if @user.plan isnt 'staff'
+      $('div.' + @user.plan).addClass 'highlighted'
+
+    @get '/postrender': ->
+      @user = plan: 'staff'
+      @render index: {postrender: 'plans'}
+      
+It receives an alternative reference to the context as an optional last parameter:
+
+    @postrender plans: ($, foo) ->
+      $('.staff').remove() if foo.user.plan isnt 'staff'
 
 ### @include
 

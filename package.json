@@ -8,7 +8,6 @@
   "dependencies": {
     "express": "2.4.6",
     "socket.io": "0.8.4",
-    "jsdom": "0.2.5",
     "coffeekup": "0.3.0",
     "node-uuid": "1.2.0",
     "uglify-js": "1.1.0"
