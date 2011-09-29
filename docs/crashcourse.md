@@ -120,7 +120,7 @@ Right. This is what a basic route with a handler function looks like:
 
 As you can see, the value of `this` is modified in the handler function too, giving you quick access to everything you need to handle the request. The low level API lives at `@request`, `@response` and `@next`, but you also have handy shortcuts such as `@render`, `@redirect`, `@query`, `@params`, etc.
 
-Of course, you can use an alternative reference here too:
+Of course, you can receive the context as a param here too:
 
 {% highlight coffeescript %}
 @get '/:name': (foo) ->
@@ -132,6 +132,7 @@ If you return a string, it will automatically be sent as the response. But most 
 {% highlight coffeescript %}
 @get '/ponchos/:id': ->
   Poncho.findById @params.id, (err, poncho) =>
+    # Is that a real poncho, or is that a sears poncho?
     @send poncho.type
 {% endhighlight %}
 
@@ -139,14 +140,14 @@ Note that we're using a fat arrow (`=>`) here, to preserve the value of `this`. 
 
 ## Radical views
 
-Generally `@render` works just as `@response.render`:
+Generally `@render` works just like `@response.render`:
 
 {% highlight coffeescript %}
 @get '/': ->
   @render 'index', foo: 'bar'
 {% endhighlight %}
 
-One difference is that it also accepts an object as parameter:
+One difference is that it also works with the "key: value syntax":
 
 {% highlight coffeescript %}
 @get '/': ->
@@ -172,7 +173,7 @@ Another is that you can define inline views that `@render` "sees" as if they wer
     body @body
 {% endhighlight %}
 
-Note that zappa comes with a default templating engine, [CoffeeKup](http://coffeekup.org), and you don't have to setup anything to use it. You can also easily use other templating engines through the mechanisms express provides, inline templates and all.
+Note that zappa comes with a default templating engine, [CoffeeKup](http://coffeekup.org), and you don't have to setup anything to use it. You can also easily use other engines by specifying the file extension or the `'view engine'` setting; it's just express. Well, express + inline views support:
 
 {% highlight coffeescript %}
  
@@ -196,7 +197,7 @@ Note that zappa comes with a default templating engine, [CoffeeKup](http://coffe
 '''
 
 @view 'index.jade': '''
-  - title = 'Jade template';
+  - title = "Jade template";
   h1= title
   p= foo
 '''
@@ -225,7 +226,7 @@ require('zappa') ->
     p @foo
 {% endhighlight %}
 
-It's just as if you had also written the following:
+The following template will be added automatically:
 
 {% highlight coffeescript %}
 @view layout: ->
@@ -262,9 +263,13 @@ require('zappa') ->
     @broadcast shouted: {@id, text: @data.text}
 {% endhighlight %}
 
-With the client-side zappa API (see below), you can use the same style on the browser too.
+Socket.io is automatically required and attached to the express server, intercepting WebSockets/comet traffic on the same port.
 
-## Client-side code
+Just like in request handlers, the value of `this` is modified to include all the relevant stuff you need, including the low-level API (here at `@socket` and `@io`) and smart shortcuts (`@id`, `@emit`, `@broadcast`, etc). Input variables are available at `@data`.
+
+On the client-side, you can use the vanilla socket.io API if you like, but that wouldn't make much sense, would it? Which leads us to...
+
+## The client side of the source
 
 With `@coffee`, you can define client-side code inline, and serve it in JS form with the correct content-type set. No compilation involved, since we already have its string representation from the runtime:
 
@@ -438,3 +443,9 @@ Finally, when using strings and objects, zappa will intercept some specific midd
 # Syntactic sugar for:
 @app.use @express.static(__dirname + '/public')
 {% endhighlight %}
+
+## Aaaaaand that's it for tonight.
+
+Thank you for coming to the show, hope you enjoyed it. [CoffeeScript](https://coffeescript.org) on guitar, [Express](http://expressjs.com) on the keyboards, [Socket.IO](http://socket.io) on drums. [Node.js](http://nodejs.org) on background vocals, [npm](http://npmjs.org) on bass. G'night everyone.
+
+To learn more, check out [the links](http://zappajs.org) at the home page.

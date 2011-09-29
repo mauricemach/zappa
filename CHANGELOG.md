@@ -1,14 +1,19 @@
 **v0.3.0 "The Gumbo Variations"** (unreleased):
 
-  - Changed: "magic locals" replaced by properties of `this` (`get` becomes `@get`). See #74 and `/docs/0.3-gumbo/announcement.md`.
-  - Backtraces show the relevant file and (js) file number.
-  - Normal JS scope restored: `def`, `zappa {foo}, ->` etc not needed anymore.
-  - Added the `'databag'` setting. Automatic input importing and exporting to templates now optional.
+  - Changed: "magic locals" replaced by properties of `this` (`get` becomes `@get`). See #74 and the [announcement](http://zappajs.org/docs/0.3-gumbo/announcement).
+  
+  - Backtraces now show the relevant file and (js) file number.
+  
+  - Normal JS scope restored: `def`, `zappa {foo}, ->` etc gone.
+  
+  - Changed: automatic input "importing" and "exporting" to templates now optional through the `databag` setting. See #84.
 
 **v0.2.1** (2011-09-22):
 
   - Changed: using standard jquery from code.jquery.com instead of node-jquery. Updated to 1.6.4.
+  
   - Changed: updated sammy to 0.7.0.
+  
   - Fixed #80: Default layout is not being added correctly.
 
 **v0.2.0 "Peaches en Regalia"** (2011-09-08):

@@ -5,7 +5,7 @@ title: CoffeeScript-optimized interface for building web apps on Node.js with Ex
 
 # Node development for the lazy
 
-If you can describe it in 494 characters, why on earth should it take 879?
+If you can describe it in 495 characters, why on earth should it take 879?
 
 Zappa is a [CoffeeScript](http://coffeescript.org)-optimized interface to [Express](http://expressjs.com) and [Socket.IO](http://socket.io) that makes this:
 
