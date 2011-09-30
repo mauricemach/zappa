@@ -41,7 +41,7 @@ require('zappa') ->
       @send txt
 {% endhighlight %}
 
-## OK, so what do I get for pre-pending those `@`s everywhere?
+## OK, so what do I get for prepending those `@`s everywhere?
 
 First, a **normal JavaScript scope**, with closures. Say goodbye to `def` & friends:
 
