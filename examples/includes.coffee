@@ -1,2 +1,0 @@
-require('zappa') ->
-  include 'included'

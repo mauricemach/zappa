@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 'Migration from 0.1.x: TL;DR guide'
+title: 'Migration to 0.2.x: TL;DR guide'
 permalink: /migration/index.html
 ---
 

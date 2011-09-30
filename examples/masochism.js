@@ -1,12 +1,11 @@
-require('zappa')(function(){
-  use('static', 'bodyParser')
+require('./zappa')(function(c){
+  c.use('static', 'bodyParser')
   
-  get('/', function(){
-    this.foo = 'bar'
-    render('index')
+  c.get('/', function(c){
+    c.render('index', {foo: 'bar'})
   })
   
-  view({index: function(){
+  c.view({index: function(){
     h1(this.foo)
   }})
 })

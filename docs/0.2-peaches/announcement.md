@@ -1,7 +1,7 @@
 ---
 layout: default
 title: v0.2.x "Peaches en Regalia"
-permalink: /peaches/index.html
+permalink: /announcement/index.html
 ---
 
 # {{page.title}}
@@ -18,7 +18,6 @@ Or to follow the bleeding edge:
 
     git clone git@github.com:mauricemach/zappa.git && cd zappa
     cake build
-    cake vendor
     npm link
 
 Then in your project:

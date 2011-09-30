@@ -1,10 +1,8 @@
-require('../src/zappa').run ->
-  app.register '.jade', zappa.adapter 'jade'
+require('../src/zappa') ->
+  @register jade: @zappa.adapter 'jade'
   
-  get '/': ->
-    @foo = 'Zappa + Jade'
-    render 'index.jade'
+  @get '/': ->
+    @render 'index.jade': {foo: 'Zappa + Jade'}
     
-  get '/coffeekup': ->
-    @foo = 'Zappa + CoffeeKup'
-    render 'index.coffee'
+  @get '/coffeekup': ->
+    @render 'index.coffee': {foo: 'Zappa + CoffeeKup'}

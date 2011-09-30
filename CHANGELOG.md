@@ -1,10 +1,24 @@
+**v0.3.0 "The Gumbo Variations"** (2011-09-29):
+
+  - Changed: "magic locals" replaced by properties of `this` (`get` becomes `@get`). See #74 and the [announcement](http://zappajs.org/docs/0.3-gumbo/announcement).
+  
+  - Backtraces now show the relevant file and (js) file number.
+  
+  - Normal JS scope restored: `def`, `zappa {foo}, ->` etc gone.
+  
+  - Changed: automatic input "importing" and "exporting" to templates now optional through the `databag` setting. See #84.
+  
+  - Changed: removed hard dependency on `jsdom`. To use `@postrender`, `npm install jsdom` first.
+
 **v0.2.1** (2011-09-22):
 
   - Changed: using standard jquery from code.jquery.com instead of node-jquery. Updated to 1.6.4.
+  
   - Changed: updated sammy to 0.7.0.
+  
   - Fixed #80: Default layout is not being added correctly.
 
-**v0.2.0** (2011-09-08):
+**v0.2.0 "Peaches en Regalia"** (2011-09-08):
 
   - Changed: externals (`zappa {foo} ->`) are available at all scopes, shadow globals and root scope locals.
   
@@ -78,4 +92,13 @@
 
 **v0.1.1** (2010-10-22):
 
-**v0.1.0** (2010-10-21):
+  - Fixed ws connection/disconnection handler implementation.
+  - Fixed ws render implementation.
+  - Fixed postrender implementation.
+  - Ports specified at the zappa command or the `.run` method, instead of the `port` function.
+  - Added a default layout.
+  - Added `style`.
+
+**v0.1.0 "Jazz from Hell"** (2010-10-21):
+
+  - Initial release.

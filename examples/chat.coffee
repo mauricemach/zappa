@@ -1,29 +1,33 @@
-require('zappa') ->
-  enable 'serve jquery'
+require('./zappa') ->
+  @enable 'serve jquery'
   
-  get '/': ->
-    render 'index', layout: no
+  @get '/': ->
+    @render index: {layout: no}
   
-  at 'set nickname': ->
-    client.nickname = @nickname
+  @on 'set nickname': ->
+    @client.nickname = @data.nickname
   
-  at said: ->
-    io.sockets.emit 'said', nickname: client.nickname, text: @text
+  @on said: ->
+    @broadcast said: {nickname: @client.nickname, text: @data.text}
+    @emit said: {nickname: @client.nickname, text: @data.text}
   
-  client '/index.js': ->
-    connect()
+  @client '/index.js': ->
+    @connect()
 
-    at said: ->
-      $('#panel').append "<p>#{@nickname} said: #{@text}</p>"
+    @on said: ->
+      $('#panel').append "<p>#{@data.nickname} said: #{@data.text}</p>"
     
-    $().ready ->
-      emit 'set nickname', nickname: prompt('Pick a nickname')
+    $ =>
+      @emit 'set nickname': {nickname: prompt 'Pick a nickname!'}
       
-      $('button').click ->
-        emit 'said', text: $('#box').val()
+      $('#box').focus()
+      
+      $('button').click (e) =>
+        @emit said: {text: $('#box').val()}
         $('#box').val('').focus()
+        e.preventDefault()
     
-  view index: ->
+  @view index: ->
     doctype 5
     html ->
       head ->
@@ -34,5 +38,6 @@ require('zappa') ->
         script src: '/index.js'
       body ->
         div id: 'panel'
-        input id: 'box'
-        button 'Send'
+        form ->
+          input id: 'box'
+          button 'Send'

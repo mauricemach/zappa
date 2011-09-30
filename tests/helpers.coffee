@@ -7,13 +7,13 @@ port = 15100
     t.wait 3000
     
     zapp = zappa port++, ->
-      helper role: (name) ->
-        if request?
-          redirect '/login' unless @user.role is name
+      @helper role: (name) ->
+        if @request?
+          @redirect '/login' unless @user.role is name
 
-      get '/': ->
-        @user = role: 'comonner'
-        role 'lord'
+      @get '/': ->
+        @user = role: 'commoner'
+        @role 'lord'
         
     c = t.client(zapp.app)
     
@@ -25,13 +25,13 @@ port = 15100
     t.expect 1, 2
     t.wait 3000
     
-    zapp = zappa port++, {t}, ->
-      helper sum: (a, b) -> a + b
-      helper subtract: (a, b) -> a - b
+    zapp = zappa port++, ->
+      @helper sum: (a, b) -> a + b
+      @helper subtract: (a, b) -> a - b
 
-      get '/': ->
-        t.equal 1, sum(1, 2), 3
-        t.equal 2, subtract(1, 2), -1
+      @get '/': ->
+        t.equal 1, @sum(1, 2), 3
+        t.equal 2, @subtract(1, 2), -1
         
     c = t.client(zapp.app)
     c.get '/'
