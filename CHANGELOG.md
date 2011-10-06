@@ -1,3 +1,7 @@
+**v0.3.1** (2011-10-06):
+
+  - Changed dependency minors to ".x". Closes #98.
+
 **v0.3.0 "The Gumbo Variations"** (2011-09-29):
 
   - Changed: "magic locals" replaced by properties of `this` (`get` becomes `@get`). See #74 and the [announcement](http://zappajs.org/docs/0.3-gumbo/announcement).

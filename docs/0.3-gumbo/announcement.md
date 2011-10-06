@@ -41,7 +41,7 @@ require('zappa') ->
       @send txt
 {% endhighlight %}
 
-## OK, so what do I get for appending those `@`s everywhere?
+## OK, so what do I get for prepending those `@`s everywhere?
 
 First, a **normal JavaScript scope**, with closures. Say goodbye to `def` & friends:
 
@@ -132,5 +132,5 @@ require('zappa') ->
 
 ## Learn more
 
-- [API Reference](https://github.com/mauricemach/zappa/blob/master/docs/0.3-gumbo/reference.md)
-- [Migration TL;DR guide](https://github.com/mauricemach/zappa/blob/master/docs/0.3-gumbo/migration.md)
+- [API Reference](http://zappajs.org/docs/0.3-gumbo/reference/)
+- [Migration TL;DR guide](http://zappajs.org/docs/0.3-gumbo/migration/)

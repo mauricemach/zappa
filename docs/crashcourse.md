@@ -23,7 +23,7 @@ And give your foot a push:
     $ coffee cuppa.coffee    
        info  - socket.io started
     Express server listening on port 3000 in development mode
-    Zappa 0.3.0 "The Gumbo Variations" orchestrating the show
+    Zappa 0.3.1 "The Gumbo Variations" orchestrating the show
 
 (hat tip to [sinatra](http://sinatrarb.com))
 
