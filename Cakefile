@@ -19,7 +19,7 @@ task 'vendor', ->
       run 'head -n 1 vendor/jquery*', ->
         run 'head -n 3 vendor/sammy*'
 
-task 'setup', ->
+task 'setup', 'build + vendor', ->
   invoke 'build'
   invoke 'vendor'
 
