@@ -2,7 +2,6 @@
   <span class="nv">zappa = </span><span class="nb">window</span><span class="p">.</span><span class="nv">zappa = </span><span class="p">{}</span>
   <span class="nv">zappa.version = </span><span class="kc">null</span>
 
-  <span class="nv">coffeescript_helpers = </span><span class="kc">null</span>
   <span class="nv">settings = </span><span class="kc">null</span>
 
   <span class="nv">zappa.run = </span><span class="nf">(func) -&gt;</span>
@@ -75,10 +74,9 @@
 
     <span class="nx">$</span><span class="p">(</span><span class="o">-&gt;</span> <span class="nx">app</span><span class="p">.</span><span class="nx">run</span> <span class="s1">&#39;#/&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">app</span><span class="o">?</span>
 
-<span class="vi">@build = </span><span class="nf">(version, coffeescript_helpers, settings) -&gt;</span>
+<span class="vi">@build = </span><span class="nf">(version, settings) -&gt;</span>
   <span class="nb">String</span><span class="p">(</span><span class="nx">skeleton</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;version = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;version = &#39;#{version}&#39;;&quot;</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;coffeescript_helpers = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var coffeescript_helpers = &#39;#{coffeescript_helpers}&#39;;&quot;</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;settings = null;&#39;</span><span class="p">,</span> <span class="s2">&quot;var settings = #{JSON.stringify settings};&quot;</span><span class="p">)</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

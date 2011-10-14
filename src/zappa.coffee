@@ -351,7 +351,7 @@ zappa.app = (func) ->
   func.apply(context, [context])
 
   # The stringified zappa client.
-  client = require('./client').build(zappa.version, coffeescript_helpers, app.settings)
+  client = require('./client').build(zappa.version, app.settings)
 
   if app.settings['serve zappa']
     app.get '/zappa/zappa.js', (req, res) ->

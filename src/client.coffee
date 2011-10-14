@@ -3,7 +3,6 @@ skeleton = ->
   zappa = window.zappa = {}
   zappa.version = null
 
-  coffeescript_helpers = null
   settings = null
 
   zappa.run = (func) ->
@@ -84,8 +83,7 @@ skeleton = ->
 
     $(-> app.run '#/') if app?
 
-@build = (version, coffeescript_helpers, settings) ->
+@build = (version, settings) ->
   String(skeleton)
     .replace('version = null;', "version = '#{version}';")
-    .replace('coffeescript_helpers = null;', "var coffeescript_helpers = '#{coffeescript_helpers}';")
     .replace('settings = null;', "var settings = #{JSON.stringify settings};")
