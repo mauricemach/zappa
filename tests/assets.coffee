@@ -94,7 +94,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      @enable 'serve jquery'
+      @use 'zappa'
 
     c = t.client(zapp.app)
     c.get '/zappa/jquery.js', (err, res) ->
@@ -106,7 +106,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      @enable 'serve sammy'
+      @use 'zappa'
 
     c = t.client(zapp.app)
     c.get '/zappa/sammy.js', (err, res) ->
@@ -118,7 +118,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      @enable 'serve zappa'
+      @use 'zappa'
 
     c = t.client(zapp.app)
     c.get '/zappa/zappa.js', (err, res) ->
@@ -142,7 +142,7 @@ port = 15200
     t.wait 3000
     
     zapp = zappa port++, ->
-      @enable 'serve zappa', 'minify'
+      @enable 'minify'
       @client '/client.js': -> alert 'foo'
       @shared '/shared.js': -> alert 'foo' if window?
       @coffee '/coffee.js': -> alert 'foo'

@@ -1,3 +1,7 @@
+**v0.3.1edge** (unreleased):
+
+  - Changed: `@enable 'serve zappa|jquery|sammy'` replaced by `@use 'zappa'`. Closes #94.
+
 **v0.3.1** (2011-10-06):
 
   - Changed dependency minors to ".x". Closes #98.

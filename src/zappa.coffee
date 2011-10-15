@@ -2,7 +2,7 @@
 # [node.js](http://nodejs.org) runtime, integrating [express](http://expressjs.com), [socket.io](http://socket.io)
 # and other best-of-breed libraries.
 
-zappa = version: '0.3.1'
+zappa = version: '0.3.1edge'
 
 codename = 'The Gumbo Variations'
 
@@ -109,17 +109,18 @@ zappa.app = (func) ->
 
   # Reference to the zappa client, the value will be set later.
   client = null
+  
+  # Tracks if the zappa middleware is already mounted (`@use 'zappa'`).
+  zappa_used = no
 
   # Zappa's default settings.
   app.set 'view engine', 'coffee'
   app.register '.coffee', zappa.adapter require('coffeekup').adapters.express,
     blacklist: ['format', 'autoescape', 'locals', 'hardcode', 'cache']
 
-  # Builds the applications's root scope.
-  
   # Sets default view dir to @root (`path.dirname(module.parent.filename)`).
   app.set 'views', path.join(context.root, '/views')
-  
+
   for verb in ['get', 'post', 'put', 'del']
     do (verb) ->
       context[verb] = ->
@@ -130,7 +131,7 @@ zappa.app = (func) ->
             route verb: verb, path: k, handler: v
 
   context.client = (obj) ->
-    app.enable 'serve zappa'
+    context.use 'zappa' unless zappa_used
     for k, v of obj
       js = ";zappa.run(#{v});"
       js = minify(js) if app.settings['minify']
@@ -191,13 +192,27 @@ zappa.app = (func) ->
     app.disable i for i in arguments
 
   context.use = ->
-    wrappers =
+    zappa_middleware =
       static: (p = path.join(context.root, '/public')) ->
         express.static(p)
+      zappa: ->
+        (req, res, next) ->
+          send = (code) ->
+            res.contentType 'js'
+            res.send code
+          if req.method.toUpperCase() isnt 'GET' then next()
+          else
+            switch req.url
+              when '/zappa/zappa.js' then send client
+              when '/zappa/jquery.js' then send jquery
+              when '/zappa/sammy.js' then send sammy
+              else next()
 
     use = (name, arg = null) ->
-      if wrappers[name]
-        app.use wrappers[name](arg)
+      zappa_used = yes if name is 'zappa'
+      
+      if zappa_middleware[name]
+        app.use zappa_middleware[name](arg)
       else if typeof express[name] is 'function'
         app.use express[name](arg)
      
@@ -214,7 +229,7 @@ zappa.app = (func) ->
   context.settings = app.settings
 
   context.shared = (obj) ->
-    app.enable 'serve zappa'
+    context.use 'zappa' unless zappa_used
     for k, v of obj
       js = ";zappa.run(#{v});"
       js = minify(js) if app.settings['minify']
@@ -352,23 +367,8 @@ zappa.app = (func) ->
 
   # The stringified zappa client.
   client = require('./client').build(zappa.version, app.settings)
-
-  if app.settings['serve zappa']
-    app.get '/zappa/zappa.js', (req, res) ->
-      js = ";#{coffeescript_helpers}(#{client})();"
-      js = minify(js) if app.settings['minify']
-      res.contentType 'js'
-      res.send js
-
-  if app.settings['serve jquery']
-    app.get '/zappa/jquery.js', (req, res) ->
-      res.contentType 'js'
-      res.send jquery
-
-  if app.settings['serve sammy']
-    app.get '/zappa/sammy.js', (req, res) ->
-      res.contentType 'js'
-      res.send sammy
+  client = ";#{coffeescript_helpers}(#{client})();"
+  client = minify(client) if app.settings['minify']
 
   if app.settings['default layout']
     context.view layout: ->

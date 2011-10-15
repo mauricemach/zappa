@@ -218,7 +218,7 @@ Will `require` the file at the path specified, and run a function exported as `i
 
 Serves `";zappa.run(#{your_function});"` as `/foo.js`, with content-type `application/javascript`.
 
-To use it, you must also include `/zappa/zappa.js` in your template, before `/foo.js`.
+To use it, you must also include `/zappa/zappa.js` in your page, before `/foo.js`.
 
 ### @shared
 
@@ -307,24 +307,29 @@ The object returned by `express.createServer`.
 
 Shortcut to `@app.use`. It can be used in a number of additional ways:
 
-It accepts multiple params. Ex.:
+It accepts multiple parameters:
 
     @use express.bodyParser(), @app.router, express.cookies()
 
-It accepts strings as parameters. This is syntactic sugar to the equivalent express middleware with no arguments. Ex.:
+Strings:
 
     @use 'bodyParser', @app.router, 'cookies'
 
-You can also specify parameters by using objects. Ex.:
+And objects:
 
     @use 'bodyParser', static: __dirname + '/public', session: {secret: 'fnord'}, 'cookies'
 
-Finally, when using strings and objects, zappa will intercept some specific middleware and add behaviour, usually default parameters. Ex.:
+When passing strings and objects, zappa's own middleware will be used if available, or express (connect) middleware otherwise.
 
-    @use 'static'
+Currently available zappa middleware are:
 
-    # Syntactic sugar for:
-    @app.use @express.static(__dirname + '/public')
+#### 'static'
+
+Same as `@express.static(root + '/public')`, where `root` is the directory of the first file that required zappa.
+    
+#### 'zappa'
+
+Serves `/zappa/zappa.js`, `/zappa/jquery.js` and `/zappa/sammy.js`. Automatically added by `@client` and `@shared` if not added before.
 
 ### @configure
 
@@ -344,13 +349,13 @@ Shortcut to `@app.set`. Accepts an object as param. Ex.:
 
 Shortcut to `@app.enable`. Accepts multiple params in one go. Ex.:
 
-    @enable 'serve jquery', 'serve sammy'
+    @enable 'foo', 'bar'
 
 ### @disable
 
 Shortcut to `@app.disable`. Accepts multiple params in one go. Ex.:
 
-    @disable 'serve jquery', 'serve sammy'
+    @disable 'foo', 'bar'
 
 ### @register
 
@@ -468,21 +473,9 @@ Same as its server-side counterpart.
 
 You can use the following options with `@set`, `@enable` and `@disable`:
 
-### 'serve zappa'
-
-Serves `/zappa/zappa.js`, required to use the zappa client API. Automatically enabled by `client` and `shared`.
-
-### 'serve jquery'
-
-Serves `/zappa/jquery.js` (just standard, minified jQuery).
-
-### 'serve sammy'
-
-Serves `/zappa/sammy.js` (just standard, minified Sammy).
-
 ### 'minify'
 
-Uses uglify-js to minify the outputs of `serve zappa`, `client`, `shared`, `coffee` and `js`.
+Uses uglify-js to minify the outputs of `/zappa/zappa.js`, `@client`, `@shared`, `@coffee`, `@js`.
 
 ### 'default layout'
 
