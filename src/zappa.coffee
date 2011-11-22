@@ -417,7 +417,7 @@ zappa.run = ->
   else app.listen port
 
   log 'Express server listening on port %d in %s mode',
-    app.address().port, app.settings.env
+    app.address()?.port, app.settings.env
 
   log "Zappa #{zappa.version} \"#{codename}\" orchestrating the show"
 

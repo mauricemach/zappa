@@ -339,7 +339,7 @@ Ex.:
   <span class="k">else</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span> <span class="nx">port</span>
 
   <span class="nx">log</span> <span class="s1">&#39;Express server listening on port %d in %s mode&#39;</span><span class="p">,</span>
-    <span class="nx">app</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">port</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">env</span>
+    <span class="nx">app</span><span class="p">.</span><span class="nx">address</span><span class="p">()</span><span class="o">?</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">env</span>
 
   <span class="nx">log</span> <span class="s2">&quot;Zappa #{zappa.version} \&quot;#{codename}\&quot; orchestrating the show&quot;</span>
 
