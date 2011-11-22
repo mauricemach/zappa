@@ -1,4 +1,4 @@
-**v0.3.1-edge** (unreleased):
+**v0.3.2** (2011-11-22):
 
   - Changed: `@enable 'serve zappa|jquery|sammy'` replaced by `@use 'zappa'`. Closes #94.
   - Updated to work with express 2.5.x and node 0.6.x.

@@ -2,7 +2,7 @@
 # [node.js](http://nodejs.org) runtime, integrating [express](http://expressjs.com), [socket.io](http://socket.io)
 # and other best-of-breed libraries.
 
-zappa = version: '0.3.1-edge'
+zappa = version: '0.3.2'
 
 codename = 'The Gumbo Variations'
 

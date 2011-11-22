@@ -1,6 +1,6 @@
 ---
 layout: default
-title: API Reference (v0.3.1)
+title: API Reference (v0.3.2)
 permalink: /reference/index.html
 ---
 
@@ -14,9 +14,7 @@ permalink: /reference/index.html
 
 ### zappa.version
 
-Version of zappa running. Ex.: `0.3.1`.
-
-If you're running a version not released on npm (directly from the repo), it will have `-edge` appended to it. Ex.: `0.3.1-edge`.
+Version of zappa running. If you're running a version not released on npm (directly from the repo), it will have `-edge` appended to it. Ex.: `0.3.0-edge`.
 
 ### zappa.app
 
