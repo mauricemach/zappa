@@ -1,29 +1,28 @@
 {
   "name": "zappa",
   "description": "CoffeeScript minimalist interface to express, socket.io and others",
-  "version": "0.3.1edge",
+  "version": "0.3.1-edge",
   "author": "Maurice Machado <maurice@bitbending.com>",
   "homepage": "http://zappajs.org",
   "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
   "dependencies": {
-    "express": "2.4.x",
+    "express": "< 3.0.0",
     "socket.io": "0.8.x",
     "coffeekup": "0.3.x",
-    "node-uuid": "1.2.x",
+    "node-uuid": "1.2.0",
     "uglify-js": "1.1.x"
   },
   "devDependencies": {
-    "jsdom": "0.2.5",
-    "underscore": "1.1.7",
-    "request": "2.1.1",
-    "socket.io-client": "0.8.4",
+    "jsdom": "0.2.10",
+    "underscore": "1.2.2",
+    "request": "2.2.5",
+    "socket.io-client": "0.8.7",
     "eco": "1.1.0-rc-1",
-    "jade": "0.15.4",
-    "stylus": "0.15.1"
+    "jade": "0.18.0",
+    "stylus": "0.19.3"
   },
   "keywords": ["framework", "websockets", "coffeescript", "express", "socket.io", "sammy", "sinatra", "dsl"],
   "main": "./lib/zappa",
-  "engines": { "node": ">= 0.4.7" },
   "contributors": [
     "Nicholas Kinsey <nicholas.kinsey@feistystudios.com>",
     "Jae Kwon <jae@flywheelnetworks.com>",
