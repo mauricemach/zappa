@@ -1,4 +1,4 @@
-**v0.3.1edge** (unreleased):
+**v0.3.1-edge** (unreleased):
 
   - Changed: `@enable 'serve zappa|jquery|sammy'` replaced by `@use 'zappa'`. Closes #94.
 

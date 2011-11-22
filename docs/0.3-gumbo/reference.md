@@ -16,7 +16,7 @@ permalink: /reference/index.html
 
 Version of zappa running. Ex.: `0.3.1`.
 
-If you're running a version not released on npm (directly from the repo), it will have `edge` appended to it. Ex.: `0.3.1edge`.
+If you're running a version not released on npm (directly from the repo), it will have `-edge` appended to it. Ex.: `0.3.1-edge`.
 
 ### zappa.app
 
