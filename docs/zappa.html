@@ -71,7 +71,7 @@ Views are kept at the module level.</p>             </td>             <td class=
   <span class="k">for</span> <span class="nx">verb</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="s1">&#39;put&#39;</span><span class="p">,</span> <span class="s1">&#39;del&#39;</span><span class="p">]</span>
     <span class="nx">do</span> <span class="nf">(verb) -&gt;</span>
       <span class="nx">context</span><span class="p">[</span><span class="nx">verb</span><span class="p">]</span> <span class="o">=</span> <span class="o">-&gt;</span>
-        <span class="k">if</span> <span class="k">typeof</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">isnt</span> <span class="s1">&#39;object&#39;</span>
+        <span class="k">if</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span>
           <span class="nx">route</span> <span class="nv">verb: </span><span class="nx">verb</span><span class="p">,</span> <span class="nv">path: </span><span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nv">handler: </span><span class="nx">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span>
           <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

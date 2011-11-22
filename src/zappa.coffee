@@ -124,7 +124,7 @@ zappa.app = (func) ->
   for verb in ['get', 'post', 'put', 'del']
     do (verb) ->
       context[verb] = ->
-        if typeof arguments[0] isnt 'object'
+        if arguments.length > 1
           route verb: verb, path: arguments[0], handler: arguments[1]
         else
           for k, v of arguments[0]
