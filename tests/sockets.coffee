@@ -1,6 +1,9 @@
 zappa = require '../src/zappa'
 port = 15700
 
+# socket.io-client currently (2011-11-22) not working in node 0.6.x
+# https://github.com/LearnBoost/socket.io-client/issues/336
+
 @tests =
   connects: (t) ->
     t.expect 1
