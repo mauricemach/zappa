@@ -1,3 +1,7 @@
+**v0.3.3** (2011-11-22):
+
+  - Fixed npm publishing error.
+
 **v0.3.2** (2011-11-22):
 
   - Changed: `@enable 'serve zappa|jquery|sammy'` replaced by `@use 'zappa'`. Closes #94.
