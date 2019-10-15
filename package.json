@@ -7,7 +7,7 @@
   "repository": {"type": "git", "url": "git://github.com/mauricemach/zappa.git"},
   "dependencies": {
     "express": "< 3.0.0",
-    "socket.io": "0.8.x",
+    "socket.io": "2.3.x",
     "coffeekup": "0.3.x",
     "node-uuid": "1.2.0",
     "uglify-js": "1.1.x"
