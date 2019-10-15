@@ -10,7 +10,7 @@
     "socket.io": "0.8.x",
     "coffeekup": "0.3.x",
     "node-uuid": "1.2.0",
-    "uglify-js": "1.1.x"
+    "uglify-js": "3.6.x"
   },
   "devDependencies": {
     "jsdom": "0.2.10",
