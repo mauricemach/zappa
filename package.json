@@ -9,7 +9,7 @@
     "express": "< 3.0.0",
     "socket.io": "0.8.x",
     "coffeekup": "0.3.x",
-    "node-uuid": "1.2.0",
+    "node-uuid": "1.4.8",
     "uglify-js": "1.1.x"
   },
   "devDependencies": {
